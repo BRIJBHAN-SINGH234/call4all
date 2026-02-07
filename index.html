@@ -5,126 +5,117 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Call4All - One Call, All Services</title>
 <style>
-body {
-  margin:0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg,#1e3c72,#2a5298);
-  color:white;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: Arial, sans-serif; color: #333; }
 
-header {
-  text-align:center;
-  padding:60px 20px;
-}
-  .logo {
-  width: 150px;
-  margin-bottom: 20px;
-}
+header { display: flex; justify-content: space-between; align-items: center; padding: 15px 50px; background: #1e3c72; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+.logo img { height: 60px; }
+nav ul { display: flex; list-style: none; gap: 30px; }
+nav a { color: white; text-decoration: none; font-size: 16px; font-weight: 500; transition: 0.3s; }
+nav a:hover { color: #ffcc00; }
 
-header h1 {
-  font-size:48px;
-  margin:0;
-}
+.slider { position: relative; width: 100%; height: 500px; overflow: hidden; }
+.slides { display: flex; width: 500%; height: 100%; animation: slide 20s infinite; }
+.slide { width: 20%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; font-weight: bold; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+.slide:nth-child(1) { background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500"><rect fill="%23ff6b9d" width="1200" height="500"/><text x="50%25" y="50%25" font-size="60" fill="white" text-anchor="middle" dominant-baseline="middle">🌸 Hotel Flower Bouquet</text></svg>'); background-size: cover; }
+.slide:nth-child(2) { background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500"><rect fill="%23c471ed" width="1200" height="500"/><text x="50%25" y="50%25" font-size="60" fill="white" text-anchor="middle" dominant-baseline="middle">💍 Marriage Services</text></svg>'); background-size: cover; }
+.slide:nth-child(3) { background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500"><rect fill="%2312c2e9" width="1200" height="500"/><text x="50%25" y="50%25" font-size="60" fill="white" text-anchor="middle" dominant-baseline="middle">🚗 Rental Cars</text></svg>'); background-size: cover; }
+.slide:nth-child(4) { background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500"><rect fill="%23f5af19" width="1200" height="500"/><text x="50%25" y="50%25" font-size="60" fill="white" text-anchor="middle" dominant-baseline="middle">👷 Manpower Supply</text></svg>'); background-size: cover; }
+.slide:nth-child(5) { background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500"><rect fill="%2356ab2f" width="1200" height="500"/><text x="50%25" y="50%25" font-size="60" fill="white" text-anchor="middle" dominant-baseline="middle">🏠 Rooms %26 Flats</text></svg>'); background-size: cover; }
+@keyframes slide { 0% { transform: translateX(0); } 20% { transform: translateX(0); } 25% { transform: translateX(-100%); } 45% { transform: translateX(-100%); } 50% { transform: translateX(-200%); } 70% { transform: translateX(-200%); } 75% { transform: translateX(-300%); } 95% { transform: translateX(-300%); } 100% { transform: translateX(-400%); } }
 
-header p {
-  font-size:20px;
-  margin-top:10px;
-}
+.services { padding: 60px 50px; background: #f5f5f5; }
+.services h2 { text-align: center; font-size: 36px; margin-bottom: 40px; color: #1e3c72; }
+.service-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+.service-card { background: white; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: 0.3s; }
+.service-card:hover { transform: translateY(-10px); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+.service-card h3 { font-size: 24px; margin: 15px 0; color: #1e3c72; }
+.service-card p { color: #666; line-height: 1.6; }
+.service-card a { display: inline-block; margin-top: 15px; padding: 10px 25px; background: #1e3c72; color: white; text-decoration: none; border-radius: 5px; transition: 0.3s; }
+.service-card a:hover { background: #ffcc00; color: #000; }
 
-.services {
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
-  gap:20px;
-  padding:40px;
-}
+.about { padding: 60px 50px; background: white; }
+.about h2 { text-align: center; font-size: 36px; margin-bottom: 30px; color: #1e3c72; }
+.about-content { max-width: 900px; margin: 0 auto; text-align: center; line-height: 1.8; color: #666; font-size: 18px; }
 
-.card {
-  background:white;
-  color:#333;
-  padding:20px;
-  border-radius:10px;
-  text-align:center;
-  box-shadow:0 10px 20px rgba(0,0,0,0.2);
-  transition:0.3s;
-}
-
-.card:hover {
-  transform:translateY(-10px);
-}
-
-.card h3 {
-  margin-bottom:10px;
-}
-
-.cta {
-  text-align:center;
-  padding:40px;
-}
-
-.cta a {
-  background:#ffcc00;
-  color:#000;
-  padding:15px 30px;
-  text-decoration:none;
-  border-radius:50px;
-  font-weight:bold;
-}
-
-footer {
-  text-align:center;
-  padding:20px;
-  background:#111;
-  font-size:14px;
-}
+footer { background: #1e3c72; color: white; padding: 40px 50px; }
+.footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-bottom: 20px; }
+.footer-section h3 { margin-bottom: 15px; color: #ffcc00; }
+.footer-section ul { list-style: none; }
+.footer-section a { color: white; text-decoration: none; line-height: 2; transition: 0.3s; }
+.footer-section a:hover { color: #ffcc00; }
+.footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); }
 </style>
 </head>
 <body>
 
 <header>
-  <img src="Imagelogo.png" alt="Call4All Logo" class="logo">
-  <h1>CALL4ALL</h1>
-  <p>One Call, All Services at Your Doorstep</p>
+  <div class="logo"><img src="Imagelogo.png" alt="Call4All Logo"></div>
+  <nav><ul><li><a href="index.html">Home</a></li><li><a href="about.html">About Us</a></li><li><a href="contact.html">Contact Us</a></li></ul></nav>
 </header>
 
+<div class="slider">
+  <div class="slides">
+    <div class="slide">🌸 Hotel Flower Bouquet</div>
+    <div class="slide">💍 Marriage Services</div>
+    <div class="slide">🚗 Rental Cars</div>
+    <div class="slide">👷 Manpower Supply</div>
+    <div class="slide">🏠 Rooms & Flats</div>
+  </div>
+</div>
 
 <section class="services">
-  <div class="card">
-    <h3>🌸 Hotel Flower Bouquet</h3>
-    <p>Luxury flower decoration & bouquet service for hotels.</p>
-  </div>
-
-  <div class="card">
-    <h3>💍 Marriage Services</h3>
-    <p>Wedding decoration, stage setup & rental items.</p>
-  </div>
-
-  <div class="card">
-    <h3>🚗 Rental Cars</h3>
-    <p>Premium & budget car rental for events & travel.</p>
-  </div>
-
-  <div class="card">
-    <h3>👷 Manpower Supply</h3>
-    <p>Skilled & unskilled manpower for any requirement.</p>
-  </div>
-
-  <div class="card">
-    <h3>🏠 Rooms & Flats</h3>
-    <p>Rent rooms, flats & properties easily.</p>
-  </div>
-
-  <div class="card">
-    <h3>🎀 Car Decoration</h3>
-    <p>Luxury car decoration for weddings & events.</p>
+  <h2>Our Services</h2>
+  <div class="service-grid">
+    <div class="service-card">
+      <h3>🌸 Hotel Flower Bouquet</h3>
+      <p>Luxury flower decoration & bouquet service for hotels and events.</p>
+      <a href="flower-bouquet.html">Learn More</a>
+    </div>
+    <div class="service-card">
+      <h3>💍 Marriage Services</h3>
+      <p>Complete wedding decoration, stage setup & rental items.</p>
+      <a href="marriage-services.html">Learn More</a>
+    </div>
+    <div class="service-card">
+      <h3>🚗 Rental Cars</h3>
+      <p>Premium & budget car rental for events & travel.</p>
+      <a href="rental-cars.html">Learn More</a>
+    </div>
+    <div class="service-card">
+      <h3>👷 Manpower Supply</h3>
+      <p>Skilled & unskilled manpower for any requirement.</p>
+      <a href="manpower-supply.html">Learn More</a>
+    </div>
+    <div class="service-card">
+      <h3>🏠 Rooms & Flats</h3>
+      <p>Rent rooms, flats & properties easily.</p>
+      <a href="rooms-flats.html">Learn More</a>
+    </div>
+    <div class="service-card">
+      <h3>🎀 Car Decoration</h3>
+      <p>Luxury car decoration for weddings & events.</p>
+      <a href="car-decoration.html">Learn More</a>
+    </div>
   </div>
 </section>
 
-<div class="cta">
-  <a href="tel:+918387930687">Call Now</a>
-</div>
+<section class="about">
+  <h2>About Us</h2>
+  <div class="about-content">
+    <p>Welcome to <strong>Call4All</strong> - Your one-stop solution for all services at your doorstep. We are committed to providing high-quality services including hotel flower bouquets, marriage services, rental cars, manpower supply, rooms & flats, and car decoration.</p>
+    <p>With years of experience and a dedicated team, we ensure customer satisfaction and timely delivery. Our mission is to make your life easier by bringing all essential services under one roof.</p>
+    <p><strong>Call us today and experience the difference!</strong></p>
+  </div>
+</section>
 
 <footer>
-  © 2026 Call4All.co.in | All Rights Reserved
+  <div class="footer-content">
+    <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="index.html">Home</a></li><li><a href="about.html">About Us</a></li><li><a href="contact.html">Contact Us</a></li></ul></div>
+    <div class="footer-section"><h3>Our Services</h3><ul><li><a href="flower-bouquet.html">Hotel Flower Bouquet</a></li><li><a href="marriage-services.html">Marriage Services</a></li><li><a href="rental-cars.html">Rental Cars</a></li><li><a href="manpower-supply.html">Manpower Supply</a></li><li><a href="rooms-flats.html">Rooms & Flats</a></li><li><a href="car-decoration.html">Car Decoration</a></li></ul></div>
+    <div class="footer-section"><h3>Contact Info</h3><ul><li>Phone: <a href="tel:+918387930687">+91 8387930687</a></li><li>Email: info@call4all.co.in</li><li>Website: www.call4all.co.in</li></ul></div>
+  </div>
+  <div class="footer-bottom"><p>© 2026 Call4All.co.in | All Rights Reserved</p></div>
 </footer>
 
 </body>
