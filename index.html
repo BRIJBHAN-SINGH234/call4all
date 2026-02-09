@@ -15,14 +15,36 @@ nav a { color: white; text-decoration: none; font-size: 16px; font-weight: 500; 
 nav a:hover { color: #ffcc00; }
 
 .slider { position: relative; width: 100%; height: 500px; overflow: hidden; }
-.slides { display: flex; width: 600%; height: 100%; animation: slide 30s linear infinite; }
-.slide { min-width: 16.666%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; font-weight: bold; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
-.slide:nth-child(1), .slide:nth-child(6) { background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500"><rect fill="%23ff6b9d" width="1200" height="500"/><text x="50%25" y="50%25" font-size="60" fill="white" text-anchor="middle" dominant-baseline="middle">🌸 Hotel Flower Bouquet</text></svg>'); background-size: cover; }
-.slide:nth-child(2) { background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500"><rect fill="%23c471ed" width="1200" height="500"/><text x="50%25" y="50%25" font-size="60" fill="white" text-anchor="middle" dominant-baseline="middle">💍 Marriage Services</text></svg>'); background-size: cover; }
-.slide:nth-child(3) { background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500"><rect fill="%2312c2e9" width="1200" height="500"/><text x="50%25" y="50%25" font-size="60" fill="white" text-anchor="middle" dominant-baseline="middle">🚗 Rental Cars</text></svg>'); background-size: cover; }
-.slide:nth-child(4) { background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500"><rect fill="%23f5af19" width="1200" height="500"/><text x="50%25" y="50%25" font-size="60" fill="white" text-anchor="middle" dominant-baseline="middle">👷 Manpower Supply</text></svg>'); background-size: cover; }
-.slide:nth-child(5) { background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500"><rect fill="%2356ab2f" width="1200" height="500"/><text x="50%25" y="50%25" font-size="60" fill="white" text-anchor="middle" dominant-baseline="middle">🏠 Rooms %26 Flats</text></svg>'); background-size: cover; }
-@keyframes slide { 0% { transform: translateX(0); } 16.66% { transform: translateX(0); } 20% { transform: translateX(-16.666%); } 36.66% { transform: translateX(-16.666%); } 40% { transform: translateX(-33.333%); } 56.66% { transform: translateX(-33.333%); } 60% { transform: translateX(-50%); } 76.66% { transform: translateX(-50%); } 80% { transform: translateX(-66.666%); } 96.66% { transform: translateX(-66.666%); } 100% { transform: translateX(-83.333%); } }
+.slides { display: flex; width: 500%; height: 100%; transition: transform 0.5s ease; }
+.slide { width: 20%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; font-weight: bold; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); flex-shrink: 0; }
+.slide:nth-child(1) { background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), #ff6b9d; }
+.slide:nth-child(2) { background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), #c471ed; }
+.slide:nth-child(3) { background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), #12c2e9; }
+.slide:nth-child(4) { background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), #f5af19; }
+.slide:nth-child(5) { background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), #56ab2f; }
+.arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.3); color: white; border: none; font-size: 30px; padding: 15px 20px; cursor: pointer; z-index: 10; transition: 0.3s; }
+.arrow:hover { background: rgba(255,255,255,0.5); }
+.arrow.left { left: 20px; }
+.arrow.right { right: 20px; }
+.dots { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: 0.3s; }
+.dot.active { background: white; }
+
+@media (max-width: 768px) {
+  header { padding: 10px 20px; flex-wrap: wrap; }
+  .logo img { height: 40px; }
+  nav ul { gap: 15px; font-size: 14px; }
+  .slider { height: 300px; }
+  .slide { font-size: 24px; padding: 20px; text-align: center; }
+  .arrow { font-size: 20px; padding: 10px 15px; }
+  .arrow.left { left: 10px; }
+  .arrow.right { right: 10px; }
+  .services { padding: 40px 20px; }
+  .services h2 { font-size: 28px; }
+  .about { padding: 40px 20px; }
+  .about h2 { font-size: 28px; }
+  footer { padding: 30px 20px; }
+}
 
 .services { padding: 60px 50px; background: #f5f5f5; }
 .services h2 { text-align: center; font-size: 36px; margin-bottom: 40px; color: #1e3c72; }
@@ -55,15 +77,60 @@ footer { background: #1e3c72; color: white; padding: 40px 50px; }
 </header>
 
 <div class="slider">
-  <div class="slides">
+  <button class="arrow left" onclick="moveSlide(-1)">&#10094;</button>
+  <div class="slides" id="slides">
     <div class="slide">🌸 Hotel Flower Bouquet</div>
     <div class="slide">💍 Marriage Services</div>
     <div class="slide">🚗 Rental Cars</div>
     <div class="slide">👷 Manpower Supply</div>
     <div class="slide">🏠 Rooms & Flats</div>
-    <div class="slide">🌸 Hotel Flower Bouquet</div>
+  </div>
+  <button class="arrow right" onclick="moveSlide(1)">&#10095;</button>
+  <div class="dots">
+    <span class="dot active" onclick="currentSlide(0)"></span>
+    <span class="dot" onclick="currentSlide(1)"></span>
+    <span class="dot" onclick="currentSlide(2)"></span>
+    <span class="dot" onclick="currentSlide(3)"></span>
+    <span class="dot" onclick="currentSlide(4)"></span>
   </div>
 </div>
+
+<script>
+let slideIndex = 0;
+let autoSlide;
+
+function showSlide(n) {
+  const slides = document.getElementById('slides');
+  const dots = document.querySelectorAll('.dot');
+  if (n >= 5) slideIndex = 0;
+  if (n < 0) slideIndex = 4;
+  slides.style.transform = `translateX(-${slideIndex * 20}%)`;
+  dots.forEach((dot, i) => dot.classList.toggle('active', i === slideIndex));
+}
+
+function moveSlide(n) {
+  clearInterval(autoSlide);
+  slideIndex += n;
+  showSlide(slideIndex);
+  startAutoSlide();
+}
+
+function currentSlide(n) {
+  clearInterval(autoSlide);
+  slideIndex = n;
+  showSlide(slideIndex);
+  startAutoSlide();
+}
+
+function startAutoSlide() {
+  autoSlide = setInterval(() => {
+    slideIndex++;
+    showSlide(slideIndex);
+  }, 4000);
+}
+
+startAutoSlide();
+</script>
 
 <section class="services">
   <h2>Our Services</h2>
