@@ -401,7 +401,22 @@ window.CsvAPI = (function () {
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `Failed to save ${path} (${res.status})`);
+      let msg = err.message || `Failed to save ${path} (${res.status})`;
+      if (res.status === 403 || /Resource not accessible/i.test(msg)) {
+        msg = 'Aapke GitHub token mein "Contents: Read and write" permission nahi hai.\n\n' +
+              'Fix karne ke liye:\n' +
+              '1. Logout karein\n' +
+              '2. Naya token banayein: https://github.com/settings/personal-access-tokens/new\n' +
+              '3. Repository: BRIJBHAN-SINGH234/call4all select karein\n' +
+              '4. Permissions → Contents → "Read and write" select karein\n' +
+              '5. Generate token, copy karein, wapas login karein\n\n' +
+              '(Original error: ' + msg + ')';
+      } else if (res.status === 409) {
+        msg = 'Conflict: file kisi ne update kar di hai. Refresh karein aur try karein.\n\n(Original: ' + msg + ')';
+      } else if (res.status === 401) {
+        msg = 'Token invalid ya expired hai. Logout karke naya token use karein.\n\n(Original: ' + msg + ')';
+      }
+      throw new Error(msg);
     }
     return res.json();
   }
