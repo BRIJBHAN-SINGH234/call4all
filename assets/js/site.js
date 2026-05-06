@@ -100,6 +100,7 @@ function renderFloatingButtons() {
   const waMsg = encodeURIComponent('Hello, I want to enquire about your services.');
   return `
     <div class="floating-buttons">
+      <button class="float-btn install" id="installAppBtn" aria-label="Install App" title="Install App" style="display:none;background:#ffcc00;color:#1e3c72;border:none;font-size:24px;">📲</button>
       <a class="float-btn whatsapp" href="https://wa.me/${cfg.whatsappNumber}?text=${waMsg}" target="_blank" aria-label="Chat on WhatsApp" title="Chat on WhatsApp">💬</a>
       <a class="float-btn call" href="tel:${cfg.phone}" aria-label="Call Now" title="Call Now">📞</a>
     </div>
@@ -125,4 +126,81 @@ document.addEventListener('DOMContentLoaded', function () {
   if (floatSlot) floatSlot.outerHTML = renderFloatingButtons();
 
   if (typeof initBookingForm === 'function') initBookingForm();
+
+  setupPwaInstall();
 });
+
+/* ===== PWA: Service Worker + Install Prompt ===== */
+let _deferredInstallPrompt = null;
+
+function setupPwaInstall() {
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('[PWA] Service worker registered:', reg.scope))
+        .catch(err => console.warn('[PWA] Service worker registration failed:', err));
+    });
+  }
+
+  // Capture the install prompt
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    _deferredInstallPrompt = e;
+    const btn = document.getElementById('installAppBtn');
+    if (btn) {
+      btn.style.display = 'flex';
+      btn.addEventListener('click', triggerInstall);
+    }
+  });
+
+  // Hide install button after the app is installed
+  window.addEventListener('appinstalled', () => {
+    const btn = document.getElementById('installAppBtn');
+    if (btn) btn.style.display = 'none';
+    _deferredInstallPrompt = null;
+    console.log('[PWA] App installed');
+  });
+
+  // For iOS users, show a one-time hint (since iOS doesn't support beforeinstallprompt)
+  setTimeout(showIosInstallHintIfNeeded, 4000);
+}
+
+async function triggerInstall() {
+  if (!_deferredInstallPrompt) return;
+  _deferredInstallPrompt.prompt();
+  const { outcome } = await _deferredInstallPrompt.userChoice;
+  console.log('[PWA] Install choice:', outcome);
+  _deferredInstallPrompt = null;
+  const btn = document.getElementById('installAppBtn');
+  if (btn) btn.style.display = 'none';
+}
+
+function showIosInstallHintIfNeeded() {
+  const ua = window.navigator.userAgent.toLowerCase();
+  const isIos = /iphone|ipad|ipod/.test(ua);
+  const isStandalone = window.navigator.standalone === true ||
+                       window.matchMedia('(display-mode: standalone)').matches;
+  const dismissed = localStorage.getItem('c4a_ios_install_hint_dismissed');
+
+  if (!isIos || isStandalone || dismissed) return;
+
+  const hint = document.createElement('div');
+  hint.id = 'iosInstallHint';
+  hint.style.cssText = `
+    position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 9999;
+    background: #1e3c72; color: white; padding: 14px 16px; border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25); font-size: 14px; line-height: 1.5;
+  `;
+  hint.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:10px;">
+      <div style="font-size:24px;">📲</div>
+      <div style="flex:1;">
+        <strong>Install Call4All on your iPhone</strong><br>
+        Tap the <strong>Share</strong> icon ⎋ in Safari, then tap <strong>"Add to Home Screen"</strong>.
+      </div>
+      <button aria-label="Dismiss" style="background:transparent;border:none;color:white;font-size:22px;cursor:pointer;line-height:1;" onclick="this.closest('#iosInstallHint').remove();localStorage.setItem('c4a_ios_install_hint_dismissed','1');">×</button>
+    </div>
+  `;
+  document.body.appendChild(hint);
+}
