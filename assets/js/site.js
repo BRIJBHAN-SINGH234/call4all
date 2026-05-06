@@ -89,7 +89,7 @@ function renderFooter() {
         </div>
       </div>
       <div class="footer-bottom">
-        <p>© ${new Date().getFullYear()} ${cfg.website} | All Rights Reserved &nbsp;|&nbsp; <a href="admin.html">Admin Panel</a></p>
+        <p>© ${new Date().getFullYear()} ${cfg.website} | All Rights Reserved &nbsp;|&nbsp; <a href="admin.html">Admin Panel</a> &nbsp;|&nbsp; <a href="staff.html">Staff Portal</a></p>
       </div>
     </footer>
   `;

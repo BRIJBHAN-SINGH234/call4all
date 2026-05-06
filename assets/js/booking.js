@@ -32,18 +32,30 @@ function renderBookingForm(options) {
               <input type="tel" id="bf_phone" name="phone" placeholder="+91 XXXXX XXXXX" required pattern="[0-9+\\s\\-]{8,15}">
             </div>
           </div>
+          <div class="form-group">
+            <label for="bf_service">Service Required *</label>
+            <select id="bf_service" name="service" required>
+              <option value="">-- Select a service --</option>
+              ${optionsHtml}
+            </select>
+          </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="bf_service">Service Required *</label>
-              <select id="bf_service" name="service" required>
-                <option value="">-- Select a service --</option>
-                ${optionsHtml}
+              <label for="bf_city">City *</label>
+              <select id="bf_city" name="city" required>
+                <option value="">Loading cities...</option>
               </select>
             </div>
             <div class="form-group">
-              <label for="bf_location">City / Location *</label>
-              <input type="text" id="bf_location" name="location" placeholder="e.g. Delhi, Jaipur" required>
+              <label for="bf_area">Area / Locality *</label>
+              <select id="bf_area" name="area" required disabled>
+                <option value="">Select city first</option>
+              </select>
             </div>
+          </div>
+          <div class="form-group">
+            <label for="bf_address">Full Address (House no, landmark)</label>
+            <input type="text" id="bf_address" name="address" placeholder="e.g. House No 123, Near Shiv Mandir">
           </div>
           <div class="form-group">
             <label for="bf_message">Aapki Requirement *</label>
@@ -65,6 +77,94 @@ function initBookingForm() {
   if (!form || form.dataset.bound === '1') return;
   form.dataset.bound = '1';
   form.addEventListener('submit', handleBookingSubmit);
+  loadAreasIntoForm();
+}
+
+let _areasCache = null;
+
+async function loadAreasIntoForm() {
+  const citySel = document.getElementById('bf_city');
+  const areaSel = document.getElementById('bf_area');
+  if (!citySel || !areaSel) return;
+
+  try {
+    const data = await window.CsvAPI.loadAllPublic('data/areas.csv');
+    _areasCache = (data.items || []).filter(a => (a.status || '').toLowerCase() === 'active');
+
+    const cities = [...new Set(_areasCache.map(a => a.city).filter(Boolean))].sort();
+    if (cities.length === 0) {
+      citySel.innerHTML = '<option value="">-- Type your city manually below --</option>';
+      enableManualCityInput();
+      return;
+    }
+
+    citySel.innerHTML = '<option value="">-- Select city --</option>' +
+      cities.map(c => `<option value="${escapeAttr(c)}">${escapeHtml(c)}</option>`).join('') +
+      '<option value="__other__">Other city (not listed)</option>';
+
+    citySel.addEventListener('change', () => onCityChange(citySel, areaSel));
+  } catch (err) {
+    console.warn('Could not load service areas:', err);
+    enableManualCityInput();
+  }
+}
+
+function onCityChange(citySel, areaSel) {
+  const selected = citySel.value;
+  if (selected === '__other__') {
+    enableManualCityInput();
+    return;
+  }
+  if (!selected) {
+    areaSel.disabled = true;
+    areaSel.innerHTML = '<option value="">Select city first</option>';
+    return;
+  }
+  const areas = (_areasCache || [])
+    .filter(a => a.city === selected)
+    .map(a => a.area)
+    .filter(Boolean)
+    .sort();
+  areaSel.disabled = false;
+  areaSel.innerHTML = '<option value="">-- Select area --</option>' +
+    areas.map(a => `<option value="${escapeAttr(a)}">${escapeHtml(a)}</option>`).join('') +
+    '<option value="__other__">Other area (not listed)</option>';
+  areaSel.addEventListener('change', () => onAreaChange(areaSel), { once: true });
+}
+
+function onAreaChange(areaSel) {
+  if (areaSel.value === '__other__') {
+    replaceWithInput(areaSel, 'area', 'Type your area name');
+  }
+}
+
+function enableManualCityInput() {
+  const citySel = document.getElementById('bf_city');
+  const areaSel = document.getElementById('bf_area');
+  if (citySel) replaceWithInput(citySel, 'city', 'Type your city');
+  if (areaSel) {
+    areaSel.disabled = false;
+    replaceWithInput(areaSel, 'area', 'Type your area');
+  }
+}
+
+function replaceWithInput(selectEl, name, placeholder) {
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.name = name;
+  input.id = selectEl.id;
+  input.placeholder = placeholder;
+  input.required = true;
+  selectEl.parentNode.replaceChild(input, selectEl);
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function escapeAttr(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/"/g, '&quot;');
 }
 
 async function handleBookingSubmit(e) {
@@ -74,12 +174,14 @@ async function handleBookingSubmit(e) {
     name: form.name.value.trim(),
     phone: form.phone.value.trim(),
     service: form.service.value.trim(),
-    location: form.location.value.trim(),
+    city: (form.city ? form.city.value.trim() : ''),
+    area: (form.area ? form.area.value.trim() : ''),
+    address: (form.address ? form.address.value.trim() : ''),
     message: form.message.value.trim()
   };
 
-  if (!data.name || !data.phone || !data.service || !data.location || !data.message) {
-    showFormMessage('Please fill all required fields.', 'error');
+  if (!data.name || !data.phone || !data.service || !data.city || !data.area || !data.message) {
+    showFormMessage('Please fill all required fields (name, phone, service, city, area, requirement).', 'error');
     return;
   }
 
@@ -96,7 +198,9 @@ async function handleBookingSubmit(e) {
     name: data.name,
     phone: data.phone,
     service: data.service,
-    location: data.location,
+    city: data.city,
+    area: data.area,
+    address: data.address,
     message: data.message,
     status: 'New'
   };
@@ -107,7 +211,7 @@ async function handleBookingSubmit(e) {
   const publicToken = localStorage.getItem('c4a_public_token');
   if (publicToken) {
     try {
-      await window.CsvAPI.appendRow(row, publicToken);
+      await window.CsvAPI.appendRow(row, publicToken, 'data/bookings.csv');
       savedToCsv = true;
     } catch (err) {
       saveError = err.message || String(err);
@@ -135,20 +239,23 @@ async function handleBookingSubmit(e) {
 }
 
 function buildWhatsAppMessage(row) {
-  return [
+  const lines = [
     '*📋 New Service Booking - Call4All*',
     '',
     `*Ref ID:* ${row.id}`,
     `*Name:* ${row.name}`,
     `*Phone:* ${row.phone}`,
     `*Service:* ${row.service}`,
-    `*Location:* ${row.location}`,
-    '',
-    '*Requirement:*',
-    row.message,
-    '',
-    `_Submitted: ${new Date(row.timestamp).toLocaleString()}_`
-  ].join('\n');
+    `*City:* ${row.city}`,
+    `*Area:* ${row.area}`
+  ];
+  if (row.address) lines.push(`*Address:* ${row.address}`);
+  lines.push('');
+  lines.push('*Requirement:*');
+  lines.push(row.message);
+  lines.push('');
+  lines.push(`_Submitted: ${new Date(row.timestamp).toLocaleString()}_`);
+  return lines.join('\n');
 }
 
 function showFormMessage(text, type) {
@@ -161,7 +268,13 @@ function showFormMessage(text, type) {
 /* ===== CSV Helper (reused by admin) ===== */
 window.CsvAPI = (function () {
   const cfg = window.SITE_CONFIG.github;
-  const apiBase = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.csvPath}`;
+
+  function apiUrlFor(path) {
+    return `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`;
+  }
+  function rawUrlFor(path) {
+    return `https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${cfg.branch}/${path}`;
+  }
 
   function csvEscape(v) {
     if (v == null) return '';
@@ -172,8 +285,8 @@ window.CsvAPI = (function () {
     return s;
   }
 
-  function rowToCsv(row) {
-    const cols = ['id', 'timestamp', 'name', 'phone', 'service', 'location', 'message', 'status'];
+  function rowToCsv(row, cols) {
+    cols = cols || ['id', 'timestamp', 'name', 'phone', 'service', 'city', 'area', 'address', 'message', 'status'];
     return cols.map(k => csvEscape(row[k] || '')).join(',');
   }
 
@@ -230,30 +343,54 @@ window.CsvAPI = (function () {
     return decodeURIComponent(escape(atob(b64.replace(/\s/g, ''))));
   }
 
-  async function getFile(token) {
+  const DEFAULT_HEADERS = {
+    'data/bookings.csv': ['id', 'timestamp', 'name', 'phone', 'service', 'city', 'area', 'address', 'message', 'status'],
+    'data/sources.csv': ['id', 'timestamp', 'category', 'name', 'city', 'area', 'address', 'contact_person', 'contact_phone', 'price', 'availability', 'notes', 'added_by'],
+    'data/staff.csv': ['id', 'email', 'password_hash', 'name', 'phone', 'role', 'status', 'created_at', 'created_by'],
+    'data/areas.csv': ['id', 'city', 'area', 'status', 'created_at']
+  };
+
+  async function getFile(path, token) {
+    path = path || cfg.csvPath;
     const headers = { 'Accept': 'application/vnd.github+json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(`${apiBase}?ref=${cfg.branch}`, { headers });
+    const res = await fetch(`${apiUrlFor(path)}?ref=${cfg.branch}&t=${Date.now()}`, { headers, cache: 'no-store' });
     if (res.status === 404) {
-      return { content: 'id,timestamp,name,phone,service,location,message,status\n', sha: null };
+      const cols = DEFAULT_HEADERS[path] || DEFAULT_HEADERS[cfg.csvPath];
+      return { content: cols.join(',') + '\n', sha: null };
     }
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `Failed to load CSV (${res.status})`);
+      throw new Error(err.message || `Failed to load ${path} (${res.status})`);
     }
     const json = await res.json();
     return { content: b64decode(json.content), sha: json.sha };
   }
 
-  async function putFile(content, sha, token, message) {
+  async function getFilePublic(path) {
+    path = path || cfg.csvPath;
+    const res = await fetch(`${rawUrlFor(path)}?t=${Date.now()}`, { cache: 'no-store' });
+    if (res.status === 404) {
+      const cols = DEFAULT_HEADERS[path] || DEFAULT_HEADERS[cfg.csvPath];
+      return { content: cols.join(',') + '\n' };
+    }
+    if (!res.ok) {
+      throw new Error(`Failed to load ${path} (${res.status})`);
+    }
+    const text = await res.text();
+    return { content: text };
+  }
+
+  async function putFile(path, content, sha, token, message) {
+    path = path || cfg.csvPath;
     const body = {
-      message: message || 'Update bookings.csv via Call4All site',
+      message: message || `Update ${path} via Call4All site`,
       content: b64encode(content),
       branch: cfg.branch
     };
     if (sha) body.sha = sha;
 
-    const res = await fetch(apiBase, {
+    const res = await fetch(apiUrlFor(path), {
       method: 'PUT',
       headers: {
         'Accept': 'application/vnd.github+json',
@@ -264,35 +401,61 @@ window.CsvAPI = (function () {
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `Failed to save CSV (${res.status})`);
+      throw new Error(err.message || `Failed to save ${path} (${res.status})`);
     }
     return res.json();
   }
 
-  async function appendRow(row, token) {
-    const file = await getFile(token);
+  async function appendRow(row, token, path) {
+    path = path || cfg.csvPath;
+    const file = await getFile(path, token);
     let content = file.content;
     if (!content.endsWith('\n')) content += '\n';
-    content += rowToCsv(row) + '\n';
-    return putFile(content, file.sha, token, `Add booking ${row.id}`);
+    const cols = DEFAULT_HEADERS[path] || DEFAULT_HEADERS[cfg.csvPath];
+    content += rowToCsv(row, cols) + '\n';
+    return putFile(path, content, file.sha, token, `Add row to ${path}`);
   }
 
-  async function loadAll(token) {
-    const file = await getFile(token);
+  async function loadAll(token, path) {
+    path = path || cfg.csvPath;
+    const file = await getFile(path, token);
     const parsed = csvToObjects(file.content);
+    if (!parsed.headers.length) {
+      parsed.headers = DEFAULT_HEADERS[path] || DEFAULT_HEADERS[cfg.csvPath];
+    }
     return { ...parsed, sha: file.sha, raw: file.content };
   }
 
-  async function saveAll(headers, items, sha, token, message) {
+  async function loadAllPublic(path) {
+    path = path || cfg.csvPath;
+    const file = await getFilePublic(path);
+    const parsed = csvToObjects(file.content);
+    if (!parsed.headers.length) {
+      parsed.headers = DEFAULT_HEADERS[path] || DEFAULT_HEADERS[cfg.csvPath];
+    }
+    return { ...parsed, raw: file.content };
+  }
+
+  async function saveAll(headers, items, sha, token, message, path) {
+    path = path || cfg.csvPath;
     const content = objectsToCsv(headers, items);
-    return putFile(content, sha, token, message);
+    return putFile(path, content, sha, token, message);
   }
 
   return {
+    PATHS: {
+      bookings: 'data/bookings.csv',
+      sources: 'data/sources.csv',
+      staff: 'data/staff.csv',
+      areas: 'data/areas.csv'
+    },
+    DEFAULT_HEADERS,
     appendRow,
     loadAll,
+    loadAllPublic,
     saveAll,
     getFile,
+    getFilePublic,
     putFile,
     csvToObjects,
     objectsToCsv,

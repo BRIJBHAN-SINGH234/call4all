@@ -1,6 +1,6 @@
 # Call4All — One Call, Every Service
 
-A static website + GitHub-backed admin panel for **Call4All**, a service aggregator that connects customers to trusted service providers (rental cars, rooms & flats, construction labor, home tutors, manpower, marriage services, and more).
+A static website + GitHub-backed admin & staff panel for **Call4All**, a service aggregator that connects customers to trusted service providers (rental cars, rooms & flats, construction labor, home tutors, manpower, marriage services, and more).
 
 🌐 Live: https://www.call4all.co.in
 
@@ -8,15 +8,30 @@ A static website + GitHub-backed admin panel for **Call4All**, a service aggrega
 
 ## ✨ Features
 
-- **Modern responsive site** — works perfectly on mobile, tablet, and desktop.
-- **Service-rich homepage** — auto-rotating slider, service grid, "How it works", "Why choose us".
-- **9 service pages** — Rental Cars, Rooms & Flats, Construction Labor / Thekedar, Home Tutor, Manpower Supply, Marriage Services, Hotel Flower Bouquet, Car Decoration, and Custom service.
-- **Booking form on every service page** — pre-selects the relevant service.
-- **Floating WhatsApp + Call buttons** on every page.
-- **WhatsApp integration** — every form submission opens WhatsApp with a beautifully formatted message including a unique reference ID.
-- **GitHub-backed CSV storage** — all bookings stored in `data/bookings.csv` directly in this repo.
-- **Admin Panel** (`/admin.html`) — view / add / edit / delete bookings, search, filter by status, export CSV.
-- **Optional public auto-save** — admin can configure a GitHub token to auto-save form submissions to CSV.
+### Customer-facing
+- Modern responsive site (mobile-first design).
+- 9 service pages, each with auto-pre-filled booking form.
+- Floating WhatsApp + Call buttons on every page.
+- Booking form with **city + area + house-no/landmark** address structure — only admin-approved areas show up.
+- Every form submission opens WhatsApp with a beautifully formatted message including a unique reference ID.
+
+### Admin Panel (`/admin.html`)
+Tabbed interface with five sections:
+
+1. **📋 Bookings** — view / add / edit / delete customer requirements.
+2. **🗂️ Sources / Inventory** — track every service provider, room, car, labor, tutor etc. with location, contact, price, availability.
+3. **👥 Staff** — create staff accounts (email + password), block / unblock, change passwords.
+4. **📍 Service Areas** — define cities and areas where service is available; Active areas show in customer dropdowns.
+5. **⚙️ Settings** — admin password, optional public-form auto-save token.
+
+### Staff Portal (`/staff.html`)
+Separate frontend for staff members:
+
+- Login with email + password (validated against `data/staff.csv`).
+- Add / edit / delete sources/inventory entries (own entries only).
+- View all sources from all staff (read-only for others' entries).
+- "My Entries" filter by default.
+- Blocked staff cannot login.
 
 ---
 
@@ -27,201 +42,248 @@ call4all/
 ├── index.html              # Homepage
 ├── about.html              # About us
 ├── contact.html            # Contact + booking form
-├── admin.html              # Admin panel (login + dashboard)
+├── admin.html              # Admin panel (5 tabs)
+├── staff.html              # Staff portal
 ├── rental-cars.html        # Service pages
 ├── rooms-flats.html
-├── construction.html       # NEW: construction labor / thekedar
-├── home-tutor.html         # NEW: home tutors
+├── construction.html       # Construction labor / thekedar
+├── home-tutor.html         # Home tutors
 ├── manpower-supply.html
 ├── marriage-services.html
 ├── flower-bouquet.html
 ├── car-decoration.html
 ├── data/
-│   └── bookings.csv        # All bookings stored here
+│   ├── bookings.csv        # Customer bookings
+│   ├── sources.csv         # Service-provider inventory
+│   ├── staff.csv           # Staff accounts (passwords are SHA-256 hashed)
+│   └── areas.csv           # Service cities + areas
 ├── assets/
 │   ├── css/style.css       # All site styles
 │   └── js/
-│       ├── site.js         # Header, footer, floating buttons
-│       ├── booking.js      # Booking form + GitHub CSV API
-│       └── admin.js        # Admin panel logic
+│       ├── site.js         # Header, footer, floating buttons, config
+│       ├── booking.js      # Booking form + GitHub CSV API helpers
+│       ├── admin.js        # Admin panel logic (5 tabs)
+│       └── staff.js        # Staff portal logic
 ├── Imagelogo.png
-└── CNAME                   # custom domain
+├── CNAME                   # custom domain
+└── README.md
 ```
 
 ---
 
-## 🔐 Admin Panel Setup (One-time)
+## 🔐 Admin Setup (One-time)
 
 ### Step 1 — Create a GitHub Personal Access Token (PAT)
 
-The admin panel reads/writes `data/bookings.csv` directly through the GitHub API. You need a fine-grained PAT.
-
 1. Go to **https://github.com/settings/personal-access-tokens/new**
 2. **Token name:** `Call4All Admin`
-3. **Expiration:** 90 days (or longer — set a calendar reminder to rotate)
-4. **Repository access:** *Only select repositories* → choose `BRIJBHAN-SINGH234/call4all`
+3. **Expiration:** 90 days (set a calendar reminder to rotate)
+4. **Repository access:** *Only select repositories* → `BRIJBHAN-SINGH234/call4all`
 5. **Permissions** → *Repository permissions* → set:
    - **Contents:** `Read and write` ✅
-   - (everything else can stay `No access`)
-6. Click **Generate token** and **copy** the token string (looks like `github_pat_xxxxxxx...`).
-7. ⚠️ Store it somewhere safe — GitHub won't show it again.
+   - (everything else `No access`)
+6. Click **Generate token** and **copy** the token string (`github_pat_xxx...`).
+7. ⚠️ Store it safely — GitHub won't show it again.
 
 ### Step 2 — Login to the Admin Panel
 
-1. Open `https://www.call4all.co.in/admin.html` (or `https://brijbhan-singh234.github.io/call4all/admin.html`).
+1. Open `https://www.call4all.co.in/admin.html`.
 2. Enter:
-   - **Username:** anything (e.g. `admin`)
-   - **Password:** set any password you like (saved hashed on this browser only)
-   - **GitHub Personal Access Token:** paste the token from Step 1
-3. Click **Login**. The token is saved in `localStorage` of *this browser only*.
-4. You are now in the admin dashboard.
+   - **Username/Email:** anything (e.g. `admin@call4all.co.in`)
+   - **Password:** any password you like (saved hashed on this browser)
+   - **GitHub PAT:** paste from Step 1
+3. Click **Login**.
 
-### Step 3 — Manage Bookings
+### Step 3 — Initial Setup Sequence (recommended order)
 
-In the admin panel you can:
+After first login, populate things in this order:
 
-- **View all bookings** in a sortable table with stats at the top.
-- **Search** by name, phone, service, location, or message text.
-- **Filter** by status (New / Contacted / Completed / Cancelled).
-- **Add a booking** manually (e.g. when a customer calls instead of using the form).
-- **Edit** any booking — change status, fix typos, etc.
-- **Delete** a booking.
-- **Export CSV** to download a backup at any time.
-- **Refresh** to pull the latest CSV from GitHub.
-
-Every change is committed back to `data/bookings.csv` on GitHub immediately.
+1. **📍 Service Areas tab** — Add the cities and areas where you provide service.
+   - Example: City = `Delhi`, Area = `Karol Bagh` → Status = Active.
+   - Add as many as needed. Customers will see only `Active` areas.
+2. **👥 Staff tab** — Add your team members with email + password.
+   - Each staff gets a separate login at `/staff.html`.
+3. **🗂️ Sources tab** — Start adding your inventory:
+   - Rooms available at certain locations
+   - Cars in stock
+   - Labor/contractors
+   - Tutors with subject expertise
+   - etc.
+4. **📋 Bookings tab** — Customer requests automatically come here (or you add manually from WhatsApp).
 
 ---
 
-## 📝 How Customer Form Submissions Work
+## 👥 Adding & Managing Staff
 
-There are **two modes** the form can run in. Pick whichever is right for you.
+In **Admin Panel → 👥 Staff tab**:
+
+1. Click **➕ Add Staff** — enter name, email, phone, role, set initial password, and click Save.
+2. After save, you'll see a popup with the credentials. Share these via WhatsApp/email with the staff member.
+3. You also need to share a **GitHub PAT** with each staff member (so they can save data to GitHub):
+   - You can use the same admin PAT (simplest, but they'll have full repo access).
+   - Or create a separate fine-grained PAT per staff member with `Contents: Read and write` for safer rotation.
+4. Staff visits `/staff.html`, logs in with email + password, then enters the GitHub PAT once.
+
+### Block / Unblock Staff
+Click the 🚫 Block button on any row. Blocked staff cannot login — even mid-session, the dashboard auto-detects and logs them out.
+
+### Change Staff Password
+Click ✏️ Edit on any staff row, type new password, save. The old password stops working immediately.
+
+---
+
+## 📍 Service Areas
+
+The areas you define in the Areas tab control:
+
+- The **city dropdown** in customer booking forms.
+- The **area dropdown** (filtered by selected city).
+- The cities/areas available when adding **Sources** (admin and staff).
+
+If a customer's city/area isn't listed:
+- Admin can mark it `Inactive` instead of deleting (preserves historical data).
+- Customer can choose "Other city/area not listed" and type manually.
+
+---
+
+## 🗂️ Sources / Inventory
+
+Use this section to keep a live database of:
+- Available rooms in different localities
+- Cars in your fleet (or partners' fleets)
+- Construction labor / contractors
+- Home tutors with their subjects
+- Manpower providers
+- Decorators, caterers, etc.
+
+Each source has:
+
+| Field | Description |
+|-------|-------------|
+| Category | matches your services list |
+| Name | "2BHK at Karol Bagh", "Innova Crysta white" etc. |
+| City + Area | from your service areas |
+| Address | full street address |
+| Contact Person + Phone | the actual provider |
+| Price | flexible text — ₹15,000/month, ₹2000/day, "negotiable" |
+| Availability | Available / Booked / On-Hold / Inactive |
+| Notes | parking, conditions, hours, etc. |
+| Added By | auto-filled (admin or staff email) |
+
+**Workflow:** When a customer requirement comes in (e.g. "2BHK in Delhi/Karol Bagh"), open the Sources tab, filter by `Category = Rooms & Flats` and `City = Delhi`, and you instantly see who you can connect them to.
+
+---
+
+## 📝 Customer Form Submissions
+
+Two modes (configurable in Admin → ⚙️ Settings):
 
 ### Mode A — WhatsApp only (default, most secure)
+1. Customer fills the form — picks city, area, types address, requirement.
+2. WhatsApp opens with a pre-formatted message (Ref ID + all details).
+3. You receive on **+91 8387930687**.
+4. Open admin panel → **➕ Add Booking** to add it to the CSV.
 
-1. Customer fills the form on any page.
-2. Their browser opens WhatsApp with a pre-formatted message including:
-   - Reference ID (e.g. `BK1746543210123`)
-   - Name, phone, service, location, requirement
-3. Customer hits *Send* in WhatsApp.
-4. You receive the WhatsApp message on **+91 8387930687**.
-5. You log into the admin panel and click **➕ Add Booking** to manually create a CSV entry from the WhatsApp details (or just copy-paste the requirement).
+### Mode B — Auto-save + WhatsApp
+1. Admin → ⚙️ Settings → paste a fine-grained PAT in **Public Form Auto-Save Token**.
+2. Form submissions then automatically write to `bookings.csv` on GitHub.
+3. WhatsApp also opens for confirmation.
 
-✅ Pros: No public token in JavaScript. 100% secure.
-❌ Cons: You add CSV entries manually.
-
-### Mode B — Auto-save to CSV + WhatsApp (optional, more automated)
-
-In this mode, every public form submission **also** writes a row to `data/bookings.csv` automatically.
-
-To enable:
-
-1. Login to the admin panel.
-2. Click **⚙️ Settings**.
-3. Paste a fine-grained PAT in the **Public Form Auto-Save Token** field.
-4. Click **Save Settings**.
-
-Now every form submission will automatically:
-- Save a row in `data/bookings.csv` (you'll see the booking immediately in admin)
-- Open WhatsApp for the customer to send confirmation
-
-⚠️ **Security note:** This token is stored in your browser's `localStorage`, but it is also used by the public form — meaning **any visitor on this same browser** could read it. Best practice for Mode B:
-
-- Use a **separate fine-grained PAT** with *only* `Contents: Read and write` on this single repo.
-- Rotate the token every 90 days.
-- Never enable Mode B on a public/shared computer.
-
-If unsure, **stick with Mode A**.
+⚠️ Mode B exposes the token in the public site's localStorage on this browser. Use a separate fine-grained PAT, rotate every 90 days, never enable on a public computer.
 
 ---
 
-## 📂 CSV Format
+## 📂 CSV Schemas
 
-`data/bookings.csv` columns:
+### `data/bookings.csv`
+```
+id, timestamp, name, phone, service, city, area, address, message, status
+```
+Status values: `New` / `Contacted` / `Completed` / `Cancelled`
 
-| Column      | Example                              |
-|-------------|--------------------------------------|
-| `id`        | `BK1746543210123`                    |
-| `timestamp` | `2026-05-06T11:13:30.123Z`           |
-| `name`      | `Ramesh Kumar`                       |
-| `phone`     | `+919812345678`                      |
-| `service`   | `Rental Cars`                        |
-| `location`  | `Delhi`                              |
-| `message`   | `Need Innova for Delhi-Jaipur trip` |
-| `status`    | `New` / `Contacted` / `Completed` / `Cancelled` |
+### `data/sources.csv`
+```
+id, timestamp, category, name, city, area, address, contact_person, contact_phone, price, availability, notes, added_by
+```
+Availability values: `Available` / `Booked` / `On-Hold` / `Inactive`
 
-Multi-line messages and commas are properly escaped (RFC 4180).
+### `data/staff.csv`
+```
+id, email, password_hash, name, phone, role, status, created_at, created_by
+```
+- `password_hash` is SHA-256 (never plaintext)
+- Status values: `Active` / `Blocked`
+
+### `data/areas.csv`
+```
+id, city, area, status, created_at
+```
+Status values: `Active` / `Inactive`
+
+All CSVs follow RFC 4180 (commas, quotes and newlines properly escaped).
 
 ---
 
 ## 🚀 Running Locally
 
-This is a static site — just open `index.html` in a browser. For full functionality (admin panel, GitHub API CORS), serve it via a local web server:
-
 ```bash
-# Python 3
 python3 -m http.server 8000
-
-# Or Node
+# or
 npx serve .
 ```
-
 Then open http://localhost:8000
 
 ---
 
-## 🌐 Deploying
+## 🌐 Deploying to GitHub Pages
 
-This repo is configured for **GitHub Pages**. Once you push to `main`:
+This repo is already configured. After every push to `main`:
 
-1. Go to **Settings** → **Pages** in the repo.
-2. **Source:** Deploy from a branch → `main` / `(root)`.
-3. The site will be live at `https://brijbhan-singh234.github.io/call4all/`.
-4. The `CNAME` file makes it serve at `www.call4all.co.in` (custom domain).
+1. GitHub Pages auto-builds in ~1-2 minutes.
+2. Live at `https://www.call4all.co.in/` (custom domain via `CNAME`).
+3. Or `https://brijbhan-singh234.github.io/call4all/`.
 
 ---
 
 ## ✏️ Customisation
 
-| What                       | Where                                                    |
-|----------------------------|----------------------------------------------------------|
-| Phone / WhatsApp / email   | `assets/js/site.js` → `SITE_CONFIG`                      |
-| Service list               | `assets/js/site.js` → `SITE_CONFIG.services`             |
-| Colors / theme             | `assets/css/style.css` → `:root` CSS variables           |
-| Logo                       | Replace `Imagelogo.png`                                  |
-| Add a new service page     | Copy any service `.html`, change title and `service` key |
-
-To add a new service, just:
-
-1. Add an entry in `SITE_CONFIG.services` in `site.js` (`id`, `name`, `icon`, `desc`, `page`).
-2. Create a new HTML file (copy `home-tutor.html` as template).
-3. Update the `renderBookingForm({ service: 'Your Service' })` call inside the new file.
+| What | Where |
+|------|-------|
+| Phone / WhatsApp / email | `assets/js/site.js` → `SITE_CONFIG` |
+| Service list (categories) | `assets/js/site.js` → `SITE_CONFIG.services` |
+| Colors / theme | `assets/css/style.css` → `:root` CSS variables |
+| Logo | Replace `Imagelogo.png` |
 
 ---
 
 ## 🛟 Troubleshooting
 
 **"Invalid GitHub token" on login**
-- Token must have `Contents: Read and write` on this exact repo.
-- Make sure repository access is set to *only* this repo.
-- Token may have expired — generate a new one.
+Token must have `Contents: Read and write` on `BRIJBHAN-SINGH234/call4all`. Repository access must be set to *only* this repo. Token may be expired.
 
 **"Failed to save CSV (409)"**
-- Someone else updated the CSV — click **🔄 Refresh** and retry.
+Someone else updated the file — click 🔄 Refresh on that tab and retry.
 
-**Form not opening WhatsApp on mobile**
-- Some Android browsers block popups; the form falls back to a redirect.
-- Make sure WhatsApp is installed on the device.
+**Admin shows 0 areas/sources/staff but CSVs exist**
+GitHub raw files may be cached. The site adds a cache-buster, but sometimes you need to hard reload (Ctrl+Shift+R).
 
-**Admin panel shows 0 bookings but CSV has rows**
-- The CSV file must have a header row matching: `id,timestamp,name,phone,service,location,message,status`.
+**Staff can't login**
+- Email must exactly match (case-insensitive).
+- Status must be `Active` (not `Blocked`).
+- Password is case-sensitive.
+
+**Staff "your account has been blocked" loop**
+The staff account is blocked — admin must unblock from `/admin.html` → Staff tab.
+
+**Customer city/area dropdown is empty**
+You haven't added any active areas yet. Admin → 📍 Service Areas → ➕ Add Area.
 
 ---
 
 ## 📞 Support
 
-For business enquiries: **+91 8387930687** or **info@call4all.co.in**
-For website issues: open an [issue on GitHub](https://github.com/BRIJBHAN-SINGH234/call4all/issues).
+- Business: **+91 8387930687** / **info@call4all.co.in**
+- Repo issues: https://github.com/BRIJBHAN-SINGH234/call4all/issues
 
 ---
 

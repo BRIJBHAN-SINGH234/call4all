@@ -552,6 +552,46 @@ img { max-width: 100%; display: block; }
 }
 .empty-state .icon { font-size: 50px; margin-bottom: 12px; }
 
+/* ===== Admin Tabs ===== */
+.admin-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  background: var(--white);
+  padding: 8px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+.admin-tab {
+  padding: 10px 18px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.admin-tab:hover { background: var(--bg-light); color: var(--primary); }
+.admin-tab.active { background: var(--primary); color: var(--white); }
+.admin-tab .badge {
+  background: var(--accent);
+  color: var(--primary-dark);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.admin-tab.active .badge { background: var(--accent); color: var(--primary-dark); }
+
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
 /* ===== Modal ===== */
 .modal-backdrop {
   display: none;
