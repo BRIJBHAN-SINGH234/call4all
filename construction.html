@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Construction Labor / Thekedar - Call4All</title>
+<meta name="description" content="Construction labor, mistri, mazdoor and contractors for your building, renovation and home improvement projects.">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="services">
+
+<div id="site-header"></div>
+
+<section class="hero" style="padding: 50px 30px;">
+  <h1>🧱 Construction Labor / Thekedar</h1>
+  <p>Mistri, mazdoor, contractors aur thekedar — har construction zaroorat ke liye.</p>
+</section>
+
+<div class="service-detail">
+  <p class="lead">Naya ghar banwana ho, renovation karna ho, ya choti repair — Call4All trusted construction labor aur experienced thekedar tak aapko pohchata hai. Verified, fair-priced aur on-time delivery guaranteed.</p>
+
+  <h2>Available Workers</h2>
+  <ul>
+    <li><strong>Rajmistri / Mason</strong> — chinai, plaster, brick work</li>
+    <li><strong>Mazdoor / Helper</strong> — daily wage labor</li>
+    <li><strong>Carpenter (Badhai)</strong> — door, window, furniture</li>
+    <li><strong>Plumber</strong> — pipes, fittings, leakage repair</li>
+    <li><strong>Electrician</strong> — wiring, repair, installation</li>
+    <li><strong>Painter</strong> — interior, exterior, texture</li>
+    <li><strong>Tile / Marble Worker</strong> — flooring, kitchen, bathroom</li>
+    <li><strong>POP / False Ceiling Worker</strong></li>
+    <li><strong>Welder / Iron Worker</strong> — grills, gates, railings</li>
+    <li><strong>Thekedar / Contractor</strong> — full project management</li>
+  </ul>
+
+  <div class="highlight">
+    <strong>Project Sizes:</strong> Small repairs se le kar 4-5 floor building tak — har size ka project handle karte hain. Material supply bhi arrange kar sakte hain.
+  </div>
+
+  <h2>Pricing Models</h2>
+  <ul>
+    <li>Daily wages (per worker per day)</li>
+    <li>Square foot basis (per sqft labor charge)</li>
+    <li>Lumpsum project rate (full thekedari)</li>
+    <li>Material + labor combined package</li>
+  </ul>
+
+  <h2>How to Book</h2>
+  <p>Form mein bata dein — kis tarah ka kaam, kitne workers, kab se kab tak aur project size kya hai. Hum aapko site visit karwa kar accurate quote denge.</p>
+</div>
+
+<div id="bookingFormSlot"></div>
+
+<div id="site-footer"></div>
+<div id="site-floating"></div>
+
+<script src="assets/js/site.js"></script>
+<script src="assets/js/booking.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const slot = document.getElementById('bookingFormSlot');
+  if (slot) slot.innerHTML = renderBookingForm({ service: 'Construction Labor / Thekedar' });
+  if (typeof initBookingForm === 'function') initBookingForm();
+});
+</script>
+</body>
+</html>

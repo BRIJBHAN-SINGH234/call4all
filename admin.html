@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel - Call4All</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+  .admin-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 30px; background: var(--primary); color: var(--white);
+    flex-wrap: wrap; gap: 10px;
+  }
+  .admin-header h1 { font-size: 22px; }
+  .admin-header .right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .admin-header .user-chip {
+    background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 20px;
+    font-size: 14px;
+  }
+  .admin-section-title { color: var(--primary); margin-bottom: 14px; font-size: 18px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN VIEW (default - shown when no token) -->
+<div id="loginView" style="display:none;">
+  <div id="site-header"></div>
+  <div class="login-wrap">
+    <div class="login-card">
+      <h2>🔐 Admin Login</h2>
+      <p class="lead">Sign in with your GitHub Personal Access Token to manage bookings.</p>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="username">Admin Username</label>
+          <input type="text" id="username" name="username" placeholder="e.g. admin" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="password">Admin Password</label>
+          <input type="password" id="password" name="password" placeholder="Set or enter your password" autocomplete="current-password">
+          <p class="help-text">First-time login: set any password — it'll be saved (hashed) on this browser.</p>
+        </div>
+        <div class="form-group">
+          <label for="token">GitHub Personal Access Token *</label>
+          <input type="password" id="token" name="token" placeholder="ghp_xxxxx... or github_pat_xxxxx..." required autocomplete="off">
+          <p class="help-text">
+            Need a token? Generate a fine-grained PAT with <strong>Contents: Read & Write</strong> permission for the
+            <code>BRIJBHAN-SINGH234/call4all</code> repo at
+            <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">github.com/settings/personal-access-tokens/new</a>.
+            Token is stored only on your browser (localStorage).
+          </p>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Login</button>
+        <div class="form-message error" id="loginError" style="display:none;"></div>
+      </form>
+    </div>
+  </div>
+  <div id="site-footer"></div>
+</div>
+
+<!-- ADMIN PANEL VIEW -->
+<div id="adminPanel" style="display:none;">
+  <div class="admin-header">
+    <h1>🛠️ Call4All Admin Panel</h1>
+    <div class="right">
+      <span class="user-chip">👤 <span id="adminUser">admin</span></span>
+      <button class="btn btn-accent btn-sm" id="settingsBtn">⚙️ Settings</button>
+      <button class="btn btn-outline btn-sm" id="logoutBtn" style="border-color:#fff;color:#fff;">🚪 Logout</button>
+    </div>
+  </div>
+
+  <div class="admin-wrap">
+    <div class="admin-stats">
+      <div class="stat-card">
+        <div class="label">Total Bookings</div>
+        <div class="value" id="statTotal">0</div>
+      </div>
+      <div class="stat-card warn">
+        <div class="label">New (Pending)</div>
+        <div class="value" id="statNew">0</div>
+      </div>
+      <div class="stat-card ok">
+        <div class="label">Contacted</div>
+        <div class="value" id="statContacted">0</div>
+      </div>
+      <div class="stat-card ok">
+        <div class="label">Completed</div>
+        <div class="value" id="statCompleted">0</div>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <h3 class="admin-section-title">📋 Bookings (synced with <code>data/bookings.csv</code> on GitHub)</h3>
+      <div class="admin-toolbar">
+        <input type="text" id="searchInput" placeholder="🔍 Search name, phone, service, message...">
+        <select id="statusFilter">
+          <option value="">All Status</option>
+          <option value="New">New</option>
+          <option value="Contacted">Contacted</option>
+          <option value="Completed">Completed</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+        <button class="btn btn-success" id="addNewBtn">➕ Add Booking</button>
+        <button class="btn btn-primary" id="refreshBtn">🔄 Refresh</button>
+        <button class="btn btn-accent" id="exportBtn">⬇️ Export CSV</button>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Ref ID</th>
+              <th>Date</th>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Service</th>
+              <th>Location</th>
+              <th>Message</th>
+              <th>Status / Actions</th>
+            </tr>
+          </thead>
+          <tbody id="bookingsBody">
+            <tr><td colspan="8" style="text-align:center;padding:30px;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit / Add Modal -->
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal">
+      <button class="modal-close" id="modalCloseBtn" type="button">&times;</button>
+      <h2 id="modalTitle">Edit Booking</h2>
+      <form id="editForm">
+        <input type="hidden" name="id_field">
+        <input type="hidden" name="timestamp_field">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Name *</label>
+            <input type="text" name="name" required>
+          </div>
+          <div class="form-group">
+            <label>Phone *</label>
+            <input type="text" name="phone" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Service *</label>
+            <select name="service" id="em_service" required></select>
+          </div>
+          <div class="form-group">
+            <label>Location *</label>
+            <input type="text" name="location" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Message / Requirement *</label>
+          <textarea name="message" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select name="status">
+            <option value="New">New</option>
+            <option value="Contacted">Contacted</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="modalCancelBtn" style="border-color:#999;color:#666;">Cancel</button>
+          <button type="submit" class="btn btn-primary">💾 Save Booking</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal">
+      <button class="modal-close" id="settingsCloseBtn" type="button">&times;</button>
+      <h2>⚙️ Admin Settings</h2>
+      <form id="settingsForm">
+        <div class="form-group">
+          <label>Public Form Auto-Save Token (optional)</label>
+          <input type="password" name="publicToken" id="publicToken" placeholder="Optional GitHub PAT for auto-save">
+          <p class="help-text">
+            Agar yeh token set karte hain, toh public booking form bhi automatically <code>bookings.csv</code> mein entry add karega
+            (saath mein WhatsApp bhi khulega). <strong>Warning:</strong> yeh token aapke browser ke localStorage mein save hoga,
+            aur public form se use hoga — fine-grained PAT use karein jisme sirf <code>Contents: write</code> permission ho.
+            Khali chhodne par form sirf WhatsApp pe message bhejega.
+          </p>
+          <button type="button" class="btn btn-danger btn-sm" id="clearPublicBtn" style="margin-top:8px;">Clear Public Token</button>
+        </div>
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid #eef0f4;">
+        <div class="form-group">
+          <label>Change Admin Password</label>
+          <input type="password" name="newAdminPass" id="newAdminPass" placeholder="Enter new password (or leave empty)">
+          <p class="help-text">New password set karne par next login se yeh use hoga (hashed stored on this browser).</p>
+          <button type="button" class="btn btn-danger btn-sm" id="clearPassBtn" style="margin-top:8px;">Clear Saved Password</button>
+        </div>
+        <div class="form-message" id="settingsMsg"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="settingsCancelBtn" style="border-color:#999;color:#666;">Close</button>
+          <button type="submit" class="btn btn-primary">💾 Save Settings</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="site-floating"></div>
+
+<script src="assets/js/site.js"></script>
+<script src="assets/js/booking.js"></script>
+<script src="assets/js/admin.js"></script>
+<script>
+(function () {
+  const token = localStorage.getItem('c4a_admin_token');
+  const session = sessionStorage.getItem('c4a_admin_session');
+  if (token && session === '1') {
+    document.getElementById('adminPanel').style.display = 'block';
+  } else {
+    document.getElementById('loginView').style.display = 'block';
+  }
+})();
+</script>
+
+</body>
+</html>

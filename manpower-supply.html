@@ -4,44 +4,54 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Manpower Supply - Call4All</title>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: Arial, sans-serif; color: #333; }
-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 50px; background: #1e3c72; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-.logo img { height: 60px; }
-nav ul { display: flex; list-style: none; gap: 30px; }
-nav a { color: white; text-decoration: none; font-size: 16px; font-weight: 500; transition: 0.3s; }
-nav a:hover { color: #ffcc00; }
-.content { padding: 60px 50px; max-width: 1000px; margin: 0 auto; }
-.content h1 { font-size: 42px; color: #1e3c72; margin-bottom: 30px; text-align: center; }
-.content p { font-size: 18px; line-height: 1.8; color: #666; margin-bottom: 20px; }
-footer { background: #1e3c72; color: white; padding: 40px 50px; }
-.footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-bottom: 20px; }
-.footer-section h3 { margin-bottom: 15px; color: #ffcc00; }
-.footer-section ul { list-style: none; }
-.footer-section a { color: white; text-decoration: none; line-height: 2; transition: 0.3s; }
-.footer-section a:hover { color: #ffcc00; }
-.footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); }
-</style>
+<meta name="description" content="Skilled and unskilled manpower supply for events, factories, construction sites and more.">
+<link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
-<header>
-  <div class="logo"><img src="Imagelogo.png" alt="Call4All Logo"></div>
-  <nav><ul><li><a href="index.html">Home</a></li><li><a href="about.html">About Us</a></li><li><a href="contact.html">Contact Us</a></li></ul></nav>
-</header>
-<div class="content">
+<body data-page="services">
+
+<div id="site-header"></div>
+
+<section class="hero" style="padding: 50px 30px;">
   <h1>👷 Manpower Supply</h1>
-  <p>Get reliable and skilled manpower for your business needs. We provide both skilled and unskilled workers for various industries including construction, hospitality, events, manufacturing, and more.</p>
-  <p>Our manpower services include temporary staffing, permanent placement, contract workers, event staff, security personnel, housekeeping staff, and technical workers. All personnel are verified and trained.</p>
-  <p>Contact us at <a href="tel:+918387930687">+91 8387930687</a> for your manpower requirements.</p>
-</div>
-<footer>
-  <div class="footer-content">
-    <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="index.html">Home</a></li><li><a href="about.html">About Us</a></li><li><a href="contact.html">Contact Us</a></li></ul></div>
-    <div class="footer-section"><h3>Our Services</h3><ul><li><a href="flower-bouquet.html">Hotel Flower Bouquet</a></li><li><a href="marriage-services.html">Marriage Services</a></li><li><a href="rental-cars.html">Rental Cars</a></li><li><a href="manpower-supply.html">Manpower Supply</a></li><li><a href="rooms-flats.html">Rooms & Flats</a></li><li><a href="car-decoration.html">Car Decoration</a></li></ul></div>
-    <div class="footer-section"><h3>Contact Info</h3><ul><li>Phone: <a href="tel:+918387930687">+91 8387930687</a></li><li>Email: info@call4all.co.in</li><li>Website: www.call4all.co.in</li></ul></div>
+  <p>Skilled aur unskilled labor — daily, weekly ya project-based.</p>
+</section>
+
+<div class="service-detail">
+  <p class="lead">Aapko event ke liye helpers chahiye, factory ke liye workers ya house shifting ke liye laborers? Call4All aapko trusted manpower turant provide karta hai.</p>
+
+  <h2>Manpower Categories</h2>
+  <ul>
+    <li>Event helpers (waiters, ushers, setup staff)</li>
+    <li>House shifting / packing labor</li>
+    <li>Factory & warehouse workers</li>
+    <li>Loading / unloading labor</li>
+    <li>Cleaning & housekeeping staff</li>
+    <li>Security guards (verified, licensed)</li>
+    <li>Drivers (commercial / personal)</li>
+    <li>Cooks & kitchen helpers</li>
+  </ul>
+
+  <div class="highlight">
+    <strong>Hire on your terms:</strong> Hourly, daily, weekly, monthly — ya kisi specific project ke liye. ID-verified workers, fair pricing, zero exploitation.
   </div>
-  <div class="footer-bottom"><p>© 2026 Call4All.co.in | All Rights Reserved</p></div>
-</footer>
+
+  <h2>How It Works</h2>
+  <p>Form mein bata dein — kitne log, kis kaam ke liye, kab se kab tak chahiye. Hum 1-2 ghante mein workers aapke pass bhej denge ya provider se direct connect karwa denge.</p>
+</div>
+
+<div id="bookingFormSlot"></div>
+
+<div id="site-footer"></div>
+<div id="site-floating"></div>
+
+<script src="assets/js/site.js"></script>
+<script src="assets/js/booking.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const slot = document.getElementById('bookingFormSlot');
+  if (slot) slot.innerHTML = renderBookingForm({ service: 'Manpower Supply' });
+  if (typeof initBookingForm === 'function') initBookingForm();
+});
+</script>
 </body>
 </html>

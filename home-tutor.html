@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Tutor - Call4All</title>
+<meta name="description" content="Qualified and verified home tutors for all classes and subjects. Book through Call4All.">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="services">
+
+<div id="site-header"></div>
+
+<section class="hero" style="padding: 50px 30px;">
+  <h1>📚 Home Tutor</h1>
+  <p>Qualified aur verified home tutors — har class, har subject ke liye.</p>
+</section>
+
+<div class="service-detail">
+  <p class="lead">Aapke bachhe ke best results ke liye trusted home tutors. Qualified, experienced aur background-verified teachers — aapke ghar par ya online.</p>
+
+  <h2>Classes & Levels</h2>
+  <ul>
+    <li>Pre-school / Nursery / KG</li>
+    <li>Primary classes (1-5)</li>
+    <li>Middle school (6-8)</li>
+    <li>High school (9-10) — CBSE / ICSE / State Board</li>
+    <li>Senior secondary (11-12) — Science, Commerce, Arts</li>
+    <li>College & competitive exams (JEE, NEET, UPSC, NDA, SSC)</li>
+    <li>Spoken English & Personality Development</li>
+    <li>Computer & Coding classes</li>
+  </ul>
+
+  <h2>Subjects Covered</h2>
+  <ul>
+    <li>Mathematics, Physics, Chemistry, Biology</li>
+    <li>English, Hindi, Sanskrit, Urdu</li>
+    <li>Social Studies, History, Geography, Civics</li>
+    <li>Accountancy, Economics, Business Studies</li>
+    <li>Computer Science, Information Technology</li>
+    <li>Music, Art, Dance, Yoga</li>
+    <li>Foreign languages (German, French, etc.)</li>
+  </ul>
+
+  <div class="highlight">
+    <strong>Why Call4All Tutors?</strong> Background-verified, qualification-checked, experienced teachers. Trial class available before commitment. Affordable monthly fees.
+  </div>
+
+  <h2>How to Book</h2>
+  <p>Form mein bata dein — aapke bachhe ki class, subjects, board (CBSE/ICSE/State), preferred timings aur location. Hum 24 ghante mein 2-3 best matching tutors aapko bhej denge.</p>
+</div>
+
+<div id="bookingFormSlot"></div>
+
+<div id="site-footer"></div>
+<div id="site-floating"></div>
+
+<script src="assets/js/site.js"></script>
+<script src="assets/js/booking.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const slot = document.getElementById('bookingFormSlot');
+  if (slot) slot.innerHTML = renderBookingForm({ service: 'Home Tutor' });
+  if (typeof initBookingForm === 'function') initBookingForm();
+});
+</script>
+</body>
+</html>
