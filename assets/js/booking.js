@@ -167,7 +167,7 @@ function escapeAttr(s) {
     .replace(/&/g, '&amp;').replace(/"/g, '&quot;');
 }
 
-async function handleBookingSubmit(e) {
+function handleBookingSubmit(e) {
   e.preventDefault();
   const form = e.target;
   const data = {
@@ -187,8 +187,6 @@ async function handleBookingSubmit(e) {
 
   const submitBtn = document.getElementById('bf_submit');
   const submitText = document.getElementById('bf_submit_text');
-  submitBtn.disabled = true;
-  submitText.textContent = '⏳ Submitting...';
 
   const id = 'BK' + Date.now();
   const timestamp = new Date().toISOString();
@@ -205,37 +203,51 @@ async function handleBookingSubmit(e) {
     status: 'New'
   };
 
-  let savedToCsv = false;
-  let saveError = null;
-
-  const publicToken = localStorage.getItem('c4a_public_token');
-  if (publicToken) {
-    try {
-      await window.CsvAPI.appendRow(row, publicToken, 'data/bookings.csv');
-      savedToCsv = true;
-    } catch (err) {
-      saveError = err.message || String(err);
-      console.error('GitHub CSV save failed:', err);
-    }
-  }
-
   const waText = buildWhatsAppMessage(row);
   const waUrl = `https://wa.me/${window.SITE_CONFIG.whatsappNumber}?text=${encodeURIComponent(waText)}`;
 
-  if (savedToCsv) {
-    showFormMessage('✅ Aapki request save ho gayi (Ref: ' + id + '). Ab WhatsApp khul raha hai — message bhej dein.', 'success');
-  } else if (saveError) {
-    showFormMessage('⚠️ WhatsApp khul raha hai. (CSV auto-save fail hua, admin manually add karega.)', 'info');
-  } else {
-    showFormMessage('✅ Aapki request taiyaar hai. WhatsApp khul raha hai — message bhej dein.', 'success');
+  // CRITICAL: window.open() must be called synchronously inside the click
+  // handler, otherwise modern browsers block it as a popup. Do this FIRST,
+  // before any async work or button state changes.
+  const waWindow = window.open(waUrl, '_blank');
+  const popupBlocked = !waWindow || waWindow.closed || typeof waWindow.closed === 'undefined';
+
+  // Now safely run async/background work
+  submitBtn.disabled = true;
+  submitText.textContent = '⏳ Sending...';
+
+  // Optional: save to CSV in the background (no await — fire and forget)
+  const publicToken = localStorage.getItem('c4a_public_token');
+  if (publicToken) {
+    window.CsvAPI.appendRow(row, publicToken, 'data/bookings.csv')
+      .then(() => console.log('Booking saved to CSV:', id))
+      .catch(err => console.error('Background CSV save failed:', err));
   }
 
-  setTimeout(() => {
-    window.open(waUrl, '_blank');
-    form.reset();
+  if (popupBlocked) {
+    // Browser blocked the popup. Render a clickable button so user can open WhatsApp.
+    showFormMessage(
+      '⚠️ Browser ne popup block kiya. Neeche button click karein WhatsApp open karne ke liye.',
+      'error'
+    );
+    submitText.innerHTML = '👉 Click here to open WhatsApp';
     submitBtn.disabled = false;
-    submitText.textContent = '📤 Submit & Send via WhatsApp';
-  }, 800);
+    submitBtn.onclick = function (ev) {
+      ev.preventDefault();
+      window.location.href = waUrl;
+    };
+  } else {
+    showFormMessage(
+      '✅ Aapki request taiyaar hai (Ref: ' + id + '). WhatsApp tab mein message bhej dein, hum 1 ghante mein reply karenge.',
+      'success'
+    );
+    // Reset form for next submission after a short delay
+    setTimeout(() => {
+      form.reset();
+      submitBtn.disabled = false;
+      submitText.textContent = '📤 Submit & Send via WhatsApp';
+    }, 1500);
+  }
 }
 
 function buildWhatsAppMessage(row) {
