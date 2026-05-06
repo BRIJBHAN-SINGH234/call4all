@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /data/
+Disallow: /admin.html
+Disallow: /staff.html
+Disallow: /assets/js/admin.js
+Disallow: /assets/js/staff.js
+
+Sitemap: https://www.call4all.co.in/sitemap.xml
