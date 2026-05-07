@@ -145,12 +145,30 @@ function applyTheme(theme) {
   }
 }
 
+/* Resolve any asset path so it loads correctly from anywhere on the site.
+ * Newly-uploaded files inside `assets/uploads/` are served via
+ * raw.githubusercontent.com — that bypasses GitHub Pages' build delay so
+ * a freshly-uploaded logo/image works *immediately* (no `/` workaround
+ * and no waiting for Pages to rebuild). */
+function assetUrl(path) {
+  if (!path) return path;
+  if (/^https?:\/\//i.test(path)) return path;
+  if (/^data:/i.test(path)) return path;
+  if (path.startsWith('assets/uploads/') || path.startsWith('/assets/uploads/')) {
+    const cfg = window.SITE_CONFIG;
+    const clean = path.replace(/^\//, '');
+    return `https://raw.githubusercontent.com/${cfg.github.owner}/${cfg.github.repo}/${cfg.github.branch}/${clean}`;
+  }
+  return path;
+}
+window.assetUrl = assetUrl;
+
 /* ===== Apply Branding (logo + names in header/footer) ===== */
 function applyBranding() {
   const cfg = window.SITE_CONFIG;
-  // Logos
+  // Logos (uploaded ones are routed via raw.github so they work instantly)
   document.querySelectorAll('[data-brand-logo]').forEach(img => {
-    img.src = cfg.logoUrl || 'Imagelogo.png';
+    img.src = assetUrl(cfg.logoUrl || 'Imagelogo.png');
     img.alt = (cfg.businessName || 'Call4All') + ' Logo';
     if (cfg.logoHeight) img.style.height = cfg.logoHeight + 'px';
   });
@@ -307,7 +325,7 @@ function renderHeader(activePage) {
   const links = [
     { href: 'index.html', label: 'Home', key: 'home' },
     { href: 'index.html#services', label: 'Services', key: 'services' },
-    { href: 'index.html#gallery', label: 'Gallery', key: 'gallery' },
+    { href: 'gallery.html', label: 'Gallery', key: 'gallery' },
     { href: 'about.html', label: 'About Us', key: 'about' },
     { href: 'contact.html', label: 'Contact Us', key: 'contact' }
   ];
@@ -315,9 +333,18 @@ function renderHeader(activePage) {
     `<li><a href="${l.href}" ${activePage === l.key ? 'class="active"' : ''}>${l.label}</a></li>`
   ).join('');
   const logoStyle = cfg.logoHeight ? `style="height:${cfg.logoHeight}px"` : '';
+  const logoUrl = assetUrl(cfg.logoUrl || 'Imagelogo.png');
+  const brandName = escapeHtml(cfg.businessName || 'Call4All');
+  const tagline = cfg.tagline ? `<span class="brand-tagline">${escapeHtml(cfg.tagline)}</span>` : '';
   return `
     <header class="site-header">
-      <div class="logo"><a href="index.html"><img src="${cfg.logoUrl || 'Imagelogo.png'}" alt="${cfg.businessName} Logo" ${logoStyle}></a></div>
+      <a class="logo" href="index.html" aria-label="${brandName} Home">
+        <img src="${logoUrl}" alt="${brandName} Logo" ${logoStyle}>
+        <span class="brand-text">
+          <span class="brand-name">${brandName}</span>
+          ${tagline}
+        </span>
+      </a>
       <button class="menu-toggle" aria-label="Toggle menu" onclick="toggleMenu()">☰</button>
       <nav class="site-nav" id="siteNav">
         <ul>${linkHtml}</ul>
@@ -497,15 +524,15 @@ function showIosInstallHintIfNeeded() {
 
 /* ===== Public Gallery (reads gallery.csv from raw github) =====
    A page can opt-in by adding:
-     <div id="galleryMount" data-category="rental-cars"></div>   (filtered)
-     <div id="galleryMount"></div>                                (all featured)
-*/
+     <div id="galleryMount" data-category="Rental Cars"></div>   (filtered)
+     <div id="galleryMount"></div>                                (all)
+     <div id="galleryMount" data-featured></div>                  (featured only)
+   Optional: data-limit="12" caps the result count. */
+let _galleryAllItems = [];   // cached full set for the dedicated gallery page
+
 async function renderGallerySection() {
   const mount = document.getElementById('galleryMount');
   if (!mount) return;
-  const filterCat = (mount.getAttribute('data-category') || '').trim();
-  const limit = parseInt(mount.getAttribute('data-limit') || '0', 10);
-  const featuredOnly = mount.hasAttribute('data-featured');
 
   const cfg = window.SITE_CONFIG;
   const url = `https://raw.githubusercontent.com/${cfg.github.owner}/${cfg.github.repo}/${cfg.github.branch}/data/gallery.csv?t=${Date.now()}`;
@@ -521,19 +548,65 @@ async function renderGallerySection() {
     return;
   }
 
-  let items = rows.filter(r => (r.status || 'Active').toLowerCase() === 'active' && r.image_path);
+  _galleryAllItems = rows.filter(r => (r.status || 'Active').toLowerCase() === 'active' && r.image_path);
+
+  // If the page provided a search input + category dropdown (the dedicated
+  // gallery page), wire them up for live filtering.
+  const searchInput = document.getElementById('galSearchInput');
+  const catSelect = document.getElementById('galCategorySelect');
+  if (searchInput || catSelect) {
+    const apply = () => paintGalleryGrid(mount);
+    if (searchInput) searchInput.addEventListener('input', apply);
+    if (catSelect) {
+      // Populate dynamic options if it has only the placeholder
+      if (catSelect.options.length <= 1) {
+        const cats = [...new Set(_galleryAllItems.map(r => r.category).filter(Boolean))].sort();
+        catSelect.innerHTML = '<option value="">All Categories</option>' +
+          cats.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+      }
+      catSelect.addEventListener('change', apply);
+    }
+  }
+
+  paintGalleryGrid(mount);
+}
+
+function paintGalleryGrid(mount) {
+  const filterCat = (mount.getAttribute('data-category') || '').trim();
+  const limit = parseInt(mount.getAttribute('data-limit') || '0', 10);
+  const featuredOnly = mount.hasAttribute('data-featured');
+
+  const searchInput = document.getElementById('galSearchInput');
+  const catSelect = document.getElementById('galCategorySelect');
+  const liveSearch = (searchInput ? searchInput.value : '').toLowerCase().trim();
+  const liveCat = catSelect ? catSelect.value : '';
+
+  let items = [..._galleryAllItems];
   if (filterCat) items = items.filter(r => (r.category || '').toLowerCase() === filterCat.toLowerCase());
+  if (liveCat) items = items.filter(r => (r.category || '').toLowerCase() === liveCat.toLowerCase());
   if (featuredOnly) items = items.filter(r => String(r.featured || '').toLowerCase() === 'true');
+  if (liveSearch) items = items.filter(r =>
+    [r.title, r.description, r.category].some(v => String(v || '').toLowerCase().includes(liveSearch))
+  );
+
   items.sort((a,b) => (parseInt(a.sort_order||'0',10) - parseInt(b.sort_order||'0',10)) || (a.timestamp < b.timestamp ? 1 : -1));
   if (limit > 0) items = items.slice(0, limit);
 
   if (!items.length) {
-    mount.innerHTML = '';
+    // On the dedicated gallery page, show a friendly empty state.
+    if (searchInput || catSelect) {
+      mount.innerHTML = `<div class="empty-state" style="padding:60px 20px;text-align:center;color:var(--text-light);">
+        <div style="font-size:48px;">🖼️</div>
+        <p>Filter ke hisab se koi image nahi mili. Search clear karein ya alag category select karein.</p>
+      </div>`;
+    } else {
+      mount.innerHTML = '';
+    }
     return;
   }
 
   const cards = items.map(it => {
-    const imgUrl = absoluteAssetUrl(it.image_path);
+    const imgUrl = assetUrl(it.image_path);
     return `
       <div class="gallery-card">
         ${it.category ? `<span class="cat-pill">${escapeHtml(it.category)}</span>` : ''}
@@ -549,18 +622,6 @@ async function renderGallerySection() {
   }).join('');
 
   mount.innerHTML = `<div class="gallery-grid">${cards}</div>`;
-}
-
-function absoluteAssetUrl(relPath) {
-  // If full URL already, return as-is
-  if (/^https?:\/\//i.test(relPath)) return relPath;
-  // For uploaded files, fetch via raw.githubusercontent so they show up immediately
-  // (avoids GH Pages caching delay after a fresh upload)
-  const cfg = window.SITE_CONFIG;
-  if (relPath.startsWith('assets/uploads/')) {
-    return `https://raw.githubusercontent.com/${cfg.github.owner}/${cfg.github.repo}/${cfg.github.branch}/${relPath}`;
-  }
-  return relPath;
 }
 
 function parseGalleryCsv(text) {

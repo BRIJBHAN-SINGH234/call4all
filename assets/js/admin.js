@@ -306,6 +306,15 @@ function renderBookingsTable() {
         (item.assigned_at ? `<span>${formatDate(item.assigned_at)}</span>` : '');
     }
 
+    const completionInfo = (status === 'Complete' && item.completion_notes)
+      ? `<div style="margin-top:6px;font-size:11px;color:#0a6b2c;background:#defbe7;padding:4px 8px;border-radius:6px;cursor:pointer;"
+              title="${escapeAttr(item.completion_notes)}"
+              onclick="alert('Completion Notes:\\n\\n' + this.dataset.notes + '\\n\\nCompleted: ${escapeAttr(formatDate(item.completed_at))}')"
+              data-notes="${escapeAttr(item.completion_notes)}">
+           📝 View notes
+         </div>`
+      : '';
+
     return `
       <tr>
         <td><strong>${escapeHtml(item.id)}</strong></td>
@@ -322,6 +331,7 @@ function renderBookingsTable() {
                   onchange="quickUpdateStatus('${escapeAttr(item.id)}', this.value)">
             ${statusOptions}
           </select>
+          ${completionInfo}
         </td>
         <td class="assigned-cell">
           <select class="inline-status-select" style="margin-bottom:4px;width:100%;"
@@ -345,15 +355,34 @@ function renderBookingsTable() {
 async function quickUpdateStatus(id, newStatus) {
   const idx = bookingsData.items.findIndex(i => i.id === id);
   if (idx < 0) return;
-  const original = bookingsData.items[idx].status;
-  bookingsData.items[idx].status = normalizeStatus(newStatus);
+  const item = bookingsData.items[idx];
+  const original = { status: item.status, completed_at: item.completed_at, completion_notes: item.completion_notes };
+  const normalized = normalizeStatus(newStatus);
+
+  // If admin marks Complete inline, ask for a note (for audit trail consistency
+  // with what staff are required to provide).
+  if (normalized === 'Complete') {
+    const note = prompt('Completion notes (kaise complete hua, customer feedback, payment etc.):', item.completion_notes || '');
+    if (note === null) {  // user cancelled
+      renderBookingsTable();
+      return;
+    }
+    item.completion_notes = note.trim();
+    item.completed_at = new Date().toISOString();
+  } else {
+    // Moving out of Complete clears the completion record
+    item.completion_notes = '';
+    item.completed_at = '';
+  }
+  item.status = normalized;
+
   try {
     await window.CsvAPI.saveAll(defaultHeaders(PATH_BOOKINGS), bookingsData.items, bookingsData.sha, getToken(),
       `Update booking ${id} status → ${newStatus}`, PATH_BOOKINGS);
     await loadBookings();
   } catch (err) {
     alert('Status update failed: ' + err.message);
-    bookingsData.items[idx].status = original;
+    Object.assign(item, original);
     renderBookingsTable();
   }
 }
@@ -451,6 +480,15 @@ async function handleSaveBooking(e) {
     assignedAt = new Date().toISOString();
   }
 
+  // Preserve any existing completion_notes / completed_at on edit
+  const existing = editingBookingId ? bookingsData.items.find(i => i.id === editingBookingId) : null;
+  const newStatus = normalizeStatus(form.status.value);
+  let completedAt = existing ? (existing.completed_at || '') : '';
+  // If admin transitions to Complete and no completed_at yet, stamp now
+  if (newStatus === 'Complete' && !completedAt) completedAt = new Date().toISOString();
+  // If admin moves OUT of Complete, clear timestamp + notes
+  if (newStatus !== 'Complete') completedAt = '';
+
   const row = {
     id: form.id_field.value,
     timestamp: form.timestamp_field.value,
@@ -461,9 +499,11 @@ async function handleSaveBooking(e) {
     area: form.area.value.trim(),
     address: form.address.value.trim(),
     message: form.message.value.trim(),
-    status: normalizeStatus(form.status.value),
+    status: newStatus,
     assigned_to: newAssigned,
-    assigned_at: assignedAt
+    assigned_at: assignedAt,
+    completion_notes: existing ? (existing.completion_notes || '') : '',
+    completed_at: completedAt
   };
 
   try {

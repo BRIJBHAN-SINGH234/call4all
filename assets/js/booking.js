@@ -202,7 +202,9 @@ function handleBookingSubmit(e) {
     message: data.message,
     status: 'Pending',
     assigned_to: '',
-    assigned_at: ''
+    assigned_at: '',
+    completion_notes: '',
+    completed_at: ''
   };
 
   const waText = buildWhatsAppMessage(row);
@@ -371,7 +373,7 @@ window.CsvAPI = (function () {
   }
 
   const DEFAULT_HEADERS = {
-    'data/bookings.csv': ['id', 'timestamp', 'name', 'phone', 'service', 'city', 'area', 'address', 'message', 'status', 'assigned_to', 'assigned_at'],
+    'data/bookings.csv': ['id', 'timestamp', 'name', 'phone', 'service', 'city', 'area', 'address', 'message', 'status', 'assigned_to', 'assigned_at', 'completion_notes', 'completed_at'],
     'data/sources.csv': ['id', 'timestamp', 'category', 'name', 'city', 'area', 'address', 'contact_person', 'contact_phone', 'price', 'availability', 'notes', 'added_by'],
     'data/staff.csv': ['id', 'email', 'password_hash', 'name', 'phone', 'role', 'status', 'created_at', 'created_by'],
     'data/areas.csv': ['id', 'city', 'area', 'status', 'created_at'],

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallery - {{brand}}</title>
+<meta name="description" content="Browse our service work gallery — rental cars, rooms, weddings, construction, manpower and more.">
+<meta name="theme-color" content="#1e3c72">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Call4All">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+  .gallery-controls {
+    max-width: 900px;
+    margin: 0 auto 28px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+  }
+  .gallery-controls input[type="text"],
+  .gallery-controls select {
+    padding: 10px 14px;
+    border: 2px solid #e1e5eb;
+    border-radius: 8px;
+    font-size: 14px;
+    min-width: 220px;
+    background: white;
+  }
+  .gallery-controls input[type="text"]:focus,
+  .gallery-controls select:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+  .gallery-hero {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    text-align: center;
+    padding: 60px 22px;
+  }
+  .gallery-hero h1 { font-size: 42px; margin-bottom: 10px; }
+  .gallery-hero p { font-size: 17px; opacity: 0.9; max-width: 700px; margin: 0 auto; }
+  @media (max-width: 768px) {
+    .gallery-hero { padding: 40px 16px; }
+    .gallery-hero h1 { font-size: 30px; }
+    .gallery-controls input[type="text"],
+    .gallery-controls select { min-width: 100%; }
+  }
+</style>
+</head>
+<body data-page="gallery">
+
+<div id="site-header"></div>
+
+<section class="gallery-hero">
+  <h1>📸 Our Work Gallery</h1>
+  <p>Hamare service work ki saari photos ek jagah. Filter ya search karke specific images dekhein.</p>
+</section>
+
+<section class="section">
+  <div class="gallery-controls">
+    <input type="text" id="galSearchInput" placeholder="🔍 Search by title, description, category...">
+    <select id="galCategorySelect">
+      <option value="">All Categories</option>
+    </select>
+  </div>
+
+  <div id="galleryMount" style="max-width:1200px;margin:0 auto;">
+    <p style="text-align:center;padding:50px 20px;color:var(--text-light);">Loading gallery...</p>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+<div id="site-floating"></div>
+
+<script src="assets/js/site.js"></script>
+<script src="assets/js/booking.js"></script>
+</body>
+</html>

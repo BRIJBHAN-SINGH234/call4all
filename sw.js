@@ -1,13 +1,14 @@
 /* ===== Call4All - Service Worker =====
  * Strategies:
  *   - HTML pages:        network-first, fallback to cache (so updates show)
- *   - Static assets:     cache-first (CSS, JS, icons, logo)
- *   - Data CSVs:         network-only (always fresh; will fail offline)
- *   - GitHub API calls:  network-only (sensitive operations, never cache)
- *   - raw.githubusercontent: network-first with cache fallback for staff login etc.
+ *   - JS / CSS:          network-first — these change frequently with deploys,
+ *                        we never want users stuck on stale logic
+ *   - Other static:      cache-first (icons, fonts, default logo)
+ *   - Data CSVs/JSON:    network-first (raw + /data/)
+ *   - GitHub API calls:  network-only (sensitive, never cache)
  */
 
-const CACHE_VERSION = 'v4-2026-05-07';
+const CACHE_VERSION = 'v5-2026-05-08';
 const STATIC_CACHE = 'c4a-static-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'c4a-runtime-' + CACHE_VERSION;
 
@@ -24,6 +25,7 @@ const PRECACHE_URLS = [
   '/marriage-services.html',
   '/flower-bouquet.html',
   '/car-decoration.html',
+  '/gallery.html',
   '/assets/css/style.css',
   '/assets/js/site.js',
   '/assets/js/booking.js',
@@ -80,7 +82,14 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Static assets — cache-first
+  // JS / CSS files — network-first so deploy updates show on normal reload
+  // (without requiring a hard refresh / SW cache version bump every time)
+  if (/\.(js|css|mjs)(\?|$)/.test(url.pathname)) {
+    event.respondWith(networkFirst(req));
+    return;
+  }
+
+  // Other static assets (icons, png, jpg, fonts) — cache-first for speed
   event.respondWith(cacheFirst(req));
 });
 

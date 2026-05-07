@@ -133,12 +133,16 @@
 
       <div class="admin-card">
         <h3 style="color:var(--primary); margin-bottom:14px;">📋 My Assigned Bookings</h3>
+        <p style="color:var(--text-light); font-size:13px; margin-bottom:14px;">
+          🔒 Note: Aap sirf <strong>Complete</strong> mark kar sakte ho — bhi description (notes) ke saath.
+          Status badalne ya cancel karne ke liye admin se baat karein. Ek baar assign ho jane ke baad booking dashboard se hatti nahi.
+        </p>
         <div class="admin-toolbar">
           <input type="text" id="myBookingSearch" placeholder="🔍 Search name, phone, service, city...">
           <select id="myBookingStatusFilter">
-            <option value="">All Status</option>
+            <option value="" selected>All Status (default)</option>
             <option value="Pending">⏳ Pending</option>
-            <option value="Processing" selected>⚙️ Processing</option>
+            <option value="Processing">⚙️ Processing</option>
             <option value="Complete">✅ Complete</option>
             <option value="Cancelled">❌ Cancelled</option>
           </select>
@@ -207,6 +211,32 @@
           </table>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ===== Booking Complete Modal ===== -->
+  <div class="modal-backdrop" id="completeModal">
+    <div class="modal">
+      <button class="modal-close" id="completeModalCloseBtn" type="button">&times;</button>
+      <h2>✅ Mark Booking Complete</h2>
+      <form id="completeForm">
+        <input type="hidden" name="booking_id">
+        <div style="background:#f3f7ff; padding:12px 14px; border-radius:8px; margin-bottom:16px; font-size:14px;">
+          <div><strong>Customer:</strong> <span id="completeCustomerName">-</span></div>
+          <div><strong>Service:</strong> <span id="completeService">-</span></div>
+          <div><strong>City / Area:</strong> <span id="completeCity">-</span></div>
+        </div>
+        <div class="form-group">
+          <label>Completion Notes / Description *</label>
+          <textarea name="notes" required rows="5"
+                    placeholder="Yeh kaam kaise complete hua, kitna time laga, customer ka feedback, payment received ya nahi, koi issue tha kya — sab detail likhein."></textarea>
+          <p class="help-text">Yeh notes admin ke dashboard mein dikhenge. Detail mein likhein taaki record clear ho.</p>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="completeCancelBtn" style="border-color:#999;color:#666;">Cancel</button>
+          <button type="submit" class="btn btn-success">✅ Confirm Complete</button>
+        </div>
+      </form>
     </div>
   </div>
 

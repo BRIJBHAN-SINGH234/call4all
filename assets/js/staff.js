@@ -212,6 +212,11 @@ function initStaffDashboard() {
   document.getElementById('myBookingSearch').addEventListener('input', renderMyBookingsTable);
   document.getElementById('myBookingStatusFilter').addEventListener('change', renderMyBookingsTable);
 
+  // Complete modal events
+  document.getElementById('completeForm').addEventListener('submit', handleCompleteBooking);
+  document.getElementById('completeModalCloseBtn').addEventListener('click', closeCompleteModal);
+  document.getElementById('completeCancelBtn').addEventListener('click', closeCompleteModal);
+
   // Tab switching
   document.querySelectorAll('[data-stab]').forEach(btn => {
     btn.addEventListener('click', () => switchStaffTab(btn.dataset.stab));
@@ -412,13 +417,16 @@ function renderMyBookingsTable() {
   const search = (document.getElementById('myBookingSearch').value || '').toLowerCase().trim();
   const statusFilter = document.getElementById('myBookingStatusFilter').value;
 
+  // Once a booking is assigned to this staff, it ALWAYS stays in their list
+  // (regardless of status). Filter only narrows the visible subset; it does
+  // NOT remove the booking from the underlying assignment.
   let items = myBookingsData.items.filter(i => (i.assigned_to || '').toLowerCase() === myEmail);
   items.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
   if (statusFilter) items = items.filter(i => normStatus(i.status).toLowerCase() === statusFilter.toLowerCase());
   if (search) items = items.filter(i => Object.values(i).some(v => String(v).toLowerCase().includes(search)));
 
   if (items.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><div class="icon">📭</div><div>No bookings assigned to you. Wait for the admin to assign one.</div></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><div class="icon">📭</div><div>No bookings match the current filter. Try changing the filter or wait for the admin to assign one.</div></div></td></tr>';
     return;
   }
 
@@ -427,9 +435,27 @@ function renderMyBookingsTable() {
     const phoneClean = (item.phone || '').replace(/[^0-9]/g, '');
     const status = normStatus(item.status);
     const statusKey = status.toLowerCase();
+    const isCompleted = status === 'Complete';
+    const isCancelled = status === 'Cancelled';
 
-    const statusOptions = ['Pending','Processing','Complete','Cancelled']
-      .map(s => `<option value="${s}" ${s === status ? 'selected' : ''}>${s}</option>`).join('');
+    // Staff cannot change status arbitrarily — only mark Complete (with notes).
+    // Already-Complete or Cancelled rows are read-only.
+    const actionCell = isCompleted
+      ? `<div style="font-size:12px;">
+           <span style="color:#0a6b2c;font-weight:600;">✅ Done</span>
+           ${item.completion_notes ? `<br><span style="color:#666;font-size:11px;cursor:pointer;text-decoration:underline;"
+              onclick="showStaffCompletionNote('${escAttr(item.id)}')">📝 View notes</span>` : ''}
+         </div>`
+      : isCancelled
+        ? `<span style="color:#93181f;font-weight:600;font-size:12px;">❌ Cancelled by admin</span>`
+        : `<button class="btn btn-success btn-sm"
+                  onclick="openCompleteModal('${escAttr(item.id)}')">
+             ✅ Mark Complete
+           </button>`;
+
+    const completedLabel = isCompleted && item.completed_at
+      ? `<div style="font-size:11px;color:#666;margin-top:3px;">${escHtml(fmtDate(item.completed_at))}</div>`
+      : '';
 
     return `
       <tr>
@@ -443,43 +469,82 @@ function renderMyBookingsTable() {
         <td class="msg-cell">${escHtml(item.address || '-')}</td>
         <td class="msg-cell">${escHtml(item.message)}</td>
         <td>
-          <select class="inline-status-select is-${statusKey}"
-                  onchange="staffUpdateBookingStatus('${escAttr(item.id)}', this.value)">
-            ${statusOptions}
-          </select>
+          <span class="status-badge status-${statusKey}">${escHtml(status)}</span>
+          ${completedLabel}
         </td>
-        <td>
-          <button class="btn btn-success btn-sm"
-                  onclick="staffMarkBookingComplete('${escAttr(item.id)}')">
-            ✅ Complete
-          </button>
-        </td>
+        <td>${actionCell}</td>
       </tr>
     `;
   }).join('');
 }
 
-async function staffUpdateBookingStatus(id, newStatus) {
+/* Show a stored completion note in a simple alert */
+function showStaffCompletionNote(id) {
+  const item = myBookingsData.items.find(i => i.id === id);
+  if (!item) return;
+  alert(
+    'Completion Notes:\n\n' + (item.completion_notes || '(empty)') +
+    '\n\nCompleted at: ' + (fmtDate(item.completed_at) || '-')
+  );
+}
+
+/* ===== Complete Modal ===== */
+function openCompleteModal(id) {
+  const item = myBookingsData.items.find(i => i.id === id);
+  if (!item) { alert('Booking not found.'); return; }
+  const form = document.getElementById('completeForm');
+  form.booking_id.value = id;
+  form.notes.value = item.completion_notes || '';
+  document.getElementById('completeCustomerName').textContent = item.name || '-';
+  document.getElementById('completeService').textContent = item.service || '-';
+  document.getElementById('completeCity').textContent =
+    [item.city, item.area].filter(Boolean).join(' / ') || '-';
+  document.getElementById('completeModal').classList.add('show');
+  setTimeout(() => form.notes.focus(), 100);
+}
+
+function closeCompleteModal() {
+  document.getElementById('completeModal').classList.remove('show');
+}
+
+async function handleCompleteBooking(e) {
+  e.preventDefault();
+  const form = e.target;
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const id = form.booking_id.value;
+  const notes = form.notes.value.trim();
+
+  if (!notes) {
+    alert('Please describe how the booking was completed.');
+    return;
+  }
+
   const idx = myBookingsData.items.findIndex(i => i.id === id);
-  if (idx < 0) return;
-  const original = myBookingsData.items[idx].status;
-  myBookingsData.items[idx].status = normStatus(newStatus);
+  if (idx < 0) { alert('Booking not found.'); return; }
+  const item = myBookingsData.items[idx];
+  const original = {
+    status: item.status,
+    completion_notes: item.completion_notes,
+    completed_at: item.completed_at
+  };
+
+  submitBtn.disabled = true; submitBtn.textContent = 'Saving...';
+
+  item.status = 'Complete';
+  item.completion_notes = notes;
+  item.completed_at = new Date().toISOString();
+
   const token = localStorage.getItem(SS_TOKEN);
   try {
     await window.CsvAPI.saveAll(window.CsvAPI.DEFAULT_HEADERS[PATH_BOOKINGS],
       myBookingsData.items, myBookingsData.sha, token,
-      `Staff status update: booking ${id} → ${newStatus}`, PATH_BOOKINGS);
+      `Staff completed booking ${id}`, PATH_BOOKINGS);
+    closeCompleteModal();
     await loadMyBookings();
   } catch (err) {
-    alert('Status update failed: ' + sanitizeError(err.message));
-    myBookingsData.items[idx].status = original;
-    renderMyBookingsTable();
-  }
-}
-
-function staffMarkBookingComplete(id) {
-  if (confirm('Mark this booking as Complete? Customer ko inform kar diya hai?')) {
-    staffUpdateBookingStatus(id, 'Complete');
+    alert('Save failed: ' + sanitizeError(err.message));
+    Object.assign(item, original);
+    submitBtn.disabled = false; submitBtn.textContent = '✅ Confirm Complete';
   }
 }
 
