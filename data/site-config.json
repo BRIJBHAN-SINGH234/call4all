@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-05-07T06:11:42.515Z",
+  "updated_at": "2026-05-07T06:22:28.656Z",
   "branding": {
     "site_name": "Call4All",
     "tagline": "One Call. Every Service. Done.",
@@ -8,14 +8,14 @@
     "logo_height": 55
   },
   "theme": {
-    "preset": "summer",
-    "primary": "#e65100",
-    "primary_dark": "#a83b00",
-    "accent": "#ffd180",
-    "accent_dark": "#e6b366",
-    "background": "#fffaf0",
-    "festival_overlay": "none",
-    "festival_banner": ""
+    "preset": "christmas",
+    "primary": "#0a5d2c",
+    "primary_dark": "#063d1d",
+    "accent": "#d32f2f",
+    "accent_dark": "#a01a1a",
+    "background": "#f6fff6",
+    "festival_overlay": "christmas",
+    "festival_banner": "🎄 Merry Christmas & Happy New Year 🎄"
   },
   "contact": {
     "phone": "+918387930687",
