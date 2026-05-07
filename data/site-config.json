@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-05-07T10:44:45.078Z",
+  "updated_at": "2026-05-07T11:07:04.557Z",
   "branding": {
     "site_name": "Call4All",
     "tagline": "One Call. Every Service. Done.",
@@ -14,7 +14,7 @@
     "accent": "#ffd180",
     "accent_dark": "#e6b366",
     "background": "#fffaf0",
-    "festival_overlay": "none",
+    "festival_overlay": "independence",
     "festival_banner": ""
   },
   "contact": {
