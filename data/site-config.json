@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at": "2026-05-07T13:45:00.000Z",
+  "updated_at": "2026-05-07T13:50:33.117Z",
   "branding": {
     "site_name": "Call4All",
     "tagline": "One Call. Every Service. Done.",
@@ -32,15 +32,101 @@
     "enabled": true,
     "interval_ms": 4500,
     "slides": [
-      { "id": "s1", "enabled": true, "icon": "🚗", "title": "Rental Cars", "subtitle": "Premium & budget cars for travel and events", "background_url": "", "link": "rental-cars.html", "order": 1 },
-      { "id": "s2", "enabled": true, "icon": "🏠", "title": "Rooms & Flats", "subtitle": "Quick rentals — rooms, flats, PG, properties", "background_url": "", "link": "rooms-flats.html", "order": 2 },
-      { "id": "s3", "enabled": true, "icon": "🧱", "title": "Construction Labor", "subtitle": "Mistri, mazdoor, thekedar — sab ek call par", "background_url": "", "link": "construction.html", "order": 3 },
-      { "id": "s4", "enabled": true, "icon": "📚", "title": "Home Tutors", "subtitle": "Qualified tutors for every class & subject", "background_url": "", "link": "home-tutor.html", "order": 4 },
-      { "id": "s5", "enabled": true, "icon": "👷", "title": "Manpower Supply", "subtitle": "Skilled & unskilled manpower on demand", "background_url": "", "link": "manpower-supply.html", "order": 5 },
-      { "id": "s6", "enabled": true, "icon": "💍", "title": "Marriage Services", "subtitle": "Decoration, catering, rentals — A to Z", "background_url": "", "link": "marriage-services.html", "order": 6 },
-      { "id": "s7", "enabled": true, "icon": "🌸", "title": "Hotel Flower Bouquet", "subtitle": "Luxury floral arrangements for hotels & events", "background_url": "", "link": "flower-bouquet.html", "order": 7 },
-      { "id": "s8", "enabled": true, "icon": "🎀", "title": "Car Decoration", "subtitle": "Wedding & event car decoration", "background_url": "", "link": "car-decoration.html", "order": 8 }
+      {
+        "id": "s1",
+        "enabled": true,
+        "icon": "🚗",
+        "title": "Rental Cars",
+        "subtitle": "Premium & budget cars for travel and events",
+        "background_url": "",
+        "link": "rental-cars.html",
+        "order": 1
+      },
+      {
+        "id": "s2",
+        "enabled": true,
+        "icon": "🏠",
+        "title": "Rooms & Flats",
+        "subtitle": "Quick rentals — rooms, flats, PG, properties",
+        "background_url": "",
+        "link": "rooms-flats.html",
+        "order": 2
+      },
+      {
+        "id": "s3",
+        "enabled": true,
+        "icon": "🧱",
+        "title": "Construction Labor",
+        "subtitle": "Mistri, mazdoor, thekedar — sab ek call par",
+        "background_url": "",
+        "link": "construction.html",
+        "order": 3
+      },
+      {
+        "id": "s4",
+        "enabled": true,
+        "icon": "📚",
+        "title": "Home Tutors",
+        "subtitle": "Qualified tutors for every class & subject",
+        "background_url": "",
+        "link": "home-tutor.html",
+        "order": 4
+      },
+      {
+        "id": "s5",
+        "enabled": true,
+        "icon": "👷",
+        "title": "Manpower Supply",
+        "subtitle": "Skilled & unskilled manpower on demand",
+        "background_url": "",
+        "link": "manpower-supply.html",
+        "order": 5
+      },
+      {
+        "id": "s6",
+        "enabled": true,
+        "icon": "💍",
+        "title": "Marriage Services",
+        "subtitle": "Decoration, catering, rentals — A to Z",
+        "background_url": "",
+        "link": "marriage-services.html",
+        "order": 6
+      },
+      {
+        "id": "s7",
+        "enabled": true,
+        "icon": "🌸",
+        "title": "Hotel Flower Bouquet",
+        "subtitle": "Luxury floral arrangements for hotels & events",
+        "background_url": "",
+        "link": "flower-bouquet.html",
+        "order": 7
+      },
+      {
+        "id": "s8",
+        "enabled": true,
+        "icon": "🎀",
+        "title": "Car Decoration",
+        "subtitle": "Wedding & event car decoration",
+        "background_url": "",
+        "link": "car-decoration.html",
+        "order": 8
+      }
     ]
   },
-  "pages": []
+  "pages": [
+    {
+      "id": "p1778161833117",
+      "created_at": "2026-05-07T13:50:33.117Z",
+      "title": "test page",
+      "slug": "test-page",
+      "nav_label": "",
+      "meta_description": "",
+      "html_content": "<b>TEST BY BHANU </b>",
+      "show_in_menu": true,
+      "enabled": true,
+      "order": 10,
+      "updated_at": "2026-05-07T13:50:33.117Z"
+    }
+  ]
 }
