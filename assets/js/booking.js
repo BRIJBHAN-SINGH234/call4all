@@ -359,7 +359,8 @@ window.CsvAPI = (function () {
     'data/bookings.csv': ['id', 'timestamp', 'name', 'phone', 'service', 'city', 'area', 'address', 'message', 'status'],
     'data/sources.csv': ['id', 'timestamp', 'category', 'name', 'city', 'area', 'address', 'contact_person', 'contact_phone', 'price', 'availability', 'notes', 'added_by'],
     'data/staff.csv': ['id', 'email', 'password_hash', 'name', 'phone', 'role', 'status', 'created_at', 'created_by'],
-    'data/areas.csv': ['id', 'city', 'area', 'status', 'created_at']
+    'data/areas.csv': ['id', 'city', 'area', 'status', 'created_at'],
+    'data/gallery.csv': ['id', 'timestamp', 'category', 'title', 'description', 'image_path', 'featured', 'sort_order', 'status', 'added_by']
   };
 
   async function getFile(path, token) {
@@ -469,12 +470,134 @@ window.CsvAPI = (function () {
     return putFile(path, content, sha, token, message);
   }
 
+  /* ===== JSON file load/save (e.g. site-config.json) ===== */
+  async function loadJson(path, token) {
+    if (token) {
+      const file = await getFile(path, token);
+      let json = {};
+      try { json = JSON.parse(file.content || '{}'); } catch (e) {}
+      return { json, sha: file.sha };
+    }
+    const file = await getFilePublic(path);
+    let json = {};
+    try { json = JSON.parse(file.content || '{}'); } catch (e) {}
+    return { json };
+  }
+
+  async function saveJson(path, json, sha, token, message) {
+    const content = JSON.stringify(json, null, 2);
+    return putFile(path, content, sha, token, message || `Update ${path}`);
+  }
+
+  /* ===== Image / Binary upload =====
+     Reads File, optionally compresses to maxWidth, uploads to GitHub repo
+     under given path. Returns the saved path (e.g. assets/uploads/foo.jpg). */
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => {
+        const dataUrl = String(r.result || '');
+        const idx = dataUrl.indexOf(',');
+        resolve(idx >= 0 ? dataUrl.slice(idx + 1) : dataUrl);
+      };
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+  }
+
+  function compressImageFile(file, maxWidth = 1400, quality = 0.82) {
+    return new Promise((resolve, reject) => {
+      // Skip compression for SVG/GIF (animations/vectors lose quality)
+      if (/svg|gif/i.test(file.type)) {
+        return fileToBase64(file).then(b64 => resolve({ base64: b64, mime: file.type }));
+      }
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          let { width, height } = img;
+          if (width > maxWidth) {
+            height = Math.round(height * (maxWidth / width));
+            width = maxWidth;
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#fff';
+          ctx.fillRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+          // Use JPEG for photos, PNG for transparency-likely files
+          const outMime = /png/i.test(file.type) ? 'image/png' : 'image/jpeg';
+          canvas.toBlob(blob => {
+            if (!blob) return reject(new Error('Image compression failed'));
+            const r2 = new FileReader();
+            r2.onload = () => {
+              const dataUrl = String(r2.result || '');
+              const idx = dataUrl.indexOf(',');
+              resolve({ base64: idx >= 0 ? dataUrl.slice(idx + 1) : dataUrl, mime: outMime });
+            };
+            r2.readAsDataURL(blob);
+          }, outMime, quality);
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function safeFilename(name) {
+    return String(name || 'file').replace(/[^a-z0-9._-]+/gi, '_').slice(0, 60);
+  }
+
+  async function uploadImage(file, token, opts) {
+    opts = opts || {};
+    if (!file) throw new Error('No file selected');
+    if (!token) throw new Error('Not authenticated');
+
+    const { base64, mime } = await compressImageFile(file, opts.maxWidth || 1400, opts.quality || 0.82);
+    const ext = mime === 'image/png' ? 'png' : (mime === 'image/svg+xml' ? 'svg' : (mime === 'image/gif' ? 'gif' : 'jpg'));
+    const slug = opts.prefix ? safeFilename(opts.prefix) + '-' : '';
+    const baseName = safeFilename(file.name.replace(/\.[^.]+$/, ''));
+    const filename = `${slug}${Date.now()}-${baseName}.${ext}`;
+    const path = (opts.folder || 'assets/uploads/').replace(/\/?$/, '/') + filename;
+
+    const res = await fetch(apiUrlFor(path), {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/vnd.github+json',
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: opts.message || `Upload ${path} via Call4All admin`,
+        content: base64,
+        branch: cfg.branch
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      let msg = err.message || `Upload failed (${res.status})`;
+      if (res.status === 403 || /Resource not accessible/i.test(msg)) {
+        msg = 'Token mein "Contents: Read and write" permission nahi hai. Naya token banayein.';
+      } else if (res.status === 401) {
+        msg = 'Token invalid ya expired hai. Logout karke naya token use karein.';
+      }
+      throw new Error(msg);
+    }
+    return { path };
+  }
+
   return {
     PATHS: {
       bookings: 'data/bookings.csv',
       sources: 'data/sources.csv',
       staff: 'data/staff.csv',
-      areas: 'data/areas.csv'
+      areas: 'data/areas.csv',
+      gallery: 'data/gallery.csv',
+      siteConfig: 'data/site-config.json'
     },
     DEFAULT_HEADERS,
     appendRow,
@@ -484,6 +607,11 @@ window.CsvAPI = (function () {
     getFile,
     getFilePublic,
     putFile,
+    loadJson,
+    saveJson,
+    uploadImage,
+    fileToBase64,
+    compressImageFile,
     csvToObjects,
     objectsToCsv,
     rowToCsv,

@@ -12,16 +12,23 @@ const PATH_BOOKINGS = 'data/bookings.csv';
 const PATH_SOURCES = 'data/sources.csv';
 const PATH_STAFF = 'data/staff.csv';
 const PATH_AREAS = 'data/areas.csv';
+const PATH_GALLERY = 'data/gallery.csv';
+const PATH_SITE_CONFIG = 'data/site-config.json';
 
 let bookingsData = { headers: [], items: [], sha: null };
 let sourcesData = { headers: [], items: [], sha: null };
 let staffData = { headers: [], items: [], sha: null };
 let areasData = { headers: [], items: [], sha: null };
+let galleryData = { headers: [], items: [], sha: null };
+let siteConfigData = { json: null, sha: null };
 
 let editingBookingId = null;
 let editingSourceId = null;
 let editingStaffId = null;
 let editingAreaId = null;
+let editingGalleryId = null;
+let pendingLogoUpload = null;
+let pendingGalleryUpload = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   const loginView = document.getElementById('loginView');
@@ -129,26 +136,55 @@ function initAdmin() {
   if (userEl) userEl.textContent = localStorage.getItem(STORAGE_USER) || 'admin';
 
   setupTabs();
+  setupSidebarToggle();
   bindBookingEvents();
   bindSourceEvents();
   bindStaffEvents();
   bindAreaEvents();
+  bindGalleryEvents();
+  bindThemeEvents();
+  bindBrandingEvents();
+  bindContactEvents();
   bindSettingsEvents();
 
   document.getElementById('logoutBtn').addEventListener('click', logout);
-  document.getElementById('settingsBtn').addEventListener('click', openSettingsModal);
 
   loadAllSections();
+  loadSiteConfig();
 }
 
 function setupTabs() {
   document.querySelectorAll('.admin-tab').forEach(tab => {
-    tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+    tab.addEventListener('click', () => {
+      switchTab(tab.dataset.tab);
+      // Auto-close sidebar on mobile after click
+      if (window.innerWidth <= 768) closeSidebar();
+    });
   });
 }
 function switchTab(tabName) {
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === 'tab-' + tabName));
+  // Lazy-load section data on first activation
+  if (tabName === 'gallery' && (!galleryData.items || !galleryData.items.length)) loadGallery();
+}
+
+function setupSidebarToggle() {
+  const btn = document.getElementById('sidebarToggleBtn');
+  const sidebar = document.getElementById('adminSidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  if (!btn || !sidebar) return;
+  btn.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    if (backdrop) backdrop.classList.toggle('show', sidebar.classList.contains('open'));
+  });
+  if (backdrop) backdrop.addEventListener('click', closeSidebar);
+}
+function closeSidebar() {
+  const sidebar = document.getElementById('adminSidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  if (sidebar) sidebar.classList.remove('open');
+  if (backdrop) backdrop.classList.remove('show');
 }
 
 async function loadAllSections() {
@@ -156,6 +192,7 @@ async function loadAllSections() {
   loadSources();
   loadStaff();
   loadAreas();
+  loadGallery();
 }
 
 /* ===========================================================================
@@ -933,12 +970,15 @@ async function deleteArea(id) {
 }
 
 /* ===========================================================================
- * SECTION 5 — SETTINGS
+ * SECTION 5 — SETTINGS (now a tab, not a modal)
  * =========================================================================== */
 function bindSettingsEvents() {
-  document.getElementById('settingsForm').addEventListener('submit', handleSaveSettings);
-  document.getElementById('settingsCloseBtn').addEventListener('click', closeSettingsModal);
-  document.getElementById('settingsCancelBtn').addEventListener('click', closeSettingsModal);
+  const form = document.getElementById('settingsForm');
+  if (!form) return;
+  form.addEventListener('submit', handleSaveSettings);
+  // Pre-fill on load
+  document.getElementById('publicToken').value = localStorage.getItem(STORAGE_PUBLIC) || '';
+
   document.getElementById('clearPublicBtn').addEventListener('click', () => {
     localStorage.removeItem(STORAGE_PUBLIC);
     document.getElementById('publicToken').value = '';
@@ -950,17 +990,6 @@ function bindSettingsEvents() {
   });
 }
 
-function openSettingsModal() {
-  document.getElementById('publicToken').value = localStorage.getItem(STORAGE_PUBLIC) || '';
-  document.getElementById('newAdminPass').value = '';
-  document.getElementById('settingsMsg').className = 'form-message';
-  document.getElementById('settingsMsg').textContent = '';
-  document.getElementById('settingsModal').classList.add('show');
-}
-function closeSettingsModal() {
-  document.getElementById('settingsModal').classList.remove('show');
-}
-
 async function handleSaveSettings(e) {
   e.preventDefault();
   const form = e.target;
@@ -970,6 +999,511 @@ async function handleSaveSettings(e) {
   if (newPass) {
     const hash = await sha256(newPass);
     localStorage.setItem(STORAGE_PASS_HASH, hash);
+    document.getElementById('newAdminPass').value = '';
   }
   showMsg('settingsMsg', '✅ Settings saved on this browser.', 'success');
+}
+
+/* ===========================================================================
+ * SECTION 6 — SITE CONFIG (Theme, Branding, Contact)
+ * =========================================================================== */
+async function loadSiteConfig() {
+  try {
+    const res = await window.CsvAPI.loadJson(PATH_SITE_CONFIG, getToken());
+    siteConfigData = { json: res.json || {}, sha: res.sha || null };
+    if (!siteConfigData.json || !Object.keys(siteConfigData.json).length) {
+      // Build default
+      siteConfigData.json = buildDefaultSiteConfig();
+    }
+    populateThemeForm();
+    populateBrandingForm();
+    populateContactForm();
+    renderFestivalPresetGrid();
+  } catch (err) {
+    console.warn('[admin] site-config load failed:', err.message);
+    siteConfigData = { json: buildDefaultSiteConfig(), sha: null };
+    populateThemeForm();
+    populateBrandingForm();
+    populateContactForm();
+    renderFestivalPresetGrid();
+  }
+}
+
+function buildDefaultSiteConfig() {
+  return {
+    version: 1,
+    updated_at: new Date().toISOString(),
+    branding: {
+      site_name: 'Call4All',
+      tagline: 'One Call. Every Service. Done.',
+      logo_url: 'Imagelogo.png',
+      logo_height: 55
+    },
+    theme: { ...window.FESTIVAL_PRESETS.default, preset: 'default' },
+    contact: {
+      phone: '+918387930687', phone_display: '+91 8387930687',
+      whatsapp: '918387930687', email: 'info@call4all.co.in',
+      website: 'www.call4all.co.in', address: 'India'
+    },
+    footer: { about_text: window.SITE_CONFIG.aboutText || '' }
+  };
+}
+
+async function saveSiteConfig(message) {
+  const cfg = siteConfigData.json;
+  cfg.updated_at = new Date().toISOString();
+  cfg.version = (cfg.version || 1);
+  const res = await window.CsvAPI.saveJson(PATH_SITE_CONFIG, cfg, siteConfigData.sha, getToken(), message || 'Update site-config.json');
+  if (res && res.content && res.content.sha) siteConfigData.sha = res.content.sha;
+  // Update local cache so cached theme refreshes immediately on next page load
+  try { localStorage.setItem('c4a_site_config_v1', JSON.stringify(cfg)); } catch (e) {}
+}
+
+/* ===== THEME ===== */
+function bindThemeEvents() {
+  const form = document.getElementById('themeForm');
+  if (!form) return;
+
+  // Sync color pickers ↔ hex inputs + live preview
+  ['primary','primary_dark','accent','accent_dark','background'].forEach(key => {
+    const picker = document.getElementById('th_' + key);
+    const hex = document.getElementById('th_' + key + '_hex');
+    if (!picker || !hex) return;
+    picker.addEventListener('input', () => {
+      hex.value = picker.value;
+      previewTheme();
+    });
+    hex.addEventListener('input', () => {
+      if (/^#[0-9a-f]{6}$/i.test(hex.value)) {
+        picker.value = hex.value;
+        previewTheme();
+      }
+    });
+  });
+  document.getElementById('th_festival_overlay').addEventListener('change', previewTheme);
+  document.getElementById('th_festival_banner').addEventListener('input', previewTheme);
+
+  document.getElementById('themeResetBtn').addEventListener('click', () => {
+    applyPresetToForm('default');
+    previewTheme();
+  });
+  document.getElementById('themePreviewBtn').addEventListener('click', previewTheme);
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true; submitBtn.textContent = 'Saving...';
+    try {
+      siteConfigData.json.theme = readThemeFromForm();
+      await saveSiteConfig('Update theme');
+      showMsg('themeMsg', '✅ Theme saved! Refresh kisi bhi page par naya theme dikhega.', 'success');
+      previewTheme();
+    } catch (err) {
+      showMsg('themeMsg', '❌ ' + err.message, 'error');
+    } finally {
+      submitBtn.disabled = false; submitBtn.textContent = '💾 Save Theme';
+    }
+  });
+}
+
+function populateThemeForm() {
+  const t = (siteConfigData.json && siteConfigData.json.theme) || window.FESTIVAL_PRESETS.default;
+  ['primary','primary_dark','accent','accent_dark','background'].forEach(key => {
+    const picker = document.getElementById('th_' + key);
+    const hex = document.getElementById('th_' + key + '_hex');
+    if (picker && t[key]) picker.value = t[key];
+    if (hex && t[key]) hex.value = t[key];
+  });
+  const overlay = document.getElementById('th_festival_overlay');
+  if (overlay) overlay.value = t.festival_overlay || 'none';
+  const banner = document.getElementById('th_festival_banner');
+  if (banner) banner.value = t.festival_banner || '';
+}
+
+function readThemeFromForm() {
+  return {
+    preset: (siteConfigData.json && siteConfigData.json.theme && siteConfigData.json.theme.preset) || 'custom',
+    primary: document.getElementById('th_primary').value,
+    primary_dark: document.getElementById('th_primary_dark').value,
+    accent: document.getElementById('th_accent').value,
+    accent_dark: document.getElementById('th_accent_dark').value,
+    background: document.getElementById('th_background').value,
+    festival_overlay: document.getElementById('th_festival_overlay').value,
+    festival_banner: document.getElementById('th_festival_banner').value
+  };
+}
+
+function previewTheme() {
+  if (typeof applyTheme === 'function') applyTheme(readThemeFromForm());
+  // Also refresh festival banner on this page
+  if (typeof insertFestivalBannerIfNeeded === 'function') {
+    window.SITE_CONFIG.theme.festival_banner = document.getElementById('th_festival_banner').value;
+    insertFestivalBannerIfNeeded();
+  }
+}
+
+function renderFestivalPresetGrid() {
+  const grid = document.getElementById('festivalPresetGrid');
+  if (!grid) return;
+  const current = (siteConfigData.json && siteConfigData.json.theme && siteConfigData.json.theme.preset) || 'default';
+  const presets = window.FESTIVAL_PRESETS;
+  grid.innerHTML = Object.keys(presets).map(key => {
+    const p = presets[key];
+    return `
+      <div class="preset-card ${key === current ? 'active' : ''}" data-preset="${key}">
+        <div class="preset-emoji">${p.emoji}</div>
+        <div class="preset-name">${escapeHtml(p.label)}</div>
+        <div class="preset-swatches">
+          <div class="swatch" style="background:${p.primary}"></div>
+          <div class="swatch" style="background:${p.accent}"></div>
+          <div class="swatch" style="background:${p.background};border-color:#ccc;"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  grid.querySelectorAll('.preset-card').forEach(card => {
+    card.addEventListener('click', () => {
+      grid.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      applyPresetToForm(card.dataset.preset);
+      previewTheme();
+    });
+  });
+}
+
+function applyPresetToForm(presetKey) {
+  const preset = window.FESTIVAL_PRESETS[presetKey];
+  if (!preset) return;
+  if (!siteConfigData.json) siteConfigData.json = buildDefaultSiteConfig();
+  siteConfigData.json.theme = { ...preset, preset: presetKey };
+  populateThemeForm();
+}
+
+/* ===== BRANDING ===== */
+function bindBrandingEvents() {
+  const form = document.getElementById('brandingForm');
+  if (!form) return;
+
+  const fileInput = document.getElementById('br_logo_file');
+  const preview = document.getElementById('newLogoPreview');
+  fileInput.addEventListener('change', () => {
+    pendingLogoUpload = fileInput.files && fileInput.files[0];
+    if (pendingLogoUpload) {
+      const r = new FileReader();
+      r.onload = () => { preview.src = r.result; preview.classList.add('show'); };
+      r.readAsDataURL(pendingLogoUpload);
+    }
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true; submitBtn.textContent = 'Saving...';
+    try {
+      const cfg = siteConfigData.json;
+      cfg.branding = cfg.branding || {};
+      cfg.branding.site_name = document.getElementById('br_site_name').value.trim() || 'Call4All';
+      cfg.branding.tagline = document.getElementById('br_tagline').value.trim();
+      cfg.branding.logo_height = parseInt(document.getElementById('br_logo_height').value, 10) || 55;
+      cfg.footer = cfg.footer || {};
+      cfg.footer.about_text = document.getElementById('br_about_text').value.trim();
+
+      if (pendingLogoUpload) {
+        const status = document.getElementById('logoUploadStatus');
+        status.textContent = 'Uploading logo...'; status.classList.add('show');
+        const { path } = await window.CsvAPI.uploadImage(pendingLogoUpload, getToken(), {
+          folder: 'assets/uploads/',
+          prefix: 'logo',
+          maxWidth: 600,
+          quality: 0.92,
+          message: 'Upload new site logo'
+        });
+        cfg.branding.logo_url = path;
+        status.textContent = '✅ Logo uploaded.';
+        pendingLogoUpload = null;
+        document.getElementById('currentLogoPreview').src = window.CsvAPI && path
+          ? `https://raw.githubusercontent.com/${window.SITE_CONFIG.github.owner}/${window.SITE_CONFIG.github.repo}/${window.SITE_CONFIG.github.branch}/${path}`
+          : path;
+      }
+
+      await saveSiteConfig('Update branding');
+      showMsg('brandingMsg', '✅ Branding saved! Refresh page to see header changes.', 'success');
+    } catch (err) {
+      showMsg('brandingMsg', '❌ ' + err.message, 'error');
+    } finally {
+      submitBtn.disabled = false; submitBtn.textContent = '💾 Save Branding';
+    }
+  });
+}
+
+function populateBrandingForm() {
+  const b = (siteConfigData.json && siteConfigData.json.branding) || {};
+  const f = (siteConfigData.json && siteConfigData.json.footer) || {};
+  document.getElementById('br_site_name').value = b.site_name || 'Call4All';
+  document.getElementById('br_tagline').value = b.tagline || '';
+  document.getElementById('br_logo_height').value = b.logo_height || 55;
+  document.getElementById('br_about_text').value = f.about_text || '';
+  const preview = document.getElementById('currentLogoPreview');
+  if (preview && b.logo_url) {
+    if (b.logo_url.startsWith('assets/uploads/')) {
+      preview.src = `https://raw.githubusercontent.com/${window.SITE_CONFIG.github.owner}/${window.SITE_CONFIG.github.repo}/${window.SITE_CONFIG.github.branch}/${b.logo_url}`;
+    } else {
+      preview.src = b.logo_url;
+    }
+  }
+}
+
+/* ===== CONTACT ===== */
+function bindContactEvents() {
+  const form = document.getElementById('contactForm');
+  if (!form) return;
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true; submitBtn.textContent = 'Saving...';
+    try {
+      const cfg = siteConfigData.json;
+      cfg.contact = cfg.contact || {};
+      cfg.contact.phone = document.getElementById('ct_phone').value.trim();
+      cfg.contact.phone_display = document.getElementById('ct_phone_display').value.trim();
+      cfg.contact.whatsapp = document.getElementById('ct_whatsapp').value.trim().replace(/\D/g, '');
+      cfg.contact.email = document.getElementById('ct_email').value.trim();
+      cfg.contact.website = document.getElementById('ct_website').value.trim();
+      cfg.contact.address = document.getElementById('ct_address').value.trim();
+      await saveSiteConfig('Update contact info');
+      showMsg('contactMsg', '✅ Contact info saved! All pages will pick up changes.', 'success');
+    } catch (err) {
+      showMsg('contactMsg', '❌ ' + err.message, 'error');
+    } finally {
+      submitBtn.disabled = false; submitBtn.textContent = '💾 Save Contact Info';
+    }
+  });
+}
+
+function populateContactForm() {
+  const c = (siteConfigData.json && siteConfigData.json.contact) || {};
+  document.getElementById('ct_phone').value = c.phone || '';
+  document.getElementById('ct_phone_display').value = c.phone_display || '';
+  document.getElementById('ct_whatsapp').value = c.whatsapp || '';
+  document.getElementById('ct_email').value = c.email || '';
+  document.getElementById('ct_website').value = c.website || '';
+  document.getElementById('ct_address').value = c.address || '';
+}
+
+/* ===========================================================================
+ * SECTION 7 — GALLERY
+ * =========================================================================== */
+function bindGalleryEvents() {
+  const addBtn = document.getElementById('addGalleryBtn');
+  if (!addBtn) return;
+  addBtn.addEventListener('click', () => openGalleryModal(null));
+  document.getElementById('refreshGalleryBtn').addEventListener('click', loadGallery);
+  document.getElementById('gallerySearchInput').addEventListener('input', renderGalleryAdminGrid);
+  document.getElementById('galleryCategoryFilter').addEventListener('change', renderGalleryAdminGrid);
+  document.getElementById('galleryForm').addEventListener('submit', handleSaveGallery);
+  document.getElementById('galleryModalCloseBtn').addEventListener('click', closeGalleryModal);
+  document.getElementById('galleryModalCancelBtn').addEventListener('click', closeGalleryModal);
+
+  const fileInput = document.getElementById('gal_file');
+  const preview = document.getElementById('galleryPreview');
+  fileInput.addEventListener('change', () => {
+    pendingGalleryUpload = fileInput.files && fileInput.files[0];
+    if (pendingGalleryUpload) {
+      const r = new FileReader();
+      r.onload = () => { preview.src = r.result; preview.classList.add('show'); };
+      r.readAsDataURL(pendingGalleryUpload);
+    }
+  });
+}
+
+async function loadGallery() {
+  const grid = document.getElementById('galleryAdminGrid');
+  if (!grid) return;
+  grid.innerHTML = '<p style="text-align:center;padding:30px;color:var(--text-light);">Loading...</p>';
+  try {
+    galleryData = await window.CsvAPI.loadAll(getToken(), PATH_GALLERY);
+    if (!galleryData.headers.length) galleryData.headers = defaultHeaders(PATH_GALLERY);
+    document.getElementById('badgeGallery').textContent = galleryData.items.length;
+    populateGalleryFilters();
+    renderGalleryAdminGrid();
+  } catch (err) {
+    grid.innerHTML = `<p style="text-align:center;padding:30px;color:#dc3545;">❌ ${escapeHtml(err.message)}</p>`;
+  }
+}
+
+function populateGalleryFilters() {
+  const filter = document.getElementById('galleryCategoryFilter');
+  if (!filter) return;
+  const services = window.SITE_CONFIG.services;
+  filter.innerHTML = '<option value="">All Categories</option>' +
+    services.map(s => `<option value="${escapeAttr(s.name)}">${s.icon} ${escapeHtml(s.name)}</option>`).join('');
+}
+
+function renderGalleryAdminGrid() {
+  const grid = document.getElementById('galleryAdminGrid');
+  if (!grid) return;
+  const search = (document.getElementById('gallerySearchInput').value || '').toLowerCase().trim();
+  const cat = document.getElementById('galleryCategoryFilter').value;
+
+  let items = [...galleryData.items];
+  items.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+  if (cat) items = items.filter(i => i.category === cat);
+  if (search) items = items.filter(i => Object.values(i).some(v => String(v).toLowerCase().includes(search)));
+
+  if (!items.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="icon">🖼️</div><div>No images yet. Click ➕ Upload Image to add.</div></div>';
+    return;
+  }
+
+  const cfg = window.SITE_CONFIG;
+  const cards = items.map(it => {
+    const fullUrl = it.image_path && it.image_path.startsWith('assets/uploads/')
+      ? `https://raw.githubusercontent.com/${cfg.github.owner}/${cfg.github.repo}/${cfg.github.branch}/${it.image_path}`
+      : it.image_path;
+    return `
+      <div class="gallery-card">
+        <span class="cat-pill">${escapeHtml(it.category || '-')}</span>
+        <img class="thumb" src="${escapeAttr(fullUrl)}" alt="${escapeAttr(it.title)}" loading="lazy" onerror="this.style.opacity=0.3;">
+        <div class="info">
+          <h4>${escapeHtml(it.title || '(untitled)')}</h4>
+          ${it.description ? `<p>${escapeHtml(it.description)}</p>` : ''}
+          <p style="font-size:11px;color:#888;margin-top:6px;">
+            ${String(it.featured).toLowerCase() === 'true' ? '⭐ Featured · ' : ''}
+            ${escapeHtml(it.status || 'Active')}
+          </p>
+          <div class="actions" style="margin-top:8px;">
+            <button class="btn btn-primary btn-sm" onclick="openGalleryModal('${escapeAttr(it.id)}')">✏️ Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteGallery('${escapeAttr(it.id)}')">🗑️</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  grid.innerHTML = `<div class="gallery-grid">${cards}</div>`;
+}
+
+function openGalleryModal(id) {
+  editingGalleryId = id;
+  pendingGalleryUpload = null;
+  const modal = document.getElementById('galleryModal');
+  const form = document.getElementById('galleryForm');
+  const title = document.getElementById('galleryModalTitle');
+  const fileNote = document.getElementById('galleryFileNote');
+  const preview = document.getElementById('galleryPreview');
+  preview.classList.remove('show');
+  preview.src = '';
+
+  // Populate category dropdown
+  const services = window.SITE_CONFIG.services;
+  document.getElementById('gal_category').innerHTML =
+    services.map(s => `<option value="${escapeAttr(s.name)}">${s.icon} ${escapeHtml(s.name)}</option>`).join('');
+
+  if (id) {
+    const item = galleryData.items.find(i => i.id === id);
+    if (!item) { alert('Image not found.'); return; }
+    title.textContent = 'Edit Image - ' + (item.title || id);
+    fileNote.textContent = '(leave empty to keep existing image)';
+    form.id_field.value = item.id;
+    form.timestamp_field.value = item.timestamp;
+    form.image_path_existing.value = item.image_path || '';
+    form.added_by.value = item.added_by || (localStorage.getItem(STORAGE_USER) || 'admin');
+    form.category.value = item.category || '';
+    form.title.value = item.title || '';
+    form.description.value = item.description || '';
+    form.sort_order.value = item.sort_order || '0';
+    form.featured.value = String(item.featured || 'false').toLowerCase() === 'true' ? 'true' : 'false';
+    form.status.value = item.status || 'Active';
+    document.getElementById('gal_file').value = '';
+  } else {
+    title.textContent = 'Upload New Image';
+    fileNote.textContent = '*';
+    form.reset();
+    form.id_field.value = genId('IMG');
+    form.timestamp_field.value = new Date().toISOString();
+    form.image_path_existing.value = '';
+    form.added_by.value = localStorage.getItem(STORAGE_USER) || 'admin';
+    form.status.value = 'Active';
+    form.featured.value = 'false';
+    form.sort_order.value = '0';
+  }
+  modal.classList.add('show');
+}
+
+function closeGalleryModal() {
+  document.getElementById('galleryModal').classList.remove('show');
+  editingGalleryId = null;
+  pendingGalleryUpload = null;
+}
+
+async function handleSaveGallery(e) {
+  e.preventDefault();
+  const form = e.target;
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const status = document.getElementById('galleryUploadStatus');
+  submitBtn.disabled = true; submitBtn.textContent = 'Saving...';
+
+  try {
+    let imagePath = form.image_path_existing.value;
+
+    if (pendingGalleryUpload) {
+      status.textContent = 'Uploading image (compressing)...';
+      status.classList.add('show');
+      const { path } = await window.CsvAPI.uploadImage(pendingGalleryUpload, getToken(), {
+        folder: 'assets/uploads/',
+        prefix: 'gal-' + (form.category.value || 'misc').toLowerCase().replace(/\s+/g, '-'),
+        maxWidth: 1400,
+        quality: 0.82,
+        message: 'Upload gallery image'
+      });
+      imagePath = path;
+      status.textContent = '✅ Image uploaded.';
+    } else if (!imagePath) {
+      throw new Error('Please select an image file.');
+    }
+
+    const row = {
+      id: form.id_field.value,
+      timestamp: form.timestamp_field.value,
+      category: form.category.value,
+      title: form.title.value.trim(),
+      description: form.description.value.trim(),
+      image_path: imagePath,
+      featured: form.featured.value,
+      sort_order: form.sort_order.value || '0',
+      status: form.status.value,
+      added_by: form.added_by.value || 'admin'
+    };
+
+    let items = [...galleryData.items];
+    if (editingGalleryId) {
+      const idx = items.findIndex(i => i.id === editingGalleryId);
+      if (idx >= 0) items[idx] = row; else items.push(row);
+    } else {
+      items.push(row);
+    }
+    await window.CsvAPI.saveAll(defaultHeaders(PATH_GALLERY), items, galleryData.sha, getToken(),
+      editingGalleryId ? `Update gallery item ${row.id}` : `Add gallery item ${row.id}`, PATH_GALLERY);
+    closeGalleryModal();
+    await loadGallery();
+  } catch (err) {
+    status.textContent = '';
+    alert('Save failed: ' + err.message);
+  } finally {
+    submitBtn.disabled = false; submitBtn.textContent = '💾 Save Image';
+  }
+}
+
+async function deleteGallery(id) {
+  const item = galleryData.items.find(i => i.id === id);
+  if (!item) return;
+  if (!confirm(`Delete image "${item.title || id}"? This cannot be undone.\n\n(Note: actual image file in repo will remain.)`)) return;
+  try {
+    const items = galleryData.items.filter(i => i.id !== id);
+    await window.CsvAPI.saveAll(defaultHeaders(PATH_GALLERY), items, galleryData.sha, getToken(),
+      `Delete gallery item ${id}`, PATH_GALLERY);
+    await loadGallery();
+  } catch (err) {
+    alert('Delete failed: ' + err.message);
+  }
 }

@@ -7,7 +7,7 @@
  *   - raw.githubusercontent: network-first with cache fallback for staff login etc.
  */
 
-const CACHE_VERSION = 'v3-2026-05-06';
+const CACHE_VERSION = 'v4-2026-05-07';
 const STATIC_CACHE = 'c4a-static-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'c4a-runtime-' + CACHE_VERSION;
 
