@@ -208,18 +208,61 @@ function loadCachedConfig() {
 async function fetchAndApplySiteConfig() {
   try {
     const cfg = window.SITE_CONFIG;
-    const url = `https://raw.githubusercontent.com/${cfg.github.owner}/${cfg.github.repo}/${cfg.github.branch}/data/site-config.json?t=${Date.now()}`;
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) return;
-    const json = await res.json();
+    let json = null;
+
+    // If admin/staff is logged in (token in localStorage), prefer the
+    // authenticated GitHub Contents API. It returns the latest commit
+    // immediately and bypasses raw.githubusercontent.com's ~5min CDN cache.
+    const token = localStorage.getItem('c4a_admin_token') || localStorage.getItem('c4a_staff_token');
+    if (token) {
+      try {
+        const apiUrl = `https://api.github.com/repos/${cfg.github.owner}/${cfg.github.repo}/contents/data/site-config.json?ref=${cfg.github.branch}&t=${Date.now()}`;
+        const res = await fetch(apiUrl, {
+          headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' },
+          cache: 'no-store'
+        });
+        if (res.ok) {
+          const apiJson = await res.json();
+          if (apiJson && apiJson.content) {
+            const decoded = decodeURIComponent(escape(atob(String(apiJson.content).replace(/\s/g, ''))));
+            json = JSON.parse(decoded);
+          }
+        }
+      } catch (e) { /* fall back to raw below */ }
+    }
+
+    // Public path: raw.githubusercontent.com (CDN-cached for ~5 min)
+    if (!json) {
+      const url = `https://raw.githubusercontent.com/${cfg.github.owner}/${cfg.github.repo}/${cfg.github.branch}/data/site-config.json?t=${Date.now()}`;
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) return;
+      json = await res.json();
+    }
+
+    // CDN race protection: if our cached config has a NEWER updated_at than
+    // what came from the network, keep the cached version. This stops the
+    // stale CDN response from reverting an admin's just-saved change.
+    try {
+      const cachedRaw = localStorage.getItem(SITE_CONFIG_CACHE_KEY);
+      if (cachedRaw) {
+        const cached = JSON.parse(cachedRaw);
+        if (cached && cached.updated_at && json.updated_at && cached.updated_at > json.updated_at) {
+          console.log('[Site] Cached site-config is newer than network — keeping cached.');
+          applyConfigToWindow(cached);
+          applyTheme(window.SITE_CONFIG.theme);
+          applyBranding();
+          rerenderSiteShell();
+          return;
+        }
+      }
+    } catch (e) {}
+
     applyConfigToWindow(json);
     applyTheme(window.SITE_CONFIG.theme);
     applyBranding();
-    // Re-render header/footer if already rendered (use latest config)
     rerenderSiteShell();
     try { localStorage.setItem(SITE_CONFIG_CACHE_KEY, JSON.stringify(json)); } catch (e) {}
   } catch (e) {
-    // Network failure - keep cached / defaults
     console.warn('[Site] site-config load failed:', e.message);
   }
 }

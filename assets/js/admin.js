@@ -1015,6 +1015,12 @@ async function loadSiteConfig() {
       // Build default
       siteConfigData.json = buildDefaultSiteConfig();
     }
+
+    // Sync the rest of the admin UI with the freshest config.
+    // Even if site.js already loaded a cached/raw copy, the API copy is the
+    // authoritative one — apply it now so colors/branding everywhere match.
+    syncSiteConfigToRuntime(siteConfigData.json);
+
     populateThemeForm();
     populateBrandingForm();
     populateContactForm();
@@ -1027,6 +1033,17 @@ async function loadSiteConfig() {
     populateContactForm();
     renderFestivalPresetGrid();
   }
+}
+
+/* Push the given site config into the running page (window.SITE_CONFIG +
+ * <html>/<body> theme styles + cached localStorage copy). */
+function syncSiteConfigToRuntime(cfg) {
+  if (!cfg) return;
+  if (typeof applyConfigToWindow === 'function') applyConfigToWindow(cfg);
+  if (typeof applyTheme === 'function') applyTheme(window.SITE_CONFIG.theme);
+  if (typeof applyBranding === 'function') applyBranding();
+  if (typeof insertFestivalBannerIfNeeded === 'function') insertFestivalBannerIfNeeded();
+  try { localStorage.setItem('c4a_site_config_v1', JSON.stringify(cfg)); } catch (e) {}
 }
 
 function buildDefaultSiteConfig() {
@@ -1055,8 +1072,11 @@ async function saveSiteConfig(message) {
   cfg.version = (cfg.version || 1);
   const res = await window.CsvAPI.saveJson(PATH_SITE_CONFIG, cfg, siteConfigData.sha, getToken(), message || 'Update site-config.json');
   if (res && res.content && res.content.sha) siteConfigData.sha = res.content.sha;
-  // Update local cache so cached theme refreshes immediately on next page load
-  try { localStorage.setItem('c4a_site_config_v1', JSON.stringify(cfg)); } catch (e) {}
+
+  // Apply changes immediately to this admin tab AND store fresh cache so
+  // any other tab on this browser (e.g. an open homepage) reads the new
+  // theme on its next reload — not the stale CDN copy.
+  syncSiteConfigToRuntime(cfg);
 }
 
 /* ===== THEME ===== */
@@ -1096,7 +1116,10 @@ function bindThemeEvents() {
     try {
       siteConfigData.json.theme = readThemeFromForm();
       await saveSiteConfig('Update theme');
-      showMsg('themeMsg', '✅ Theme saved! Refresh kisi bhi page par naya theme dikhega.', 'success');
+      showMsg('themeMsg',
+        '✅ Theme saved! Aapke aur logged-in users ke browsers mein turant naya theme dikhega. ' +
+        'Public visitors (logged out) ko ~5 min lag sakte hain (GitHub CDN cache).',
+        'success');
       previewTheme();
     } catch (err) {
       showMsg('themeMsg', '❌ ' + err.message, 'error');
@@ -1227,7 +1250,10 @@ function bindBrandingEvents() {
       }
 
       await saveSiteConfig('Update branding');
-      showMsg('brandingMsg', '✅ Branding saved! Refresh page to see header changes.', 'success');
+      showMsg('brandingMsg',
+        '✅ Branding saved! Refresh karke header mein naya logo/name dikhega. ' +
+        'Public visitors ke liye ~5 min CDN delay ho sakta hai.',
+        'success');
     } catch (err) {
       showMsg('brandingMsg', '❌ ' + err.message, 'error');
     } finally {
@@ -1271,7 +1297,10 @@ function bindContactEvents() {
       cfg.contact.website = document.getElementById('ct_website').value.trim();
       cfg.contact.address = document.getElementById('ct_address').value.trim();
       await saveSiteConfig('Update contact info');
-      showMsg('contactMsg', '✅ Contact info saved! All pages will pick up changes.', 'success');
+      showMsg('contactMsg',
+        '✅ Contact info saved! Aapke browser mein turant apply ho gaya. ' +
+        'Public visitors ko CDN cache ke liye ~5 min lag sakte hain.',
+        'success');
     } catch (err) {
       showMsg('contactMsg', '❌ ' + err.message, 'error');
     } finally {
