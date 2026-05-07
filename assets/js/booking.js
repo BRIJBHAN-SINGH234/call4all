@@ -20,7 +20,7 @@ function renderBookingForm(options) {
     <section class="booking-section" id="book">
       <div class="booking-card">
         <h2>📋 Book a Service / Submit Your Requirement</h2>
-        <p class="subtitle">Bharein form ya call karein <a href="tel:${window.SITE_CONFIG.phone}"><strong>${window.SITE_CONFIG.phoneDisplay}</strong></a> — hum aapko service provider tak pohchayenge.</p>
+        <p class="subtitle">Bharein form ya call karein <a href="tel:" data-call-link><strong data-brand-phone></strong></a> — hum aapko service provider tak pohchayenge.</p>
         <form id="bookingForm" novalidate>
           <div class="form-row">
             <div class="form-group">
@@ -77,6 +77,9 @@ function initBookingForm() {
   if (!form || form.dataset.bound === '1') return;
   form.dataset.bound = '1';
   form.addEventListener('submit', handleBookingSubmit);
+  // Re-apply branding so any data-brand-* / data-call-link inside the
+  // freshly-injected booking form picks up current admin values.
+  if (typeof window.applyBranding === 'function') window.applyBranding();
   loadAreasIntoForm();
 }
 

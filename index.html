@@ -26,26 +26,12 @@
   <h1>One Call. Every Service. Done.</h1>
   <p>Cars, rooms, labor, tutors, manpower, weddings — jo bhi chahiye, hum aapko trusted service provider tak pohchayenge. Aapko kahin jaana nahi, dhundhna nahi.</p>
   <div class="hero-cta">
-    <a href="tel:+918387930687" class="btn btn-accent">📞 Call Now: +91 8387930687</a>
+    <a href="tel:" data-call-link class="btn btn-accent">📞 Call Now: <span data-brand-phone></span></a>
     <a href="#book" class="btn btn-outline">📋 Submit Requirement</a>
   </div>
 </section>
 
-<div class="slider">
-  <button class="arrow left" onclick="moveSlide(-1)" aria-label="Previous">&#10094;</button>
-  <div class="slides" id="slides">
-    <div class="slide">🚗 Rental Cars<div class="slide-sub">Premium & budget cars for travel and events</div></div>
-    <div class="slide">🏠 Rooms & Flats<div class="slide-sub">Quick rentals — rooms, flats, PG, properties</div></div>
-    <div class="slide">🧱 Construction Labor<div class="slide-sub">Mistri, mazdoor, thekedar — sab ek call par</div></div>
-    <div class="slide">📚 Home Tutors<div class="slide-sub">Qualified tutors for every class & subject</div></div>
-    <div class="slide">👷 Manpower Supply<div class="slide-sub">Skilled & unskilled manpower on demand</div></div>
-    <div class="slide">💍 Marriage Services<div class="slide-sub">Decoration, catering, rentals — A to Z</div></div>
-    <div class="slide">🌸 Hotel Flower Bouquet<div class="slide-sub">Luxury floral arrangements for hotels & events</div></div>
-    <div class="slide">🎀 Car Decoration<div class="slide-sub">Wedding & event car decoration</div></div>
-  </div>
-  <button class="arrow right" onclick="moveSlide(1)" aria-label="Next">&#10095;</button>
-  <div class="dots" id="dots"></div>
-</div>
+<div id="sliderMount"></div>
 
 <section class="section section-light" id="services">
   <h2 class="section-title">Our Services</h2>
@@ -138,32 +124,9 @@
 <script src="assets/js/site.js"></script>
 <script src="assets/js/booking.js"></script>
 <script>
-const slides = document.querySelectorAll('.slide');
-const dotsContainer = document.getElementById('dots');
-let slideIndex = 0;
-let autoSlide;
-
-slides.forEach((_, i) => {
-  const d = document.createElement('span');
-  d.className = 'dot' + (i === 0 ? ' active' : '');
-  d.onclick = () => currentSlide(i);
-  dotsContainer.appendChild(d);
-});
-
-function showSlide(n) {
-  const slidesEl = document.getElementById('slides');
-  const dots = document.querySelectorAll('.dot');
-  if (n >= slides.length) slideIndex = 0;
-  if (n < 0) slideIndex = slides.length - 1;
-  slidesEl.style.transform = `translateX(-${slideIndex * 100}%)`;
-  dots.forEach((d, i) => d.classList.toggle('active', i === slideIndex));
-}
-function moveSlide(n) { clearInterval(autoSlide); slideIndex += n; showSlide(slideIndex); startAutoSlide(); }
-function currentSlide(n) { clearInterval(autoSlide); slideIndex = n; showSlide(slideIndex); startAutoSlide(); }
-function startAutoSlide() { autoSlide = setInterval(() => { slideIndex++; showSlide(slideIndex); }, 4500); }
-startAutoSlide();
-
 document.addEventListener('DOMContentLoaded', () => {
+  if (typeof window.renderSlider === 'function') window.renderSlider();
+
   const grid = document.getElementById('serviceGrid');
   if (grid) {
     grid.innerHTML = window.SITE_CONFIG.services.map(s => `

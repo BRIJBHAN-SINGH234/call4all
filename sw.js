@@ -8,7 +8,7 @@
  *   - GitHub API calls:  network-only (sensitive, never cache)
  */
 
-const CACHE_VERSION = 'v5-2026-05-08';
+const CACHE_VERSION = 'v6-2026-05-08';
 const STATIC_CACHE = 'c4a-static-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'c4a-runtime-' + CACHE_VERSION;
 
@@ -26,6 +26,7 @@ const PRECACHE_URLS = [
   '/flower-bouquet.html',
   '/car-decoration.html',
   '/gallery.html',
+  '/page.html',
   '/assets/css/style.css',
   '/assets/js/site.js',
   '/assets/js/booking.js',

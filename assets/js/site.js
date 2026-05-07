@@ -40,7 +40,22 @@ window.SITE_CONFIG = {
     { id: 'flower-bouquet', name: 'Hotel Flower Bouquet', icon: '🌸', desc: 'Luxury flower decoration & bouquet service.', page: 'flower-bouquet.html' },
     { id: 'car-decoration', name: 'Car Decoration', icon: '🎀', desc: 'Luxury car decoration for weddings & events.', page: 'car-decoration.html' },
     { id: 'other', name: 'Other / Custom Service', icon: '🛎️', desc: 'Need something else? Just tell us, we will arrange it.', page: 'index.html#book' }
-  ]
+  ],
+  slider: {
+    enabled: true,
+    interval_ms: 4500,
+    slides: [
+      { id: 's1', enabled: true, icon: '🚗', title: 'Rental Cars', subtitle: 'Premium & budget cars for travel and events', background_url: '', link: 'rental-cars.html', order: 1 },
+      { id: 's2', enabled: true, icon: '🏠', title: 'Rooms & Flats', subtitle: 'Quick rentals — rooms, flats, PG, properties', background_url: '', link: 'rooms-flats.html', order: 2 },
+      { id: 's3', enabled: true, icon: '🧱', title: 'Construction Labor', subtitle: 'Mistri, mazdoor, thekedar — sab ek call par', background_url: '', link: 'construction.html', order: 3 },
+      { id: 's4', enabled: true, icon: '📚', title: 'Home Tutors', subtitle: 'Qualified tutors for every class & subject', background_url: '', link: 'home-tutor.html', order: 4 },
+      { id: 's5', enabled: true, icon: '👷', title: 'Manpower Supply', subtitle: 'Skilled & unskilled manpower on demand', background_url: '', link: 'manpower-supply.html', order: 5 },
+      { id: 's6', enabled: true, icon: '💍', title: 'Marriage Services', subtitle: 'Decoration, catering, rentals — A to Z', background_url: '', link: 'marriage-services.html', order: 6 },
+      { id: 's7', enabled: true, icon: '🌸', title: 'Hotel Flower Bouquet', subtitle: 'Luxury floral arrangements for hotels & events', background_url: '', link: 'flower-bouquet.html', order: 7 },
+      { id: 's8', enabled: true, icon: '🎀', title: 'Car Decoration', subtitle: 'Wedding & event car decoration', background_url: '', link: 'car-decoration.html', order: 8 }
+    ]
+  },
+  pages: []
 };
 
 /* ===== Festival Theme Presets ===== */
@@ -163,7 +178,126 @@ function assetUrl(path) {
 }
 window.assetUrl = assetUrl;
 
-/* ===== Apply Branding (logo + names in header/footer) ===== */
+/* ===== Hero Slider (admin-managed via site-config.json) ===== */
+let _sliderState = { idx: 0, timer: null, slides: [] };
+
+function renderSlider() {
+  const mount = document.getElementById('sliderMount');
+  if (!mount) return;
+  const cfg = window.SITE_CONFIG.slider || { enabled: true, interval_ms: 4500, slides: [] };
+  if (cfg.enabled === false) { mount.innerHTML = ''; return; }
+
+  const slides = (cfg.slides || [])
+    .filter(s => s.enabled !== false)
+    .slice()
+    .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+
+  if (!slides.length) { mount.innerHTML = ''; return; }
+  _sliderState.slides = slides;
+  _sliderState.idx = 0;
+
+  const html = `
+    <div class="slider">
+      <button class="arrow left" type="button" aria-label="Previous" onclick="moveSlide(-1)">&#10094;</button>
+      <div class="slides" id="slides">
+        ${slides.map(s => {
+          const bg = s.background_url ? `style="background-image:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url('${assetUrl(s.background_url)}');background-size:cover;background-position:center;color:#fff;"` : '';
+          const inner = `${escapeHtml(s.icon || '')} ${escapeHtml(s.title || '')}<div class="slide-sub">${escapeHtml(s.subtitle || '')}</div>`;
+          return s.link
+            ? `<a class="slide" href="${escapeAttr(s.link)}" ${bg} style="${bg ? '' : ''}text-decoration:none;">${inner}</a>`
+            : `<div class="slide" ${bg}>${inner}</div>`;
+        }).join('')}
+      </div>
+      <button class="arrow right" type="button" aria-label="Next" onclick="moveSlide(1)">&#10095;</button>
+      <div class="dots" id="dots">${slides.map((_, i) => `<span class="dot${i === 0 ? ' active' : ''}" onclick="currentSlide(${i})"></span>`).join('')}</div>
+    </div>
+  `;
+  mount.innerHTML = html;
+
+  if (_sliderState.timer) clearInterval(_sliderState.timer);
+  const interval = Math.max(2000, Number(cfg.interval_ms) || 4500);
+  _sliderState.timer = setInterval(() => moveSlide(1), interval);
+}
+
+function showSlide(n) {
+  const slidesEl = document.getElementById('slides');
+  if (!slidesEl) return;
+  const total = _sliderState.slides.length;
+  if (!total) return;
+  if (n >= total) _sliderState.idx = 0;
+  else if (n < 0) _sliderState.idx = total - 1;
+  else _sliderState.idx = n;
+  slidesEl.style.transform = `translateX(-${_sliderState.idx * 100}%)`;
+  document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === _sliderState.idx));
+}
+function moveSlide(delta) {
+  showSlide(_sliderState.idx + delta);
+  // restart timer so manual navigation gets full interval
+  const cfg = window.SITE_CONFIG.slider || {};
+  if (_sliderState.timer) clearInterval(_sliderState.timer);
+  _sliderState.timer = setInterval(() => moveSlide(1), Math.max(2000, Number(cfg.interval_ms) || 4500));
+}
+function currentSlide(n) { showSlide(n); }
+
+window.renderSlider = renderSlider;
+window.moveSlide = moveSlide;
+window.currentSlide = currentSlide;
+
+/* ===== Dynamic Page Renderer (admin-managed pages) =====
+ * Used by `page.html?slug=xyz` to render the matching custom page from
+ * window.SITE_CONFIG.pages. Falls back to a friendly 404 if not found. */
+async function renderDynamicPage(slug) {
+  const root = document.getElementById('dynamicPageRoot');
+  if (!root) return;
+
+  const findAndPaint = () => {
+    const cfg = window.SITE_CONFIG;
+    const pages = cfg.pages || [];
+    const page = pages.find(p => p.slug === slug && p.enabled !== false);
+    if (!page) {
+      document.title = 'Page not found - ' + (cfg.businessName || 'Call4All');
+      root.innerHTML = `
+        <div class="page-not-found">
+          <div class="icon">📄</div>
+          <h1>Page Not Found</h1>
+          <p style="color:#666;">The page you're looking for doesn't exist or has been disabled.</p>
+          <p style="margin-top:30px;"><a href="index.html" class="btn btn-primary">← Go to Home</a></p>
+        </div>
+      `;
+      return false;
+    }
+    document.title = `${page.title} - ${cfg.businessName || 'Call4All'}`;
+    const metaEl = document.getElementById('metaDescription');
+    if (metaEl && page.meta_description) metaEl.setAttribute('content', page.meta_description);
+    document.body.setAttribute('data-page', 'page-' + page.slug);
+
+    root.innerHTML = `<div class="dynamic-page-wrap">${page.html_content || ''}</div>`;
+    // Re-apply branding so any data-brand-* inside the rendered HTML resolves
+    if (typeof applyBranding === 'function') applyBranding();
+    return true;
+  };
+
+  // Paint immediately with whatever config we have, then re-paint after the
+  // background fetch finishes (so visitors don't see "loading" if config is
+  // already cached).
+  const found = findAndPaint();
+  if (!found) {
+    // Wait briefly for fetchAndApplySiteConfig (kicked off by site.js init)
+    // and try again — needed when this is the user's first visit and config
+    // wasn't in localStorage.
+    setTimeout(findAndPaint, 1500);
+    setTimeout(findAndPaint, 3500);
+  }
+}
+window.renderDynamicPage = renderDynamicPage;
+
+function escapeAttr(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+/* ===== Apply Branding (logo + names + phone/email links) =====
+ * Public: window.applyBranding — call after injecting any HTML that
+ * contains data-brand-* attributes so values stay in sync with config. */
 function applyBranding() {
   const cfg = window.SITE_CONFIG;
   // Logos (uploaded ones are routed via raw.github so they work instantly)
@@ -181,11 +315,30 @@ function applyBranding() {
   document.querySelectorAll('[data-brand-phone]').forEach(el => {
     el.textContent = cfg.phoneDisplay || cfg.phone || '';
   });
+  // Auto-update any <a data-call-link> → href becomes tel:<current-phone>
+  // (Pages can place this on buttons / inline phone CTAs to stay in sync
+  // with admin-side phone changes.)
+  document.querySelectorAll('a[data-call-link]').forEach(a => {
+    a.href = `tel:${cfg.phone || ''}`;
+  });
+  document.querySelectorAll('a[data-whatsapp-link]').forEach(a => {
+    const wa = (cfg.whatsappNumber || '').replace(/[^0-9]/g, '');
+    const txt = a.getAttribute('data-message') || `Hi ${cfg.businessName || ''}, mujhe service chahiye.`;
+    a.href = `https://wa.me/${wa}?text=${encodeURIComponent(txt)}`;
+  });
+  document.querySelectorAll('[data-brand-email]').forEach(el => {
+    if (el.tagName === 'A') el.href = `mailto:${cfg.email || ''}`;
+    else el.textContent = cfg.email || '';
+  });
+  document.querySelectorAll('[data-brand-address]').forEach(el => {
+    el.textContent = cfg.address || '';
+  });
   // Update document title prefix if a placeholder is present
   if (document.title.includes('{{brand}}')) {
     document.title = document.title.replace('{{brand}}', cfg.businessName || 'Call4All');
   }
 }
+window.applyBranding = applyBranding;
 
 /* ===== Load site-config.json from public source ===== */
 const SITE_CONFIG_CACHE_KEY = 'c4a_site_config_v1';
@@ -210,6 +363,16 @@ function applyConfigToWindow(json) {
   if (json.footer && json.footer.about_text) cfg.aboutText = json.footer.about_text;
   if (json.theme) {
     Object.assign(cfg.theme, json.theme);
+  }
+  if (json.slider && Array.isArray(json.slider.slides)) {
+    cfg.slider = {
+      enabled: json.slider.enabled !== false,
+      interval_ms: Number(json.slider.interval_ms) || 4500,
+      slides: json.slider.slides
+    };
+  }
+  if (Array.isArray(json.pages)) {
+    cfg.pages = json.pages;
   }
 }
 
@@ -301,7 +464,17 @@ function rerenderSiteShell() {
   }
   // Festival banner above header
   insertFestivalBannerIfNeeded();
+  // Re-paint slider if the home page is showing one
+  if (document.getElementById('sliderMount') && typeof renderSlider === 'function') renderSlider();
+  // Re-paint dynamic page if we're on page.html (fresh config may now contain it)
+  if (document.getElementById('dynamicPageRoot') && typeof renderDynamicPage === 'function') {
+    const slug = new URLSearchParams(window.location.search).get('slug') || '';
+    renderDynamicPage(slug);
+  }
+  // Re-apply branding so phone/email links pick up updated values
+  if (typeof applyBranding === 'function') applyBranding();
 }
+window.rerenderSiteShell = rerenderSiteShell;
 
 function insertFestivalBannerIfNeeded() {
   const existing = document.getElementById('festivalBanner');
@@ -329,8 +502,20 @@ function renderHeader(activePage) {
     { href: 'about.html', label: 'About Us', key: 'about' },
     { href: 'contact.html', label: 'Contact Us', key: 'contact' }
   ];
+  // Append admin-managed dynamic pages flagged "show_in_menu"
+  const dynamicPages = (cfg.pages || [])
+    .filter(p => p.enabled !== false && p.show_in_menu === true && p.slug)
+    .slice()
+    .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+  dynamicPages.forEach(p => {
+    links.push({
+      href: `page.html?slug=${encodeURIComponent(p.slug)}`,
+      label: p.nav_label || p.title || p.slug,
+      key: 'page-' + p.slug
+    });
+  });
   const linkHtml = links.map(l =>
-    `<li><a href="${l.href}" ${activePage === l.key ? 'class="active"' : ''}>${l.label}</a></li>`
+    `<li><a href="${l.href}" ${activePage === l.key ? 'class="active"' : ''}>${escapeHtml(l.label)}</a></li>`
   ).join('');
   const logoStyle = cfg.logoHeight ? `style="height:${cfg.logoHeight}px"` : '';
   const logoUrl = assetUrl(cfg.logoUrl || 'Imagelogo.png');

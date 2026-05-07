@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loading... - {{brand}}</title>
+<meta id="metaDescription" name="description" content="">
+<meta name="theme-color" content="#1e3c72">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Call4All">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+  .dynamic-page-wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 50px 22px;
+  }
+  .dynamic-page-wrap h1 { color: var(--primary); font-size: 36px; margin-bottom: 18px; }
+  .dynamic-page-wrap h2 { color: var(--primary); font-size: 26px; margin: 28px 0 12px; }
+  .dynamic-page-wrap h3 { color: var(--primary-dark); font-size: 21px; margin: 22px 0 10px; }
+  .dynamic-page-wrap p { line-height: 1.7; margin-bottom: 14px; color: #333; }
+  .dynamic-page-wrap a { color: var(--primary); text-decoration: underline; }
+  .dynamic-page-wrap ul, .dynamic-page-wrap ol { margin: 12px 0 18px 24px; line-height: 1.7; }
+  .dynamic-page-wrap img { max-width: 100%; border-radius: 8px; margin: 12px 0; }
+  .dynamic-page-wrap blockquote {
+    border-left: 4px solid var(--accent);
+    padding: 10px 18px;
+    background: #fffbe5;
+    margin: 16px 0;
+    font-style: italic;
+  }
+  .page-not-found {
+    text-align: center;
+    padding: 80px 20px;
+  }
+  .page-not-found .icon { font-size: 80px; margin-bottom: 20px; }
+  @media (max-width: 768px) {
+    .dynamic-page-wrap { padding: 30px 16px; }
+    .dynamic-page-wrap h1 { font-size: 28px; }
+  }
+</style>
+</head>
+<body data-page="">
+
+<div id="site-header"></div>
+
+<main id="dynamicPageRoot">
+  <div class="dynamic-page-wrap">
+    <p style="text-align:center;padding:60px 0;color:var(--text-light);">Loading page...</p>
+  </div>
+</main>
+
+<div id="site-footer"></div>
+<div id="site-floating"></div>
+
+<script src="assets/js/site.js"></script>
+<script src="assets/js/booking.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get('slug') || '';
+  if (typeof window.renderDynamicPage === 'function') {
+    window.renderDynamicPage(slug);
+  }
+});
+</script>
+
+</body>
+</html>

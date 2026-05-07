@@ -142,6 +142,8 @@ function initAdmin() {
   bindStaffEvents();
   bindAreaEvents();
   bindGalleryEvents();
+  bindSliderEvents();
+  bindPagesEvents();
   bindThemeEvents();
   bindBrandingEvents();
   bindContactEvents();
@@ -166,8 +168,10 @@ function setupTabs() {
 function switchTab(tabName) {
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === 'tab-' + tabName));
-  // Lazy-load section data on first activation
+  // Lazy-load / refresh section data on activation
   if (tabName === 'gallery' && (!galleryData.items || !galleryData.items.length)) loadGallery();
+  if (tabName === 'slider') refreshSliderUI();
+  if (tabName === 'pages') refreshPagesUI();
 }
 
 function setupSidebarToggle() {
@@ -1231,6 +1235,8 @@ async function loadSiteConfig() {
     populateBrandingForm();
     populateContactForm();
     renderFestivalPresetGrid();
+    refreshSliderUI();
+    refreshPagesUI();
   } catch (err) {
     console.warn('[admin] site-config load failed:', err.message);
     siteConfigData = { json: buildDefaultSiteConfig(), sha: null };
@@ -1238,6 +1244,8 @@ async function loadSiteConfig() {
     populateBrandingForm();
     populateContactForm();
     renderFestivalPresetGrid();
+    refreshSliderUI();
+    refreshPagesUI();
   }
 }
 
@@ -1254,7 +1262,7 @@ function syncSiteConfigToRuntime(cfg) {
 
 function buildDefaultSiteConfig() {
   return {
-    version: 1,
+    version: 2,
     updated_at: new Date().toISOString(),
     branding: {
       site_name: 'Call4All',
@@ -1268,7 +1276,13 @@ function buildDefaultSiteConfig() {
       whatsapp: '918387930687', email: 'info@call4all.co.in',
       website: 'www.call4all.co.in', address: 'India'
     },
-    footer: { about_text: window.SITE_CONFIG.aboutText || '' }
+    footer: { about_text: window.SITE_CONFIG.aboutText || '' },
+    slider: {
+      enabled: true,
+      interval_ms: 4500,
+      slides: [...((window.SITE_CONFIG.slider && window.SITE_CONFIG.slider.slides) || [])]
+    },
+    pages: []
   };
 }
 
@@ -1738,6 +1752,407 @@ async function deleteGallery(id) {
     await window.CsvAPI.saveAll(defaultHeaders(PATH_GALLERY), items, galleryData.sha, getToken(),
       `Delete gallery item ${id}`, PATH_GALLERY);
     await loadGallery();
+  } catch (err) {
+    alert('Delete failed: ' + err.message);
+  }
+}
+
+/* ===========================================================================
+ * SECTION — HERO SLIDER (admin-managed slides in site-config.json)
+ * =========================================================================== */
+let editingSlideId = null;
+let pendingSlideBgUpload = null;
+
+function ensureSliderConfig() {
+  if (!siteConfigData.json) siteConfigData.json = buildDefaultSiteConfig();
+  if (!siteConfigData.json.slider) {
+    siteConfigData.json.slider = { enabled: true, interval_ms: 4500, slides: [] };
+  }
+  if (!Array.isArray(siteConfigData.json.slider.slides)) siteConfigData.json.slider.slides = [];
+  return siteConfigData.json.slider;
+}
+
+function bindSliderEvents() {
+  const addBtn = document.getElementById('addSlideBtn');
+  const refreshBtn = document.getElementById('refreshSliderBtn');
+  const saveCfgBtn = document.getElementById('saveSliderConfigBtn');
+  const closeBtn = document.getElementById('slideModalCloseBtn');
+  const cancelBtn = document.getElementById('slideCancelBtn');
+  const form = document.getElementById('slideForm');
+  const fileInput = document.getElementById('slideBgFile');
+  if (!addBtn) return;
+
+  addBtn.addEventListener('click', () => openSlideModal(null));
+  refreshBtn.addEventListener('click', loadSiteConfig);
+  saveCfgBtn.addEventListener('click', saveSliderTopLevel);
+  closeBtn.addEventListener('click', closeSlideModal);
+  cancelBtn.addEventListener('click', closeSlideModal);
+  form.addEventListener('submit', handleSaveSlide);
+
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    const preview = document.getElementById('slideBgPreview');
+    if (!file) { pendingSlideBgUpload = null; preview.innerHTML = ''; return; }
+    pendingSlideBgUpload = file;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      preview.innerHTML = `<img src="${ev.target.result}" alt="preview" style="max-width:100%;max-height:200px;border-radius:8px;border:2px solid #e1e5eb;">`;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function refreshSliderUI() {
+  const slider = ensureSliderConfig();
+  const enabledChk = document.getElementById('sliderEnabledChk');
+  const intervalInput = document.getElementById('sliderIntervalInput');
+  const badge = document.getElementById('badgeSlider');
+  if (enabledChk) enabledChk.checked = slider.enabled !== false;
+  if (intervalInput) intervalInput.value = Number(slider.interval_ms) || 4500;
+  if (badge) badge.textContent = slider.slides.length;
+  renderSliderTable();
+}
+
+function renderSliderTable() {
+  const tbody = document.getElementById('sliderTableBody');
+  if (!tbody) return;
+  const slides = ensureSliderConfig().slides
+    .slice()
+    .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+
+  if (!slides.length) {
+    tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="icon">🎞️</div><div>No slides yet. Click <strong>Add Slide</strong> to create the first one.</div></div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = slides.map((s, i) => {
+    const bgPreview = s.background_url
+      ? `<img src="${escapeAttr(typeof window.assetUrl === 'function' ? window.assetUrl(s.background_url) : s.background_url)}" alt="bg" style="width:60px;height:34px;object-fit:cover;border-radius:4px;">`
+      : '<span style="color:#999;">—</span>';
+    const linkDisplay = s.link
+      ? `<a href="${escapeAttr(s.link)}" target="_blank" style="font-size:12px;">${escapeHtml(s.link)}</a>`
+      : '<span style="color:#999;">—</span>';
+    return `
+      <tr>
+        <td>${i + 1}</td>
+        <td style="font-size:22px;text-align:center;">${escapeHtml(s.icon || '')}</td>
+        <td><strong>${escapeHtml(s.title || '')}</strong></td>
+        <td class="msg-cell">${escapeHtml(s.subtitle || '')}</td>
+        <td>${bgPreview}</td>
+        <td>${linkDisplay}</td>
+        <td style="text-align:center;">
+          ${s.enabled !== false
+            ? '<span class="status-badge status-complete">Enabled</span>'
+            : '<span class="status-badge status-cancelled">Disabled</span>'}
+        </td>
+        <td>${escapeHtml(String(s.order || ''))}</td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-primary btn-sm" onclick="openSlideModal('${escapeAttr(s.id)}')">✏️ Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteSlide('${escapeAttr(s.id)}')">🗑️</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function openSlideModal(id) {
+  editingSlideId = id;
+  pendingSlideBgUpload = null;
+  const form = document.getElementById('slideForm');
+  form.reset();
+  document.getElementById('slideBgPreview').innerHTML = '';
+  const titleEl = document.getElementById('slideModalTitle');
+  if (id) {
+    const slide = ensureSliderConfig().slides.find(s => s.id === id);
+    if (!slide) { alert('Slide not found.'); return; }
+    titleEl.textContent = '✏️ Edit Slide';
+    form.id_field.value = slide.id;
+    form.icon.value = slide.icon || '';
+    form.title.value = slide.title || '';
+    form.subtitle.value = slide.subtitle || '';
+    form.link.value = slide.link || '';
+    form.order.value = slide.order || 100;
+    form.enabled.checked = slide.enabled !== false;
+    if (slide.background_url) {
+      const url = typeof window.assetUrl === 'function' ? window.assetUrl(slide.background_url) : slide.background_url;
+      document.getElementById('slideBgPreview').innerHTML =
+        `<img src="${escapeAttr(url)}" style="max-width:100%;max-height:200px;border-radius:8px;border:2px solid #e1e5eb;">
+         <p class="help-text">Current background. Upload a new file to replace.</p>`;
+    }
+  } else {
+    titleEl.textContent = '➕ Add Slide';
+    form.id_field.value = '';
+    form.order.value = (ensureSliderConfig().slides.length + 1) * 1;
+    form.enabled.checked = true;
+  }
+  document.getElementById('slideModal').classList.add('show');
+}
+
+function closeSlideModal() {
+  document.getElementById('slideModal').classList.remove('show');
+  editingSlideId = null;
+  pendingSlideBgUpload = null;
+}
+
+async function handleSaveSlide(e) {
+  e.preventDefault();
+  const form = e.target;
+  const submitBtn = form.querySelector('button[type="submit"]');
+  submitBtn.disabled = true; submitBtn.textContent = 'Saving...';
+
+  const slider = ensureSliderConfig();
+  const id = form.id_field.value || ('s' + Date.now());
+  let slide = slider.slides.find(s => s.id === id);
+  const isNew = !slide;
+  if (!slide) {
+    slide = { id };
+    slider.slides.push(slide);
+  }
+  slide.icon = form.icon.value.trim();
+  slide.title = form.title.value.trim();
+  slide.subtitle = form.subtitle.value.trim();
+  slide.link = form.link.value.trim();
+  slide.order = Number(form.order.value) || 100;
+  slide.enabled = !!form.enabled.checked;
+
+  try {
+    if (pendingSlideBgUpload) {
+      const { path } = await window.CsvAPI.uploadImage(pendingSlideBgUpload, getToken(), {
+        prefix: 'slide-bg',
+        maxWidth: 1600,
+        quality: 0.85,
+        message: `Upload slide background for ${slide.title || slide.id}`
+      });
+      slide.background_url = path;
+    }
+    await saveSiteConfig(`Slider: ${isNew ? 'add' : 'update'} slide ${slide.title}`);
+    closeSlideModal();
+    refreshSliderUI();
+    alert('✅ Slide saved. Public visitors ko ~5 min lag sakte hain (CDN cache).');
+  } catch (err) {
+    alert('Save failed: ' + err.message);
+    submitBtn.disabled = false; submitBtn.textContent = '💾 Save Slide';
+  }
+}
+
+async function deleteSlide(id) {
+  if (!confirm('Delete this slide?')) return;
+  const slider = ensureSliderConfig();
+  slider.slides = slider.slides.filter(s => s.id !== id);
+  try {
+    await saveSiteConfig(`Slider: delete slide ${id}`);
+    refreshSliderUI();
+  } catch (err) {
+    alert('Delete failed: ' + err.message);
+  }
+}
+
+async function saveSliderTopLevel() {
+  const slider = ensureSliderConfig();
+  const enabledChk = document.getElementById('sliderEnabledChk');
+  const intervalInput = document.getElementById('sliderIntervalInput');
+  slider.enabled = !!enabledChk.checked;
+  slider.interval_ms = Math.max(2000, Number(intervalInput.value) || 4500);
+  const btn = document.getElementById('saveSliderConfigBtn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  try {
+    await saveSiteConfig('Slider: update top-level settings');
+    btn.textContent = '✅ Saved';
+    setTimeout(() => { btn.textContent = '💾 Save Slider Settings'; btn.disabled = false; }, 1800);
+  } catch (err) {
+    alert('Save failed: ' + err.message);
+    btn.textContent = '💾 Save Slider Settings'; btn.disabled = false;
+  }
+}
+
+/* ===========================================================================
+ * SECTION — CUSTOM PAGES (admin-managed pages stored in site-config.json)
+ * =========================================================================== */
+let editingPageId = null;
+
+function ensurePagesArray() {
+  if (!siteConfigData.json) siteConfigData.json = buildDefaultSiteConfig();
+  if (!Array.isArray(siteConfigData.json.pages)) siteConfigData.json.pages = [];
+  return siteConfigData.json.pages;
+}
+
+function bindPagesEvents() {
+  const addBtn = document.getElementById('addPageBtn');
+  const refreshBtn = document.getElementById('refreshPagesBtn');
+  const search = document.getElementById('pagesSearchInput');
+  const closeBtn = document.getElementById('pageModalCloseBtn');
+  const cancelBtn = document.getElementById('pageCancelBtn');
+  const form = document.getElementById('pageForm');
+  if (!addBtn) return;
+
+  addBtn.addEventListener('click', () => openPageModal(null));
+  refreshBtn.addEventListener('click', loadSiteConfig);
+  if (search) search.addEventListener('input', renderPagesTable);
+  closeBtn.addEventListener('click', closePageModal);
+  cancelBtn.addEventListener('click', closePageModal);
+  form.addEventListener('submit', handleSavePage);
+
+  // Auto-generate slug from title if user hasn't typed one yet
+  const titleInput = form.querySelector('input[name="title"]');
+  const slugInput = form.querySelector('input[name="slug"]');
+  titleInput.addEventListener('input', () => {
+    if (!slugInput.dataset.touched) {
+      slugInput.value = slugify(titleInput.value);
+    }
+  });
+  slugInput.addEventListener('input', () => { slugInput.dataset.touched = '1'; });
+}
+
+function slugify(s) {
+  return String(s || '').toLowerCase().trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60);
+}
+
+function refreshPagesUI() {
+  const badge = document.getElementById('badgePages');
+  const pages = ensurePagesArray();
+  if (badge) badge.textContent = pages.length;
+  renderPagesTable();
+}
+
+function renderPagesTable() {
+  const tbody = document.getElementById('pagesTableBody');
+  if (!tbody) return;
+  const search = (document.getElementById('pagesSearchInput') || { value: '' }).value.toLowerCase().trim();
+
+  let pages = ensurePagesArray().slice()
+    .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+  if (search) {
+    pages = pages.filter(p =>
+      [p.title, p.slug, p.nav_label].some(v => String(v || '').toLowerCase().includes(search))
+    );
+  }
+
+  if (!pages.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="icon">📄</div><div>No custom pages yet. Click <strong>Add New Page</strong> to create one.</div></div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = pages.map(p => {
+    const updated = p.updated_at ? formatDate(p.updated_at) : '-';
+    return `
+      <tr>
+        <td><strong>${escapeHtml(p.title || '')}</strong></td>
+        <td>
+          <code style="font-size:12px;">${escapeHtml(p.slug || '')}</code><br>
+          <a href="page.html?slug=${encodeURIComponent(p.slug || '')}" target="_blank" style="font-size:11px;">🔗 View</a>
+        </td>
+        <td style="text-align:center;">${p.show_in_menu ? '✅' : '—'}</td>
+        <td>${escapeHtml(String(p.order || ''))}</td>
+        <td>
+          ${p.enabled !== false
+            ? '<span class="status-badge status-complete">Enabled</span>'
+            : '<span class="status-badge status-cancelled">Disabled</span>'}
+        </td>
+        <td style="font-size:12px;">${escapeHtml(updated)}</td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-primary btn-sm" onclick="openPageModal('${escapeAttr(p.id)}')">✏️ Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deletePage('${escapeAttr(p.id)}')">🗑️</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function openPageModal(id) {
+  editingPageId = id;
+  const form = document.getElementById('pageForm');
+  form.reset();
+  delete form.querySelector('input[name="slug"]').dataset.touched;
+  const titleEl = document.getElementById('pageModalTitle');
+  if (id) {
+    const page = ensurePagesArray().find(p => p.id === id);
+    if (!page) { alert('Page not found.'); return; }
+    titleEl.textContent = '✏️ Edit Page';
+    form.id_field.value = page.id;
+    form.created_at_field.value = page.created_at || '';
+    form.title.value = page.title || '';
+    form.slug.value = page.slug || '';
+    form.nav_label.value = page.nav_label || '';
+    form.order.value = page.order || 100;
+    form.meta_description.value = page.meta_description || '';
+    form.html_content.value = page.html_content || '';
+    form.show_in_menu.checked = !!page.show_in_menu;
+    form.enabled.checked = page.enabled !== false;
+    form.querySelector('input[name="slug"]').dataset.touched = '1';
+  } else {
+    titleEl.textContent = '➕ Add New Page';
+    form.id_field.value = '';
+    form.created_at_field.value = '';
+    form.order.value = (ensurePagesArray().length + 1) * 10;
+    form.show_in_menu.checked = false;
+    form.enabled.checked = true;
+  }
+  document.getElementById('pageModal').classList.add('show');
+}
+
+function closePageModal() {
+  document.getElementById('pageModal').classList.remove('show');
+  editingPageId = null;
+}
+
+async function handleSavePage(e) {
+  e.preventDefault();
+  const form = e.target;
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const slugVal = slugify(form.slug.value);
+  if (!slugVal) { alert('Please enter a valid slug (a-z, 0-9, dashes).'); return; }
+
+  const pages = ensurePagesArray();
+  // Slug must be unique
+  const dup = pages.find(p => p.slug === slugVal && p.id !== form.id_field.value);
+  if (dup) { alert(`A page with slug "${slugVal}" already exists. Choose a different slug.`); return; }
+
+  submitBtn.disabled = true; submitBtn.textContent = 'Saving...';
+
+  const id = form.id_field.value || ('p' + Date.now());
+  let page = pages.find(p => p.id === id);
+  const isNew = !page;
+  if (!page) {
+    page = { id, created_at: new Date().toISOString() };
+    pages.push(page);
+  }
+  page.title = form.title.value.trim();
+  page.slug = slugVal;
+  page.nav_label = form.nav_label.value.trim();
+  page.meta_description = form.meta_description.value.trim();
+  page.html_content = form.html_content.value;
+  page.show_in_menu = !!form.show_in_menu.checked;
+  page.enabled = !!form.enabled.checked;
+  page.order = Number(form.order.value) || 100;
+  page.updated_at = new Date().toISOString();
+  if (!page.created_at) page.created_at = form.created_at_field.value || new Date().toISOString();
+
+  try {
+    await saveSiteConfig(`Pages: ${isNew ? 'create' : 'update'} "${page.title}"`);
+    closePageModal();
+    refreshPagesUI();
+    alert(`✅ Page saved. View it at:\npage.html?slug=${page.slug}\n\nNote: Public visitors ko ~5 min lag sakte hain (CDN cache).`);
+  } catch (err) {
+    alert('Save failed: ' + err.message);
+    submitBtn.disabled = false; submitBtn.textContent = '💾 Save Page';
+  }
+}
+
+async function deletePage(id) {
+  const page = ensurePagesArray().find(p => p.id === id);
+  if (!page) return;
+  if (!confirm(`Delete page "${page.title}"?\nSlug: ${page.slug}\n\nThis cannot be undone.`)) return;
+  siteConfigData.json.pages = ensurePagesArray().filter(p => p.id !== id);
+  try {
+    await saveSiteConfig(`Pages: delete "${page.title}"`);
+    refreshPagesUI();
   } catch (err) {
     alert('Delete failed: ' + err.message);
   }

@@ -122,6 +122,14 @@
           <span class="icon">🖼️</span> <span>Image Gallery</span>
           <span class="badge" id="badgeGallery">0</span>
         </button>
+        <button class="admin-tab" data-tab="slider">
+          <span class="icon">🎞️</span> <span>Hero Slider</span>
+          <span class="badge" id="badgeSlider">0</span>
+        </button>
+        <button class="admin-tab" data-tab="pages">
+          <span class="icon">📄</span> <span>Pages</span>
+          <span class="badge" id="badgePages">0</span>
+        </button>
 
         <div class="nav-section">Customize</div>
         <button class="admin-tab" data-tab="theme">
@@ -304,6 +312,195 @@
         <div id="galleryAdminGrid" style="margin-top: 18px;">
           <p style="text-align:center;padding:30px;color:var(--text-light);">Loading gallery...</p>
         </div>
+      </div>
+    </div>
+
+    <!-- ===== HERO SLIDER TAB ===== -->
+    <div class="tab-pane" id="tab-slider">
+      <div class="admin-card-section">
+        <h3>🎞️ Hero Slider</h3>
+        <p class="subtitle">
+          Homepage ke top par jo slider chalta hai uska content yahan se manage karein.
+          Har slide ka icon, title, subtitle, background image aur link customize karein.
+        </p>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:14px;background:#f7f9fc;padding:14px;border-radius:8px;">
+          <label style="display:flex;align-items:center;gap:8px;font-weight:600;">
+            <input type="checkbox" id="sliderEnabledChk" style="width:auto;"> Slider enabled
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;">
+            Auto-play interval (ms):
+            <input type="number" id="sliderIntervalInput" min="2000" max="20000" step="500" value="4500" style="width:120px;">
+          </label>
+          <button class="btn btn-primary btn-sm" id="saveSliderConfigBtn">💾 Save Slider Settings</button>
+        </div>
+        <div class="admin-toolbar">
+          <button class="btn btn-success" id="addSlideBtn">➕ Add Slide</button>
+          <button class="btn btn-primary" id="refreshSliderBtn">🔄 Refresh</button>
+        </div>
+        <div style="overflow-x:auto;margin-top:14px;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width:40px;">#</th>
+                <th>Icon</th>
+                <th>Title</th>
+                <th>Subtitle</th>
+                <th>Background</th>
+                <th>Link</th>
+                <th>Enabled</th>
+                <th>Order</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="sliderTableBody">
+              <tr><td colspan="9" style="text-align:center;padding:30px;">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide Add/Edit Modal -->
+    <div class="modal-backdrop" id="slideModal">
+      <div class="modal">
+        <button class="modal-close" id="slideModalCloseBtn" type="button">&times;</button>
+        <h2 id="slideModalTitle">➕ Add Slide</h2>
+        <form id="slideForm">
+          <input type="hidden" name="id_field">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Icon (emoji)</label>
+              <input name="icon" placeholder="🚗" maxlength="4">
+            </div>
+            <div class="form-group">
+              <label>Order</label>
+              <input name="order" type="number" min="1" value="100">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Title *</label>
+            <input name="title" required placeholder="Rental Cars">
+          </div>
+          <div class="form-group">
+            <label>Subtitle</label>
+            <input name="subtitle" placeholder="Premium & budget cars for travel and events">
+          </div>
+          <div class="form-group">
+            <label>Background Image (optional)</label>
+            <input type="file" id="slideBgFile" accept="image/*">
+            <p class="help-text">Upload an image — slide background ke liye. Empty rakhne pe brand gradient use hoga.</p>
+            <div id="slideBgPreview" style="margin-top:10px;"></div>
+          </div>
+          <div class="form-group">
+            <label>Link / URL (optional)</label>
+            <input name="link" placeholder="rental-cars.html or https://...">
+            <p class="help-text">Slide click karne pe yahan navigate hoga. Empty = no link.</p>
+          </div>
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:8px;">
+              <input type="checkbox" name="enabled" checked style="width:auto;"> Slide enabled (visible on homepage)
+            </label>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-outline" id="slideCancelBtn">Cancel</button>
+            <button type="submit" class="btn btn-success">💾 Save Slide</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===== PAGES TAB ===== -->
+    <div class="tab-pane" id="tab-pages">
+      <div class="admin-card-section">
+        <h3>📄 Custom Pages</h3>
+        <p class="subtitle">
+          Naye pages create karein (Privacy Policy, Terms, FAQ, etc.) — admin se HTML content add ho jayega.
+          <strong>Show in menu</strong> check karne pe page navigation menu mein bhi automatically appear hoga.
+          URL format: <code>page.html?slug=your-slug</code>
+        </p>
+        <div class="admin-toolbar">
+          <input type="text" id="pagesSearchInput" placeholder="🔍 Search by title or slug...">
+          <button class="btn btn-success" id="addPageBtn">➕ Add New Page</button>
+          <button class="btn btn-primary" id="refreshPagesBtn">🔄 Refresh</button>
+        </div>
+        <div style="overflow-x:auto;margin-top:14px;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Slug (URL)</th>
+                <th>In Menu</th>
+                <th>Order</th>
+                <th>Status</th>
+                <th>Updated</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="pagesTableBody">
+              <tr><td colspan="7" style="text-align:center;padding:30px;">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page Add/Edit Modal -->
+    <div class="modal-backdrop" id="pageModal">
+      <div class="modal" style="max-width:760px;">
+        <button class="modal-close" id="pageModalCloseBtn" type="button">&times;</button>
+        <h2 id="pageModalTitle">➕ Add New Page</h2>
+        <form id="pageForm">
+          <input type="hidden" name="id_field">
+          <input type="hidden" name="created_at_field">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Title *</label>
+              <input name="title" required placeholder="Privacy Policy">
+            </div>
+            <div class="form-group">
+              <label>Slug (URL-safe) *</label>
+              <input name="slug" required placeholder="privacy-policy" pattern="[a-z0-9\-]+">
+              <p class="help-text">Sirf small letters, digits aur dashes. URL: <code>page.html?slug=...</code></p>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nav Menu Label</label>
+              <input name="nav_label" placeholder="Privacy">
+              <p class="help-text">Empty = title use hoga.</p>
+            </div>
+            <div class="form-group">
+              <label>Order (sort)</label>
+              <input name="order" type="number" min="1" value="100">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Meta Description (SEO, optional)</label>
+            <textarea name="meta_description" rows="2" placeholder="Short description for search engines..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Page Content (HTML allowed) *</label>
+            <textarea name="html_content" rows="14" required style="font-family:monospace;font-size:13px;"
+                      placeholder="<h1>Privacy Policy</h1>&#10;<p>Your content here. HTML tags supported.</p>"></textarea>
+            <p class="help-text">Pure HTML supported. <code>&lt;h1&gt;, &lt;p&gt;, &lt;a&gt;, &lt;img&gt;, &lt;ul&gt;, &lt;ol&gt;</code> etc. all allowed.</p>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label style="display:flex;align-items:center;gap:8px;">
+                <input type="checkbox" name="show_in_menu" style="width:auto;"> Show in navigation menu
+              </label>
+            </div>
+            <div class="form-group">
+              <label style="display:flex;align-items:center;gap:8px;">
+                <input type="checkbox" name="enabled" checked style="width:auto;"> Page enabled (publicly visible)
+              </label>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-outline" id="pageCancelBtn">Cancel</button>
+            <button type="submit" class="btn btn-success">💾 Save Page</button>
+          </div>
+        </form>
       </div>
     </div>
 
