@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at": "2026-05-07T13:53:08.773Z",
+  "updated_at": "2026-05-07T13:55:32.423Z",
   "branding": {
     "site_name": "Call4All",
     "tagline": "One Call. Every Service. Done.",
@@ -8,14 +8,14 @@
     "logo_height": 55
   },
   "theme": {
-    "preset": "holi",
-    "primary": "#c2185b",
-    "primary_dark": "#880e4f",
-    "accent": "#ffeb3b",
-    "accent_dark": "#fbc02d",
-    "background": "#fff5f8",
-    "festival_overlay": "holi",
-    "festival_banner": "🎨 Happy Holi - Colourful greetings to all! 🎨"
+    "preset": "default",
+    "primary": "#1e3c72",
+    "primary_dark": "#142850",
+    "accent": "#ffcc00",
+    "accent_dark": "#e6b800",
+    "background": "#ffffff",
+    "festival_overlay": "none",
+    "festival_banner": ""
   },
   "contact": {
     "phone": "+917737353588",
