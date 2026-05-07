@@ -1,15 +1,15 @@
 /* ===== Call4All - Staff Portal Logic =====
  * 3-step authentication:
- *   1. Email + password (validated against publicly readable data/staff.csv)
- *   2. GitHub PAT entry (one-time per browser, used to write to sources.csv)
+ *   1. Email + password (validated against the staff database)
+ *   2. Access key entry (one-time per browser)
  *   3. Staff Dashboard - manage sources/inventory entries
  *
- * Note on security:
- * - data/staff.csv is publicly readable (it's a static file on GitHub Pages).
- *   We only store *hashed* passwords (SHA-256), never plaintext.
- * - The GitHub PAT is supplied by the staff member after successful login.
- *   Admin shares this token via WhatsApp/email.
- * - Token is stored in localStorage on staff's browser only.
+ * Implementation notes (internal):
+ * - data/staff.csv stores SHA-256 hashed passwords (never plaintext)
+ * - The "access key" shown to staff is internally a GitHub fine-grained PAT
+ *   that grants Contents: Read and write on the data repo. We deliberately
+ *   hide this branding from staff so the storage backend stays opaque.
+ * - The key is stored in localStorage on staff's browser only.
  */
 
 const SS_EMAIL = 'c4a_staff_email';
@@ -49,6 +49,20 @@ function escHtml(s) {
   return String(s == null ? '' : s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// Sanitize error messages so staff never sees the underlying storage backend (GitHub).
+function sanitizeError(msg) {
+  return String(msg || '')
+    .replace(/GitHub token/gi, 'access key')
+    .replace(/GitHub PAT/gi, 'access key')
+    .replace(/Personal Access Token/gi, 'access key')
+    .replace(/personal access token/gi, 'access key')
+    .replace(/Contents: Read and write/g, 'write permission')
+    .replace(/https?:\/\/github\.com[^\s)"']*/gi, 'admin')
+    .replace(/api\.github\.com[^\s)"']*/gi, 'storage server')
+    .replace(/raw\.githubusercontent\.com[^\s)"']*/gi, 'storage server')
+    .replace(/github/gi, 'storage');
 }
 function genId(prefix) { return prefix + Date.now() + Math.floor(Math.random() * 100); }
 function fmtDate(iso) {
@@ -125,7 +139,7 @@ function initStaffLogin() {
 }
 
 /* ===========================================================================
- * STEP 2 — GitHub Token Entry
+ * STEP 2 — Access Key Entry
  * =========================================================================== */
 function initTokenStep() {
   document.getElementById('tokenWelcomeName').textContent = localStorage.getItem(SS_NAME) || 'Staff';
@@ -144,10 +158,11 @@ function initTokenStep() {
     submitBtn.disabled = true; submitBtn.textContent = 'Verifying...';
 
     try {
+      // Internally validates against the storage backend (GitHub API)
       const verify = await fetch('https://api.github.com/user', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (!verify.ok) throw new Error('Invalid GitHub token. Please ask admin to share a fresh token.');
+      if (!verify.ok) throw new Error('Invalid access key. Please ask admin for a fresh key.');
 
       localStorage.setItem(SS_TOKEN, token);
       window.location.href = 'staff.html';
@@ -218,7 +233,7 @@ async function loadStaffData() {
     updateStaffStats();
     renderStaffSourcesTable();
   } catch (err) {
-    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:30px;color:#dc3545;">❌ ${escHtml(err.message)}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:30px;color:#dc3545;">❌ ${escHtml(sanitizeError(err.message))}</td></tr>`;
   }
 }
 
@@ -415,7 +430,7 @@ async function handleStaffSaveSource(e) {
     closeStaffSourceModal();
     await loadStaffData();
   } catch (err) {
-    alert('Save failed: ' + err.message);
+    alert('Save failed: ' + sanitizeError(err.message));
     submitBtn.disabled = false; submitBtn.textContent = '💾 Save';
   }
 }
@@ -437,6 +452,6 @@ async function deleteStaffSource(id) {
       `Delete source ${id} by ${myEmail}`, PATH_SOURCES);
     await loadStaffData();
   } catch (err) {
-    alert('Delete failed: ' + err.message);
+    alert('Delete failed: ' + sanitizeError(err.message));
   }
 }

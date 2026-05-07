@@ -61,22 +61,22 @@
   <div id="site-footer"></div>
 </div>
 
-<!-- TOKEN STEP 2: GitHub PAT (after email/password verified) -->
+<!-- TOKEN STEP 2: Access token (after email/password verified) -->
 <div id="tokenView" style="display:none;">
   <div id="site-header"></div>
   <div class="login-wrap">
     <div class="login-card">
       <h2>🔑 One-Time Setup</h2>
-      <p class="lead">Welcome <strong id="tokenWelcomeName">Staff</strong>! To save data on GitHub, paste the access token your admin shared with you.</p>
+      <p class="lead">Welcome <strong id="tokenWelcomeName">Staff</strong>! Paste your <strong>access key</strong> to start saving data.</p>
       <div class="step-card">
-        <strong>📌 Note for staff:</strong> Apke admin ne aapko ek <em>GitHub access token</em> diya hoga (WhatsApp/email pe).
-        Wo paste karein. Yeh token sirf <em>is browser</em> mein save hoga aur sirf data save karne ke liye use hoga.
-        Logout karne par bhi yeh token saved rahega is browser mein.
+        <strong>📌 Note:</strong> Aapke admin ne aapko ek <em>access key</em> diya hoga (WhatsApp / email pe).
+        Wo yahan paste karein. Yeh key sirf <em>is browser</em> mein securely save hogi aur sirf data save karne ke liye use hogi.
+        Logout karne par bhi key saved rahegi (jaldi login ke liye).
       </div>
       <form id="tokenForm">
         <div class="form-group">
-          <label for="staff_token">GitHub Access Token *</label>
-          <input type="password" id="staff_token" name="token" placeholder="github_pat_xxxxx... or ghp_xxxxx..." required autocomplete="off">
+          <label for="staff_token">Access Key *</label>
+          <input type="password" id="staff_token" name="token" placeholder="Paste your access key here" required autocomplete="off">
         </div>
         <button type="submit" class="btn btn-primary btn-block">Verify & Continue</button>
         <button type="button" class="btn btn-outline btn-block" id="logoutFromTokenBtn" style="margin-top:10px;border-color:#999;color:#666;">← Back to Login</button>
