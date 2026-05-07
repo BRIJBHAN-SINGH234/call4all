@@ -541,9 +541,75 @@ img { max-width: 100%; display: block; }
   text-transform: uppercase;
 }
 .status-new { background: #ffe7ad; color: #6b4d00; }
+.status-pending { background: #ffe7ad; color: #6b4d00; }
 .status-contacted { background: #cfe5ff; color: #134c8b; }
+.status-processing { background: #cfe5ff; color: #134c8b; }
 .status-completed { background: #d1f7dd; color: #0a6b2c; }
+.status-complete { background: #d1f7dd; color: #0a6b2c; }
 .status-cancelled { background: #fde2e4; color: #93181f; }
+
+/* Inline status select inside table cell */
+.inline-status-select {
+  font-size: 12px;
+  padding: 4px 6px;
+  border: 1px solid #d4d8e0;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+.inline-status-select.is-pending { background: #fff5d4; color: #6b4d00; }
+.inline-status-select.is-processing { background: #e6f0ff; color: #134c8b; }
+.inline-status-select.is-complete { background: #defbe7; color: #0a6b2c; }
+.inline-status-select.is-cancelled { background: #ffe5e7; color: #93181f; }
+
+.assigned-cell {
+  font-size: 12px;
+  color: var(--text-light);
+}
+.assigned-cell .name { display: block; color: var(--primary); font-weight: 600; }
+
+/* Alert banner (used for warnings on top of sections) */
+.alert-banner {
+  background: linear-gradient(90deg, #fff8e1, #fff3c4);
+  border: 1px solid #ffd54f;
+  border-left: 5px solid #ff9800;
+  color: #5f4300;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.alert-banner a { color: #b15300; font-weight: 700; text-decoration: underline; }
+
+/* Big status pill block (used in Settings → Auto-save status) */
+.status-pill-block {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  box-shadow: var(--shadow);
+  margin-bottom: 18px;
+  border-left: 6px solid #ff9800;
+  transition: var(--transition);
+}
+.status-pill-block.is-on { border-left-color: #2e7d32; }
+.status-pill-block .pill-header {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 8px;
+}
+.status-pill-block .pill-emoji { font-size: 32px; }
+.status-pill-block h3 { color: var(--primary); margin: 0; }
+.status-pill-block #autoSaveLabel {
+  padding: 3px 10px;
+  border-radius: 14px;
+  font-size: 14px;
+  background: #ff9800;
+  color: white;
+}
+.status-pill-block.is-on #autoSaveLabel {
+  background: #2e7d32;
+}
 
 .empty-state {
   text-align: center;

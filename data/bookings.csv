@@ -1,1 +1,1 @@
-id,timestamp,name,phone,service,city,area,address,message,status
+id,timestamp,name,phone,service,city,area,address,message,status,assigned_to,assigned_at

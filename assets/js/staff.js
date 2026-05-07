@@ -16,14 +16,29 @@ const SS_EMAIL = 'c4a_staff_email';
 const SS_NAME = 'c4a_staff_name';
 const SS_TOKEN = 'c4a_staff_token';
 const SS_SESSION = 'c4a_staff_session';
+const SS_SEEN_BOOKINGS = 'c4a_staff_seen_bookings';
+const SS_NOTIF_ENABLED = 'c4a_staff_notif_enabled';
 
 const PATH_SOURCES = 'data/sources.csv';
 const PATH_STAFF = 'data/staff.csv';
 const PATH_AREAS = 'data/areas.csv';
+const PATH_BOOKINGS = 'data/bookings.csv';
 
 let staffSourcesData = { headers: [], items: [], sha: null };
 let staffAreasCache = [];
 let staffEditingId = null;
+
+let myBookingsData = { headers: [], items: [], sha: null };
+let bookingsPollTimer = null;
+let _audioCtx = null;
+
+const STAFF_STATUS_MAP = {
+  'new':'Pending','pending':'Pending',
+  'contacted':'Processing','processing':'Processing',
+  'completed':'Complete','complete':'Complete',
+  'cancelled':'Cancelled','cancel':'Cancelled'
+};
+function normStatus(s) { return STAFF_STATUS_MAP[String(s||'').toLowerCase()] || 'Pending'; }
 
 document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('loginView') && document.getElementById('loginView').style.display !== 'none') {
@@ -181,19 +196,291 @@ function initStaffDashboard() {
   document.getElementById('staffUserName').textContent = localStorage.getItem(SS_NAME) || 'Staff';
   document.getElementById('staffLogoutBtn').addEventListener('click', fullStaffLogout);
 
+  // Sources tab events
   document.getElementById('staffAddSourceBtn').addEventListener('click', () => openStaffSourceModal(null));
   document.getElementById('staffRefreshBtn').addEventListener('click', loadStaffData);
   document.getElementById('staffSrcSearch').addEventListener('input', renderStaffSourcesTable);
   document.getElementById('staffSrcCategoryFilter').addEventListener('change', renderStaffSourcesTable);
   document.getElementById('staffSrcMineFilter').addEventListener('change', renderStaffSourcesTable);
-
   document.getElementById('staffSourceForm').addEventListener('submit', handleStaffSaveSource);
   document.getElementById('staffSrcCloseBtn').addEventListener('click', closeStaffSourceModal);
   document.getElementById('staffSrcCancelBtn').addEventListener('click', closeStaffSourceModal);
   document.getElementById('staff_src_city').addEventListener('change', updateStaffAreaOptions);
 
+  // Bookings tab events
+  document.getElementById('myBookingsRefreshBtn').addEventListener('click', loadMyBookings);
+  document.getElementById('myBookingSearch').addEventListener('input', renderMyBookingsTable);
+  document.getElementById('myBookingStatusFilter').addEventListener('change', renderMyBookingsTable);
+
+  // Tab switching
+  document.querySelectorAll('[data-stab]').forEach(btn => {
+    btn.addEventListener('click', () => switchStaffTab(btn.dataset.stab));
+  });
+
+  // Notification permission UI
+  setupStaffNotifications();
+
   populateStaffCategoryFilter();
   loadStaffData();
+  loadMyBookings();
+  startBookingPolling();
+}
+
+function switchStaffTab(name) {
+  document.querySelectorAll('[data-stab]').forEach(btn => {
+    const active = btn.dataset.stab === name;
+    btn.classList.toggle('active', active);
+    btn.style.background = active ? 'var(--primary)' : '#e1e5eb';
+    btn.style.color = active ? 'white' : '#444';
+  });
+  document.getElementById('stab-bookings').style.display = name === 'bookings' ? 'block' : 'none';
+  document.getElementById('stab-sources').style.display = name === 'sources' ? 'block' : 'none';
+}
+
+/* ===== Notifications: sound + browser push + vibration ===== */
+function setupStaffNotifications() {
+  const banner = document.getElementById('notifPermissionBanner');
+  const headerBtn = document.getElementById('enableNotifBtn');
+  const link = document.getElementById('enableNotifLink');
+
+  function refreshNotifUi() {
+    const enabled = localStorage.getItem(SS_NOTIF_ENABLED) === '1';
+    const permission = ('Notification' in window) ? Notification.permission : 'denied';
+    const allDone = enabled && (permission === 'granted' || !('Notification' in window));
+    if (banner) banner.style.display = allDone ? 'none' : 'block';
+    if (headerBtn) headerBtn.style.display = allDone ? 'none' : 'inline-block';
+  }
+
+  async function requestEnable(ev) {
+    if (ev) ev.preventDefault();
+    try {
+      // Browsers require a user gesture to start AudioContext. Create one
+      // here so subsequent beeps work.
+      if (!_audioCtx && (window.AudioContext || window.webkitAudioContext)) {
+        _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      // Play a short test tone so user hears that audio is working.
+      playNotificationTone();
+      // Vibrate test (mobile)
+      if (navigator.vibrate) navigator.vibrate([120, 60, 120]);
+      // Ask for browser notification permission
+      if ('Notification' in window && Notification.permission !== 'granted') {
+        const perm = await Notification.requestPermission();
+        if (perm === 'granted') {
+          new Notification('Call4All Staff', {
+            body: 'Alerts enabled. Naye assigned bookings ke liye sound + notification milegi.',
+            icon: 'assets/icons/icon-192.png'
+          });
+        }
+      }
+      localStorage.setItem(SS_NOTIF_ENABLED, '1');
+    } catch (e) {
+      console.warn('[staff] notification setup failed:', e);
+    }
+    refreshNotifUi();
+  }
+
+  if (headerBtn) headerBtn.addEventListener('click', requestEnable);
+  if (link) link.addEventListener('click', requestEnable);
+
+  refreshNotifUi();
+}
+
+/* Plays a short two-note "ding-ding" tone via Web Audio. Works on mobile
+ * after the user has clicked "Enable Alerts" once (gesture requirement). */
+function playNotificationTone() {
+  try {
+    if (!_audioCtx && (window.AudioContext || window.webkitAudioContext)) {
+      _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (!_audioCtx) return;
+    const ctx = _audioCtx;
+    const now = ctx.currentTime;
+
+    const blip = (freq, start, dur) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, now + start);
+      gain.gain.linearRampToValueAtTime(0.5, now + start + 0.02);
+      gain.gain.linearRampToValueAtTime(0, now + start + dur);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + start);
+      osc.stop(now + start + dur + 0.02);
+    };
+
+    blip(880, 0,    0.18);
+    blip(1320, 0.20, 0.18);
+    blip(880, 0.42, 0.18);
+  } catch (e) { /* ignore */ }
+}
+
+function showBookingNotification(count, sample) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    const title = count > 1
+      ? `📋 ${count} new bookings assigned`
+      : `📋 New booking: ${sample.service || 'Service'}`;
+    const body = count > 1
+      ? `Apne dashboard mein "My Bookings" tab kholein.`
+      : `Customer: ${sample.name || '-'}\nPhone: ${sample.phone || '-'}\nCity: ${sample.city || '-'}`;
+    try {
+      const n = new Notification(title, {
+        body,
+        icon: 'assets/icons/icon-192.png',
+        badge: 'assets/icons/icon-192.png',
+        tag: 'c4a-new-booking',
+        renotify: true,
+        requireInteraction: false
+      });
+      n.onclick = () => { window.focus(); switchStaffTab('bookings'); n.close(); };
+    } catch (e) { /* notification API can throw on some browsers */ }
+  }
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
+  playNotificationTone();
+}
+
+function startBookingPolling() {
+  // Poll every 30 seconds
+  if (bookingsPollTimer) clearInterval(bookingsPollTimer);
+  bookingsPollTimer = setInterval(loadMyBookings, 30000);
+  // Also re-check when tab becomes visible after backgrounded
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') loadMyBookings();
+  });
+}
+
+/* ===== My Bookings ===== */
+async function loadMyBookings() {
+  const tbody = document.getElementById('myBookingsBody');
+  const myEmail = (localStorage.getItem(SS_EMAIL) || '').toLowerCase();
+  const token = localStorage.getItem(SS_TOKEN);
+  if (!myEmail || !token) return;
+
+  try {
+    myBookingsData = await window.CsvAPI.loadAll(token, PATH_BOOKINGS);
+    if (!myBookingsData.headers.length) myBookingsData.headers = window.CsvAPI.DEFAULT_HEADERS[PATH_BOOKINGS];
+
+    // Detect newly-assigned bookings since last visit
+    detectNewAssignedBookings(myEmail);
+
+    updateMyBookingsStats(myEmail);
+    renderMyBookingsTable();
+  } catch (err) {
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:30px;color:#dc3545;">❌ ${escHtml(sanitizeError(err.message))}</td></tr>`;
+    }
+  }
+}
+
+function detectNewAssignedBookings(myEmail) {
+  const mine = myBookingsData.items.filter(i => (i.assigned_to || '').toLowerCase() === myEmail);
+  let seen = [];
+  try { seen = JSON.parse(localStorage.getItem(SS_SEEN_BOOKINGS) || '[]'); } catch (e) {}
+  const seenSet = new Set(seen);
+  const newOnes = mine.filter(i => !seenSet.has(i.id));
+
+  // Update seen list (only keep IDs that still exist + the new ones)
+  const allIds = new Set(mine.map(i => i.id));
+  const updatedSeen = [...new Set([...seen.filter(id => allIds.has(id)), ...mine.map(i => i.id)])];
+  try { localStorage.setItem(SS_SEEN_BOOKINGS, JSON.stringify(updatedSeen)); } catch (e) {}
+
+  // First time loading? Just record what we have without alerting (otherwise
+  // the staff would get a beep on every login for old bookings).
+  if (seen.length === 0) return;
+
+  if (newOnes.length > 0 && localStorage.getItem(SS_NOTIF_ENABLED) === '1') {
+    showBookingNotification(newOnes.length, newOnes[0]);
+  }
+}
+
+function updateMyBookingsStats(myEmail) {
+  const mine = myBookingsData.items.filter(i => (i.assigned_to || '').toLowerCase() === myEmail);
+  document.getElementById('myBookingsBadge').textContent = mine.length;
+  const counts = { Pending: 0, Processing: 0, Complete: 0, Cancelled: 0 };
+  mine.forEach(i => { counts[normStatus(i.status)]++; });
+  document.getElementById('myStatPending').textContent = counts.Pending;
+  document.getElementById('myStatProcessing').textContent = counts.Processing;
+  document.getElementById('myStatComplete').textContent = counts.Complete;
+  document.getElementById('myStatCancelled').textContent = counts.Cancelled;
+}
+
+function renderMyBookingsTable() {
+  const tbody = document.getElementById('myBookingsBody');
+  const myEmail = (localStorage.getItem(SS_EMAIL) || '').toLowerCase();
+  const search = (document.getElementById('myBookingSearch').value || '').toLowerCase().trim();
+  const statusFilter = document.getElementById('myBookingStatusFilter').value;
+
+  let items = myBookingsData.items.filter(i => (i.assigned_to || '').toLowerCase() === myEmail);
+  items.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+  if (statusFilter) items = items.filter(i => normStatus(i.status).toLowerCase() === statusFilter.toLowerCase());
+  if (search) items = items.filter(i => Object.values(i).some(v => String(v).toLowerCase().includes(search)));
+
+  if (items.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><div class="icon">📭</div><div>No bookings assigned to you. Wait for the admin to assign one.</div></div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = items.map(item => {
+    const cityArea = [item.city, item.area].filter(Boolean).join(' / ');
+    const phoneClean = (item.phone || '').replace(/[^0-9]/g, '');
+    const status = normStatus(item.status);
+    const statusKey = status.toLowerCase();
+
+    const statusOptions = ['Pending','Processing','Complete','Cancelled']
+      .map(s => `<option value="${s}" ${s === status ? 'selected' : ''}>${s}</option>`).join('');
+
+    return `
+      <tr>
+        <td><strong>${escHtml(item.id)}</strong></td>
+        <td style="font-size:12px;">${escHtml(fmtDate(item.timestamp))}</td>
+        <td>${escHtml(item.name)}</td>
+        <td><a href="tel:${escAttr(item.phone)}">${escHtml(item.phone)}</a><br>
+            <a href="https://wa.me/${phoneClean}" target="_blank" style="font-size:12px;">💬 WhatsApp</a></td>
+        <td>${escHtml(item.service)}</td>
+        <td>${escHtml(cityArea || '-')}</td>
+        <td class="msg-cell">${escHtml(item.address || '-')}</td>
+        <td class="msg-cell">${escHtml(item.message)}</td>
+        <td>
+          <select class="inline-status-select is-${statusKey}"
+                  onchange="staffUpdateBookingStatus('${escAttr(item.id)}', this.value)">
+            ${statusOptions}
+          </select>
+        </td>
+        <td>
+          <button class="btn btn-success btn-sm"
+                  onclick="staffMarkBookingComplete('${escAttr(item.id)}')">
+            ✅ Complete
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function staffUpdateBookingStatus(id, newStatus) {
+  const idx = myBookingsData.items.findIndex(i => i.id === id);
+  if (idx < 0) return;
+  const original = myBookingsData.items[idx].status;
+  myBookingsData.items[idx].status = normStatus(newStatus);
+  const token = localStorage.getItem(SS_TOKEN);
+  try {
+    await window.CsvAPI.saveAll(window.CsvAPI.DEFAULT_HEADERS[PATH_BOOKINGS],
+      myBookingsData.items, myBookingsData.sha, token,
+      `Staff status update: booking ${id} → ${newStatus}`, PATH_BOOKINGS);
+    await loadMyBookings();
+  } catch (err) {
+    alert('Status update failed: ' + sanitizeError(err.message));
+    myBookingsData.items[idx].status = original;
+    renderMyBookingsTable();
+  }
+}
+
+function staffMarkBookingComplete(id) {
+  if (confirm('Mark this booking as Complete? Customer ko inform kar diya hai?')) {
+    staffUpdateBookingStatus(id, 'Complete');
+  }
 }
 
 function populateStaffCategoryFilter() {

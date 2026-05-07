@@ -92,54 +92,120 @@
   <div class="staff-header">
     <h1>👤 Call4All Staff Portal</h1>
     <div class="right">
+      <button class="btn btn-accent btn-sm" id="enableNotifBtn" title="Enable sound + push notifications" style="display:none;">🔔 Enable Alerts</button>
       <span class="user-chip">👤 <span id="staffUserName">Staff</span></span>
       <button class="btn btn-outline btn-sm" id="staffLogoutBtn" style="border-color:#fff;color:#fff;">🚪 Logout</button>
     </div>
   </div>
 
+  <!-- Notification permission banner (shown until allowed) -->
+  <div id="notifPermissionBanner" class="alert-banner" style="display:none; margin: 12px 18px 0;">
+    🔔 Naye assigned bookings ke liye <strong>sound + push notification</strong> chalu karein —
+    <a href="#" id="enableNotifLink">Click karke Allow karein</a>.
+    Mobile pe tone aur vibration bhi bajegi jab admin koi naya booking aapko assign kare.
+  </div>
+
   <div class="admin-wrap">
-    <div class="step-card">
-      <strong>Welcome to your Staff Portal!</strong> Yahan se aap apne saare service providers / inventory entries add aur manage kar sakte hain.
-      Admin sab kuch dekh sakta hai. Sirf <strong>Active</strong> service areas (city + area) mein hi entries add ki ja sakti hain.
+    <!-- Tab nav -->
+    <div class="admin-tabs" style="position:static;display:flex;flex-direction:row;background:transparent;padding:0;box-shadow:none;border-radius:0;width:auto;height:auto;margin-bottom:14px;gap:6px;">
+      <button class="admin-tab active" data-stab="bookings" style="border-radius:8px;border-left:none;background:var(--primary);color:white;padding:10px 18px;width:auto;">
+        📋 My Bookings <span class="badge" id="myBookingsBadge" style="margin-left:6px;">0</span>
+      </button>
+      <button class="admin-tab" data-stab="sources" style="border-radius:8px;border-left:none;background:#e1e5eb;color:#444;padding:10px 18px;width:auto;">
+        🗂️ Sources / Inventory
+      </button>
     </div>
 
-    <div class="admin-stats" id="staffStats"></div>
-
-    <div class="admin-card">
-      <h3 style="color:var(--primary); margin-bottom:14px;">🗂️ Sources / Inventory</h3>
-      <div class="admin-toolbar">
-        <input type="text" id="staffSrcSearch" placeholder="🔍 Search...">
-        <select id="staffSrcCategoryFilter">
-          <option value="">All Categories</option>
-        </select>
-        <select id="staffSrcMineFilter">
-          <option value="all">All Sources</option>
-          <option value="mine" selected>Only My Entries</option>
-        </select>
-        <button class="btn btn-success" id="staffAddSourceBtn">➕ Add Source</button>
-        <button class="btn btn-primary" id="staffRefreshBtn">🔄 Refresh</button>
+    <!-- ===== MY BOOKINGS ===== -->
+    <div class="staff-pane active" id="stab-bookings">
+      <div class="step-card">
+        <strong>📋 Aapko Assigned Bookings</strong>
+        — Admin jo bhi booking aapko assign karega, yahan turant dikhegi (har 30 sec mein refresh hoga).
+        Aap status update kar sakte ho: <strong>Processing</strong> (kaam shuru), <strong>Complete</strong> (kaam ho gaya), ya <strong>Cancelled</strong>.
       </div>
-      <div style="overflow-x:auto;">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Category</th>
-              <th>Name</th>
-              <th>City / Area</th>
-              <th>Address</th>
-              <th>Contact</th>
-              <th>Price</th>
-              <th>Avail.</th>
-              <th>Notes</th>
-              <th>Added By</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="staffSourcesBody">
-            <tr><td colspan="11" style="text-align:center;padding:30px;">Loading...</td></tr>
-          </tbody>
-        </table>
+
+      <div class="admin-stats">
+        <div class="stat-card warn"><div class="label">⏳ Pending</div><div class="value" id="myStatPending">0</div></div>
+        <div class="stat-card warn"><div class="label">⚙️ Processing</div><div class="value" id="myStatProcessing">0</div></div>
+        <div class="stat-card ok"><div class="label">✅ Complete</div><div class="value" id="myStatComplete">0</div></div>
+        <div class="stat-card"><div class="label">❌ Cancelled</div><div class="value" id="myStatCancelled">0</div></div>
+      </div>
+
+      <div class="admin-card">
+        <h3 style="color:var(--primary); margin-bottom:14px;">📋 My Assigned Bookings</h3>
+        <div class="admin-toolbar">
+          <input type="text" id="myBookingSearch" placeholder="🔍 Search name, phone, service, city...">
+          <select id="myBookingStatusFilter">
+            <option value="">All Status</option>
+            <option value="Pending">⏳ Pending</option>
+            <option value="Processing" selected>⚙️ Processing</option>
+            <option value="Complete">✅ Complete</option>
+            <option value="Cancelled">❌ Cancelled</option>
+          </select>
+          <button class="btn btn-primary" id="myBookingsRefreshBtn">🔄 Refresh</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Ref ID</th><th>Date</th><th>Customer</th><th>Phone</th>
+                <th>Service</th><th>City / Area</th><th>Address</th>
+                <th>Requirement</th><th>Status</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="myBookingsBody">
+              <tr><td colspan="10" style="text-align:center;padding:30px;">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SOURCES ===== -->
+    <div class="staff-pane" id="stab-sources" style="display:none;">
+      <div class="step-card">
+        <strong>🗂️ Sources / Inventory</strong> — Yahan se aap apne saare service providers / inventory entries add aur manage kar sakte hain.
+        Admin sab kuch dekh sakta hai. Sirf <strong>Active</strong> service areas (city + area) mein hi entries add ki ja sakti hain.
+      </div>
+
+      <div class="admin-stats" id="staffStats"></div>
+
+      <div class="admin-card">
+        <h3 style="color:var(--primary); margin-bottom:14px;">🗂️ Sources / Inventory</h3>
+        <div class="admin-toolbar">
+          <input type="text" id="staffSrcSearch" placeholder="🔍 Search...">
+          <select id="staffSrcCategoryFilter">
+            <option value="">All Categories</option>
+          </select>
+          <select id="staffSrcMineFilter">
+            <option value="all">All Sources</option>
+            <option value="mine" selected>Only My Entries</option>
+          </select>
+          <button class="btn btn-success" id="staffAddSourceBtn">➕ Add Source</button>
+          <button class="btn btn-primary" id="staffRefreshBtn">🔄 Refresh</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Category</th>
+                <th>Name</th>
+                <th>City / Area</th>
+                <th>Address</th>
+                <th>Contact</th>
+                <th>Price</th>
+                <th>Avail.</th>
+                <th>Notes</th>
+                <th>Added By</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="staffSourcesBody">
+              <tr><td colspan="11" style="text-align:center;padding:30px;">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>

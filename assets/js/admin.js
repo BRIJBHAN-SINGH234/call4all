@@ -149,6 +149,7 @@ function initAdmin() {
 
   document.getElementById('logoutBtn').addEventListener('click', logout);
 
+  refreshAutoSaveUi();  // banner state on first paint
   loadAllSections();
   loadSiteConfig();
 }
@@ -198,12 +199,31 @@ async function loadAllSections() {
 /* ===========================================================================
  * SECTION 1 — BOOKINGS
  * =========================================================================== */
+/* Status normalisation: legacy "New" / "Contacted" / "Completed" map to
+ * the new vocabulary so old rows render correctly with the new badges.
+ */
+const STATUS_MAP = {
+  'new':        'Pending',
+  'pending':    'Pending',
+  'contacted':  'Processing',
+  'processing': 'Processing',
+  'completed':  'Complete',
+  'complete':   'Complete',
+  'cancelled':  'Cancelled',
+  'cancel':     'Cancelled'
+};
+function normalizeStatus(s) {
+  return STATUS_MAP[String(s || '').toLowerCase()] || 'Pending';
+}
+
 function bindBookingEvents() {
   document.getElementById('refreshBtn').addEventListener('click', loadBookings);
   document.getElementById('addNewBtn').addEventListener('click', () => openBookingModal(null));
   document.getElementById('exportBtn').addEventListener('click', exportBookingsCsv);
   document.getElementById('searchInput').addEventListener('input', renderBookingsTable);
   document.getElementById('statusFilter').addEventListener('change', renderBookingsTable);
+  const af = document.getElementById('assignedFilter');
+  if (af) af.addEventListener('change', renderBookingsTable);
   document.getElementById('editForm').addEventListener('submit', handleSaveBooking);
   document.getElementById('modalCloseBtn').addEventListener('click', closeBookingModal);
   document.getElementById('modalCancelBtn').addEventListener('click', closeBookingModal);
@@ -211,44 +231,81 @@ function bindBookingEvents() {
 
 async function loadBookings() {
   const tbody = document.getElementById('bookingsBody');
-  tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:30px;">Loading...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:30px;">Loading...</td></tr>';
   try {
     bookingsData = await window.CsvAPI.loadAll(getToken(), PATH_BOOKINGS);
     if (!bookingsData.headers.length) bookingsData.headers = defaultHeaders(PATH_BOOKINGS);
     updateBookingsStats();
+    populateAssignedFilter();
     renderBookingsTable();
   } catch (err) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:30px;color:#dc3545;">❌ ${escapeHtml(err.message)}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:30px;color:#dc3545;">❌ ${escapeHtml(err.message)}</td></tr>`;
   }
 }
 
 function updateBookingsStats() {
   const items = bookingsData.items;
+  const counts = { Pending: 0, Processing: 0, Complete: 0, Cancelled: 0 };
+  items.forEach(i => { counts[normalizeStatus(i.status)]++; });
   document.getElementById('statTotal').textContent = items.length;
-  document.getElementById('statNew').textContent = items.filter(i => (i.status || '').toLowerCase() === 'new').length;
-  document.getElementById('statContacted').textContent = items.filter(i => (i.status || '').toLowerCase() === 'contacted').length;
-  document.getElementById('statCompleted').textContent = items.filter(i => (i.status || '').toLowerCase() === 'completed').length;
+  document.getElementById('statPending').textContent = counts.Pending;
+  document.getElementById('statProcessing').textContent = counts.Processing;
+  document.getElementById('statComplete').textContent = counts.Complete;
+  document.getElementById('statCancelled').textContent = counts.Cancelled;
   document.getElementById('badgeBookings').textContent = items.length;
+}
+
+function populateAssignedFilter() {
+  const sel = document.getElementById('assignedFilter');
+  if (!sel) return;
+  const current = sel.value;
+  const staff = (staffData.items || []).filter(s => (s.status || '').toLowerCase() !== 'blocked');
+  sel.innerHTML = '<option value="">All Staff</option>' +
+    '<option value="__unassigned__">— Unassigned</option>' +
+    staff.map(s => `<option value="${escapeAttr(s.email)}">${escapeHtml(s.name || s.email)}</option>`).join('');
+  if (current) sel.value = current;
 }
 
 function renderBookingsTable() {
   const tbody = document.getElementById('bookingsBody');
   const search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
   const statusFilter = document.getElementById('statusFilter').value;
+  const assignedFilter = (document.getElementById('assignedFilter') || {}).value || '';
 
   let items = [...bookingsData.items];
   items.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
-  if (statusFilter) items = items.filter(i => (i.status || '').toLowerCase() === statusFilter.toLowerCase());
+  if (statusFilter) items = items.filter(i => normalizeStatus(i.status).toLowerCase() === statusFilter.toLowerCase());
+  if (assignedFilter === '__unassigned__') items = items.filter(i => !i.assigned_to);
+  else if (assignedFilter) items = items.filter(i => (i.assigned_to || '') === assignedFilter);
   if (search) items = items.filter(i => Object.values(i).some(v => String(v).toLowerCase().includes(search)));
 
   if (items.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="icon">📭</div><div>No bookings found.</div></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state"><div class="icon">📭</div><div>No bookings found.</div></div></td></tr>';
     return;
   }
+
+  const activeStaff = (staffData.items || []).filter(s => (s.status || '').toLowerCase() !== 'blocked');
 
   tbody.innerHTML = items.map(item => {
     const cityArea = [item.city, item.area].filter(Boolean).join(' / ');
     const phoneClean = (item.phone || '').replace(/[^0-9]/g, '');
+    const status = normalizeStatus(item.status);
+    const statusKey = status.toLowerCase();
+
+    const statusOptions = ['Pending','Processing','Complete','Cancelled']
+      .map(s => `<option value="${s}" ${s === status ? 'selected' : ''}>${s}</option>`).join('');
+
+    const assignedOptions =
+      `<option value="">— Unassigned —</option>` +
+      activeStaff.map(s => `<option value="${escapeAttr(s.email)}" ${item.assigned_to === s.email ? 'selected' : ''}>${escapeHtml(s.name || s.email)}</option>`).join('');
+
+    let assignedDisplay = '<span style="color:#999;font-style:italic;">Unassigned</span>';
+    if (item.assigned_to) {
+      const staff = activeStaff.find(s => s.email === item.assigned_to);
+      assignedDisplay = `<span class="name">${escapeHtml(staff ? staff.name : item.assigned_to)}</span>` +
+        (item.assigned_at ? `<span>${formatDate(item.assigned_at)}</span>` : '');
+    }
+
     return `
       <tr>
         <td><strong>${escapeHtml(item.id)}</strong></td>
@@ -261,8 +318,20 @@ function renderBookingsTable() {
         <td class="msg-cell">${escapeHtml(item.address || '-')}</td>
         <td class="msg-cell">${escapeHtml(item.message)}</td>
         <td>
-          <span class="status-badge status-${(item.status || 'new').toLowerCase()}">${escapeHtml(item.status || 'New')}</span>
-          <div class="actions" style="margin-top:6px;">
+          <select class="inline-status-select is-${statusKey}"
+                  onchange="quickUpdateStatus('${escapeAttr(item.id)}', this.value)">
+            ${statusOptions}
+          </select>
+        </td>
+        <td class="assigned-cell">
+          <select class="inline-status-select" style="margin-bottom:4px;width:100%;"
+                  onchange="quickAssignStaff('${escapeAttr(item.id)}', this.value)">
+            ${assignedOptions}
+          </select>
+          ${assignedDisplay}
+        </td>
+        <td>
+          <div class="actions">
             <button class="btn btn-primary btn-sm" onclick="openBookingModal('${escapeAttr(item.id)}')">✏️ Edit</button>
             <button class="btn btn-danger btn-sm" onclick="deleteBooking('${escapeAttr(item.id)}')">🗑️</button>
           </div>
@@ -270,6 +339,47 @@ function renderBookingsTable() {
       </tr>
     `;
   }).join('');
+}
+
+/* Quick inline update — change status without opening the modal */
+async function quickUpdateStatus(id, newStatus) {
+  const idx = bookingsData.items.findIndex(i => i.id === id);
+  if (idx < 0) return;
+  const original = bookingsData.items[idx].status;
+  bookingsData.items[idx].status = normalizeStatus(newStatus);
+  try {
+    await window.CsvAPI.saveAll(defaultHeaders(PATH_BOOKINGS), bookingsData.items, bookingsData.sha, getToken(),
+      `Update booking ${id} status → ${newStatus}`, PATH_BOOKINGS);
+    await loadBookings();
+  } catch (err) {
+    alert('Status update failed: ' + err.message);
+    bookingsData.items[idx].status = original;
+    renderBookingsTable();
+  }
+}
+
+/* Quick inline update — assign or unassign a staff member */
+async function quickAssignStaff(id, email) {
+  const idx = bookingsData.items.findIndex(i => i.id === id);
+  if (idx < 0) return;
+  const item = bookingsData.items[idx];
+  const original = { assigned_to: item.assigned_to, assigned_at: item.assigned_at };
+  item.assigned_to = email || '';
+  item.assigned_at = email ? new Date().toISOString() : '';
+  // If newly assigned and status was Pending, auto-bump to Processing
+  if (email && normalizeStatus(item.status) === 'Pending') {
+    item.status = 'Processing';
+  }
+  try {
+    await window.CsvAPI.saveAll(defaultHeaders(PATH_BOOKINGS), bookingsData.items, bookingsData.sha, getToken(),
+      email ? `Assign booking ${id} to ${email}` : `Unassign booking ${id}`, PATH_BOOKINGS);
+    await loadBookings();
+  } catch (err) {
+    alert('Assignment failed: ' + err.message);
+    item.assigned_to = original.assigned_to;
+    item.assigned_at = original.assigned_at;
+    renderBookingsTable();
+  }
 }
 
 function openBookingModal(id) {
@@ -283,12 +393,19 @@ function openBookingModal(id) {
     `<option value="${escapeAttr(s.name)}">${s.icon} ${escapeHtml(s.name)}</option>`
   ).join('');
 
+  // Populate staff dropdown (active only)
+  const activeStaff = (staffData.items || []).filter(s => (s.status || '').toLowerCase() !== 'blocked');
+  document.getElementById('em_assigned_to').innerHTML =
+    '<option value="">— Unassigned —</option>' +
+    activeStaff.map(s => `<option value="${escapeAttr(s.email)}">${escapeHtml(s.name || s.email)} (${escapeHtml(s.email)})</option>`).join('');
+
   if (id) {
     const item = bookingsData.items.find(i => i.id === id);
     if (!item) { alert('Booking not found.'); return; }
     title.textContent = 'Edit Booking - ' + id;
     form.id_field.value = item.id;
     form.timestamp_field.value = item.timestamp;
+    form.assigned_at_field.value = item.assigned_at || '';
     form.name.value = item.name || '';
     form.phone.value = item.phone || '';
     form.service.value = item.service || '';
@@ -296,13 +413,16 @@ function openBookingModal(id) {
     form.area.value = item.area || '';
     form.address.value = item.address || '';
     form.message.value = item.message || '';
-    form.status.value = item.status || 'New';
+    form.status.value = normalizeStatus(item.status);
+    form.assigned_to.value = item.assigned_to || '';
   } else {
     title.textContent = 'Add New Booking';
     form.reset();
     form.id_field.value = genId('BK');
     form.timestamp_field.value = new Date().toISOString();
-    form.status.value = 'New';
+    form.assigned_at_field.value = '';
+    form.status.value = 'Pending';
+    form.assigned_to.value = '';
   }
   modal.classList.add('show');
 }
@@ -318,6 +438,19 @@ async function handleSaveBooking(e) {
   submitBtn.disabled = true;
   submitBtn.textContent = 'Saving...';
 
+  const newAssigned = form.assigned_to.value.trim();
+  const oldAssignedAt = form.assigned_at_field.value || '';
+  // If the assignee changed, stamp a new assigned_at; otherwise keep old.
+  let assignedAt = oldAssignedAt;
+  if (editingBookingId) {
+    const orig = bookingsData.items.find(i => i.id === editingBookingId);
+    if (orig && (orig.assigned_to || '') !== newAssigned) {
+      assignedAt = newAssigned ? new Date().toISOString() : '';
+    }
+  } else if (newAssigned) {
+    assignedAt = new Date().toISOString();
+  }
+
   const row = {
     id: form.id_field.value,
     timestamp: form.timestamp_field.value,
@@ -328,7 +461,9 @@ async function handleSaveBooking(e) {
     area: form.area.value.trim(),
     address: form.address.value.trim(),
     message: form.message.value.trim(),
-    status: form.status.value
+    status: normalizeStatus(form.status.value),
+    assigned_to: newAssigned,
+    assigned_at: assignedAt
   };
 
   try {
@@ -635,6 +770,12 @@ async function loadStaff() {
     if (!staffData.headers.length) staffData.headers = defaultHeaders(PATH_STAFF);
     document.getElementById('badgeStaff').textContent = staffData.items.length;
     renderStaffTable();
+    // After staff list is known, refresh bookings UI so the assignment
+    // dropdowns and "Assigned" column show real names instead of emails.
+    if (bookingsData.items && bookingsData.items.length) {
+      populateAssignedFilter();
+      renderBookingsTable();
+    }
   } catch (err) {
     tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:30px;color:#dc3545;">❌ ${escapeHtml(err.message)}</td></tr>`;
   }
@@ -976,13 +1117,15 @@ function bindSettingsEvents() {
   const form = document.getElementById('settingsForm');
   if (!form) return;
   form.addEventListener('submit', handleSaveSettings);
-  // Pre-fill on load
+  // Pre-fill on load + initial pill state
   document.getElementById('publicToken').value = localStorage.getItem(STORAGE_PUBLIC) || '';
+  refreshAutoSaveUi();
 
   document.getElementById('clearPublicBtn').addEventListener('click', () => {
     localStorage.removeItem(STORAGE_PUBLIC);
     document.getElementById('publicToken').value = '';
-    showMsg('settingsMsg', 'Public token cleared. Forms will only send via WhatsApp.', 'info');
+    showMsg('settingsMsg', 'Public token cleared. Customer ke form ab sirf WhatsApp pe aayenge.', 'info');
+    refreshAutoSaveUi();
   });
   document.getElementById('clearPassBtn').addEventListener('click', () => {
     localStorage.removeItem(STORAGE_PASS_HASH);
@@ -1002,6 +1145,29 @@ async function handleSaveSettings(e) {
     document.getElementById('newAdminPass').value = '';
   }
   showMsg('settingsMsg', '✅ Settings saved on this browser.', 'success');
+  refreshAutoSaveUi();
+}
+
+/* Toggle the big "Auto-save: ENABLED / DISABLED" pill in Settings AND the
+ * warning banner shown above the Bookings list. */
+function refreshAutoSaveUi() {
+  const hasToken = !!localStorage.getItem(STORAGE_PUBLIC);
+
+  const pill = document.getElementById('autoSaveStatus');
+  const label = document.getElementById('autoSaveLabel');
+  const emoji = document.getElementById('autoSaveEmoji');
+  const desc = document.getElementById('autoSaveDesc');
+  if (pill && label && emoji && desc) {
+    pill.classList.toggle('is-on', hasToken);
+    label.textContent = hasToken ? 'ENABLED' : 'DISABLED';
+    emoji.textContent = hasToken ? '✅' : '⚠️';
+    desc.innerHTML = hasToken
+      ? 'Customer ka koi bhi booking form submission turant <code>data/bookings.csv</code> mein <strong>Pending</strong> status ke saath save ho jayega — admin panel mein turant dikhega.'
+      : 'Customer ke booking form abhi sirf WhatsApp pe aate hain. <strong>Admin panel mein automatically nahi dikhenge.</strong> Niche "Public Auto-Save Token" set karein taaki har new request <code>data/bookings.csv</code> mein turant save ho jaye.';
+  }
+
+  const banner = document.getElementById('autoSaveBanner');
+  if (banner) banner.style.display = hasToken ? 'none' : 'block';
 }
 
 /* ===========================================================================

@@ -146,11 +146,21 @@
 
     <!-- ===== BOOKINGS TAB ===== -->
     <div class="tab-pane active" id="tab-bookings">
+
+      <!-- Auto-save status banner (shown when public token is missing) -->
+      <div id="autoSaveBanner" class="alert-banner" style="display:none;">
+        <strong>⚠️ Auto-save OFF —</strong>
+        Customer ke form submission abhi sirf WhatsApp pe aate hain, admin panel mein nahi.
+        <a href="#" onclick="document.querySelector('[data-tab=settings]').click();return false;">⚙️ Settings → Public Auto-Save Token</a> set karein
+        taaki har new booking yahan apne aap dikhe.
+      </div>
+
       <div class="admin-stats">
         <div class="stat-card"><div class="label">Total Bookings</div><div class="value" id="statTotal">0</div></div>
-        <div class="stat-card warn"><div class="label">New (Pending)</div><div class="value" id="statNew">0</div></div>
-        <div class="stat-card ok"><div class="label">Contacted</div><div class="value" id="statContacted">0</div></div>
-        <div class="stat-card ok"><div class="label">Completed</div><div class="value" id="statCompleted">0</div></div>
+        <div class="stat-card warn"><div class="label">⏳ Pending</div><div class="value" id="statPending">0</div></div>
+        <div class="stat-card warn"><div class="label">⚙️ Processing</div><div class="value" id="statProcessing">0</div></div>
+        <div class="stat-card ok"><div class="label">✅ Complete</div><div class="value" id="statComplete">0</div></div>
+        <div class="stat-card"><div class="label">❌ Cancelled</div><div class="value" id="statCancelled">0</div></div>
       </div>
 
       <div class="admin-card">
@@ -159,10 +169,14 @@
           <input type="text" id="searchInput" placeholder="🔍 Search name, phone, service, city, area, message...">
           <select id="statusFilter">
             <option value="">All Status</option>
-            <option value="New">New</option>
-            <option value="Contacted">Contacted</option>
-            <option value="Completed">Completed</option>
-            <option value="Cancelled">Cancelled</option>
+            <option value="Pending">⏳ Pending</option>
+            <option value="Processing">⚙️ Processing</option>
+            <option value="Complete">✅ Complete</option>
+            <option value="Cancelled">❌ Cancelled</option>
+          </select>
+          <select id="assignedFilter">
+            <option value="">All Staff</option>
+            <option value="__unassigned__">— Unassigned</option>
           </select>
           <button class="btn btn-success" id="addNewBtn">➕ Add Booking</button>
           <button class="btn btn-primary" id="refreshBtn">🔄 Refresh</button>
@@ -173,10 +187,11 @@
             <thead>
               <tr>
                 <th>Ref ID</th><th>Date</th><th>Name</th><th>Phone</th><th>Service</th>
-                <th>City / Area</th><th>Address</th><th>Message</th><th>Status / Actions</th>
+                <th>City / Area</th><th>Address</th><th>Message</th>
+                <th>Status</th><th>Assigned</th><th>Actions</th>
               </tr>
             </thead>
-            <tbody id="bookingsBody"><tr><td colspan="9" style="text-align:center;padding:30px;">Loading...</td></tr></tbody>
+            <tbody id="bookingsBody"><tr><td colspan="11" style="text-align:center;padding:30px;">Loading...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -447,23 +462,46 @@
 
     <!-- ===== SETTINGS TAB ===== -->
     <div class="tab-pane" id="tab-settings">
+
+      <!-- Big visible auto-save status -->
+      <div id="autoSaveStatus" class="status-pill-block">
+        <div class="pill-header">
+          <span class="pill-emoji" id="autoSaveEmoji">⚠️</span>
+          <h3 id="autoSaveTitle">Auto-save: <span id="autoSaveLabel">DISABLED</span></h3>
+        </div>
+        <p id="autoSaveDesc">
+          Customer ke booking form abhi sirf WhatsApp pe aate hain. <strong>Admin panel mein automatically nahi dikhenge.</strong>
+          Niche "Public Auto-Save Token" set karein taaki har new request <code>data/bookings.csv</code> mein turant save ho jaye.
+        </p>
+      </div>
+
       <div class="admin-card-section">
         <h3>⚙️ System Settings</h3>
         <p class="subtitle">Browser-only settings (token + admin password).</p>
         <form id="settingsForm">
           <div class="form-group">
-            <label>Public Form Auto-Save Token (optional)</label>
-            <input type="password" name="publicToken" id="publicToken" placeholder="Optional GitHub PAT for auto-save">
+            <label>🔓 Public Form Auto-Save Token</label>
+            <input type="password" name="publicToken" id="publicToken" placeholder="Paste GitHub PAT here (ghp_xxx... or github_pat_xxx...)">
             <p class="help-text">
-              Agar yeh token set karte hain, toh public booking form bhi automatically <code>bookings.csv</code> mein entry add karega
-              (saath mein WhatsApp bhi khulega). <strong>Warning:</strong> yeh token aapke browser ke localStorage mein save hoga.
-              Use a fine-grained PAT with only <code>Contents: write</code>.
+              Yeh GitHub PAT set karne par customer ka submitted form turant <code>bookings.csv</code> mein entry add kar dega
+              (status = <strong>Pending</strong>). Aapko alag se add nahi karna padega. WhatsApp bhi normally khulega.
+              <br><br>
+              <strong>Setup:</strong>
+              <ol style="margin: 6px 0 0 18px; padding: 0;">
+                <li>Generate fine-grained PAT: <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">github.com/settings/personal-access-tokens/new</a></li>
+                <li>Repository: <code>BRIJBHAN-SINGH234/call4all</code></li>
+                <li>Permissions → Contents → <strong>Read and write</strong></li>
+                <li>Expiration: 1 year (suggested)</li>
+                <li>Copy the token aur yahan paste karein → Save Settings</li>
+              </ol>
+              <strong>⚠️ Security:</strong> Yeh token aapke browser ke localStorage mein save hoga (sirf is browser pe).
+              Site ke har visitor ko bhi yeh exposed hoga (since browser code can read it). Isliye PAT ko sirf <code>Contents: Read &amp; Write</code> permission ke saath limit karein.
             </p>
             <button type="button" class="btn btn-danger btn-sm" id="clearPublicBtn" style="margin-top:8px;">Clear Public Token</button>
           </div>
           <hr style="margin: 20px 0; border: none; border-top: 1px solid #eef0f4;">
           <div class="form-group">
-            <label>Change Admin Password</label>
+            <label>🔑 Change Admin Password</label>
             <input type="password" name="newAdminPass" id="newAdminPass" placeholder="Enter new password (or leave empty)">
             <p class="help-text">New password set karne par next login se yeh use hoga.</p>
             <button type="button" class="btn btn-danger btn-sm" id="clearPassBtn" style="margin-top:8px;">Clear Saved Password</button>
@@ -487,6 +525,7 @@
       <form id="editForm">
         <input type="hidden" name="id_field">
         <input type="hidden" name="timestamp_field">
+        <input type="hidden" name="assigned_at_field">
         <div class="form-row">
           <div class="form-group"><label>Name *</label><input type="text" name="name" required></div>
           <div class="form-group"><label>Phone *</label><input type="text" name="phone" required></div>
@@ -498,14 +537,23 @@
         </div>
         <div class="form-group"><label>Address (House no, landmark)</label><input type="text" name="address"></div>
         <div class="form-group"><label>Message / Requirement *</label><textarea name="message" required></textarea></div>
-        <div class="form-group">
-          <label>Status</label>
-          <select name="status">
-            <option value="New">New</option>
-            <option value="Contacted">Contacted</option>
-            <option value="Completed">Completed</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Status</label>
+            <select name="status">
+              <option value="Pending">⏳ Pending</option>
+              <option value="Processing">⚙️ Processing</option>
+              <option value="Complete">✅ Complete</option>
+              <option value="Cancelled">❌ Cancelled</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Assign to Staff</label>
+            <select name="assigned_to" id="em_assigned_to">
+              <option value="">— Unassigned —</option>
+            </select>
+            <p class="help-text">Staff ko assign karte hi unke dashboard mein dikhega aur sound notification bajegi.</p>
+          </div>
         </div>
         <div class="modal-actions">
           <button type="button" class="btn btn-outline" id="modalCancelBtn" style="border-color:#999;color:#666;">Cancel</button>

@@ -200,7 +200,9 @@ function handleBookingSubmit(e) {
     area: data.area,
     address: data.address,
     message: data.message,
-    status: 'New'
+    status: 'Pending',
+    assigned_to: '',
+    assigned_at: ''
   };
 
   const waText = buildWhatsAppMessage(row);
@@ -216,12 +218,25 @@ function handleBookingSubmit(e) {
   submitBtn.disabled = true;
   submitText.textContent = '⏳ Sending...';
 
-  // Optional: save to CSV in the background (no await — fire and forget)
+  // Save to CSV in the background. If the auto-save token is configured,
+  // the booking is recorded server-side immediately (admin will see it).
+  // Without a token, we only send via WhatsApp — admin must add manually.
   const publicToken = localStorage.getItem('c4a_public_token');
+  let savePromise = null;
   if (publicToken) {
-    window.CsvAPI.appendRow(row, publicToken, 'data/bookings.csv')
-      .then(() => console.log('Booking saved to CSV:', id))
-      .catch(err => console.error('Background CSV save failed:', err));
+    savePromise = window.CsvAPI.appendRow(row, publicToken, 'data/bookings.csv')
+      .then(() => { console.log('Booking saved to CSV:', id); return true; })
+      .catch(err => {
+        console.error('Background CSV save failed:', err);
+        // Show a non-blocking warning so the customer knows their request still
+        // reached us via WhatsApp even if backend save failed.
+        showFormMessage(
+          '⚠️ Backend save fail (' + (err.message || 'unknown') + '). ' +
+          'Lekin WhatsApp tab khul gaya — wahaan se message bhej do, hum response denge.',
+          'error'
+        );
+        return false;
+      });
   }
 
   if (popupBlocked) {
@@ -356,7 +371,7 @@ window.CsvAPI = (function () {
   }
 
   const DEFAULT_HEADERS = {
-    'data/bookings.csv': ['id', 'timestamp', 'name', 'phone', 'service', 'city', 'area', 'address', 'message', 'status'],
+    'data/bookings.csv': ['id', 'timestamp', 'name', 'phone', 'service', 'city', 'area', 'address', 'message', 'status', 'assigned_to', 'assigned_at'],
     'data/sources.csv': ['id', 'timestamp', 'category', 'name', 'city', 'area', 'address', 'contact_person', 'contact_phone', 'price', 'availability', 'notes', 'added_by'],
     'data/staff.csv': ['id', 'email', 'password_hash', 'name', 'phone', 'role', 'status', 'created_at', 'created_by'],
     'data/areas.csv': ['id', 'city', 'area', 'status', 'created_at'],
