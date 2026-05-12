@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Call4All - One Call, Every Service | Cars, Rooms, Labor, Tutors & More</title>
 <meta name="description" content="Call4All is your one-stop service aggregator. Rental cars, rooms & flats, construction labor, manpower supply, home tutors, marriage services and more — just one call away.">
-<meta name="theme-color" content="#1e3c72">
+<meta name="theme-color" content="#1f3a2e">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16.png">
@@ -16,31 +16,71 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Call4All">
 <meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.unsplash.com">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body data-page="home">
 
 <div id="site-header"></div>
 
+<!-- ===== HERO ===== -->
 <section class="hero">
-  <h1>One Call. Every Service. Done.</h1>
+  <span class="hero-eyebrow">Trusted Service Aggregator</span>
+  <h1>One Call. <em>Every Service.</em><br>Done Right.</h1>
   <p>Cars, rooms, labor, tutors, manpower, weddings — jo bhi chahiye, hum aapko trusted service provider tak pohchayenge. Aapko kahin jaana nahi, dhundhna nahi.</p>
   <div class="hero-cta">
-    <a href="tel:" data-call-link class="btn btn-accent">📞 Call Now: <span data-brand-phone></span></a>
-    <a href="#book" class="btn btn-outline">📋 Submit Requirement</a>
+    <a href="tel:" data-call-link class="btn btn-accent btn-lg">📞 Call Now: <span data-brand-phone></span></a>
+    <a href="#book" class="btn btn-outline btn-lg">📋 Submit Requirement</a>
   </div>
 </section>
 
+<!-- ===== SLIDER ===== -->
 <div id="sliderMount"></div>
 
-<section class="section section-light" id="services">
-  <h2 class="section-title">Our Services</h2>
-  <p class="section-subtitle">Aapko jo bhi service chahiye — neeche se select karein, ya form mein "Other" likh kar bata dein.</p>
+<!-- ===== ABOUT (2-column with image) ===== -->
+<section class="section section-light">
+  <div class="about-2col">
+    <div class="about-2col-image"
+         style="background-image:url('https://images.unsplash.com/photo-1556761175-b413da4baf72?w=1200&q=80&auto=format&fit=crop');"></div>
+    <div class="about-2col-text">
+      <span class="section-eyebrow">About <span data-brand-name></span></span>
+      <h2>Your Single Point <span class="accent">For Every Need.</span></h2>
+      <p>Hum ek service aggregator hain — bicholiye nahi, balki aapke <strong>trusted partner</strong>. Kissi bhi sewa ki zaroorat ho, ek call ya ek form, baaki sab hum sambhal lete hain. Trusted providers, fair pricing, follow-up tak.</p>
+      <p>Cars, rooms, construction labor, home tutors, manpower, weddings — har service ke liye verified providers se aapko connect karte hain. Saalon ka experience aur sankh-bandh customers hamare bharose ki gawahi hain.</p>
+      <div style="display:flex; gap:30px; margin-top:24px; flex-wrap:wrap;">
+        <div>
+          <div style="font-family:var(--font-heading); font-size:36px; font-weight:700; color:var(--accent-dark);">500+</div>
+          <div style="font-size:13px; text-transform:uppercase; letter-spacing:1px; color:var(--text-light);">Happy Customers</div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-heading); font-size:36px; font-weight:700; color:var(--accent-dark);">8+</div>
+          <div style="font-size:13px; text-transform:uppercase; letter-spacing:1px; color:var(--text-light);">Service Categories</div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-heading); font-size:36px; font-weight:700; color:var(--accent-dark);">24/7</div>
+          <div style="font-size:13px; text-transform:uppercase; letter-spacing:1px; color:var(--text-light);">Support</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SERVICES ===== -->
+<section class="section" id="services">
+  <span class="section-eyebrow">Our Services</span>
+  <h2 class="section-title">A Curated Range of <span class="accent">Services</span></h2>
+  <div class="title-divider"></div>
+  <p class="section-subtitle">Aapko jo bhi service chahiye — neeche se select karein, ya form mein "Other" likh kar bata dein. Har service ke piche verified providers hain.</p>
   <div class="service-grid" id="serviceGrid"></div>
 </section>
 
-<section class="section">
-  <h2 class="section-title">Why Choose Call4All?</h2>
+<!-- ===== WHY CHOOSE US ===== -->
+<section class="section section-light">
+  <span class="section-eyebrow">Why Choose Us</span>
+  <h2 class="section-title">Built on <span class="accent">Trust</span> & Convenience</h2>
+  <div class="title-divider"></div>
   <p class="section-subtitle">Ek call mein har service. Bharose aur quality ke saath.</p>
   <div class="features-grid">
     <div class="feature-box">
@@ -64,58 +104,98 @@
       <p>Best market rates. Koi hidden charges nahi.</p>
     </div>
     <div class="feature-box">
-      <div class="feature-icon">🕒</div>
-      <h4>24/7 Available</h4>
-      <p>Hum hamesha online hain — emergency mein bhi.</p>
+      <div class="feature-icon">🛡️</div>
+      <h4>Follow-up & Support</h4>
+      <p>Service complete hone tak hum saath rahte hain.</p>
     </div>
     <div class="feature-box">
-      <div class="feature-icon">🤝</div>
-      <h4>End-to-End Support</h4>
-      <p>Booking se le kar service complete hone tak — hum saath hain.</p>
+      <div class="feature-icon">📍</div>
+      <h4>Local Expertise</h4>
+      <p>Aapke aas-paas ke verified providers, local knowledge ke saath.</p>
     </div>
   </div>
 </section>
 
-<section class="section section-light" id="gallery">
-  <h2 class="section-title">Our Work Gallery</h2>
-  <p class="section-subtitle">Hamare kaam ki kuch jhalkiyaan. Admin se images add hote hi yahan show ho jayengi.</p>
-  <div id="galleryMount" data-limit="12"></div>
-  <div style="text-align:center;margin-top:30px;">
-    <a href="gallery.html" class="btn btn-primary">📸 View Full Gallery →</a>
-  </div>
-</section>
-
-<div id="bookingFormSlot"></div>
-
-<section class="section section-light">
-  <h2 class="section-title">How It Works</h2>
-  <p class="section-subtitle">Sirf 3 simple steps mein aapki service ready.</p>
+<!-- ===== HOW IT WORKS ===== -->
+<section class="section">
+  <span class="section-eyebrow">Process</span>
+  <h2 class="section-title">How It <span class="accent">Works</span></h2>
+  <div class="title-divider"></div>
+  <p class="section-subtitle">3 simple steps mein aapka kaam done.</p>
   <div class="features-grid">
     <div class="feature-box">
-      <div class="feature-icon">1️⃣</div>
-      <h4>Tell Us Your Need</h4>
-      <p>Form bharein ya direct call karein. Hum aapki requirement note karte hain.</p>
+      <div class="feature-icon" style="background:var(--primary); color:#fff;">1</div>
+      <h4>Call or Submit Form</h4>
+      <p>Apni requirement WhatsApp pe bhej dein ya form fill karein.</p>
     </div>
     <div class="feature-box">
-      <div class="feature-icon">2️⃣</div>
-      <h4>We Match Best Provider</h4>
-      <p>Hamare network mein se best service provider select karte hain.</p>
+      <div class="feature-icon" style="background:var(--primary); color:#fff;">2</div>
+      <h4>We Connect You</h4>
+      <p>Hum aapko verified, trusted service provider se 1 ghante mein connect karenge.</p>
     </div>
     <div class="feature-box">
-      <div class="feature-icon">3️⃣</div>
+      <div class="feature-icon" style="background:var(--primary); color:#fff;">3</div>
       <h4>Service Delivered</h4>
       <p>Provider aapse direct contact karega. Service complete hone tak hum follow up karte hain.</p>
     </div>
   </div>
 </section>
 
-<section class="section">
-  <h2 class="section-title">About Call4All</h2>
-  <div class="about-content">
-    <p>Welcome to <strong>Call4All</strong> — aapka ek-call solution. Hum ek service aggregator hain jo customers ko trusted service providers se connect karte hain. Cars, rooms, construction labor, home tutors, manpower, weddings — kuch bhi chahiye, bas humein bata dein.</p>
-    <p>Hamari mission yahi hai ki aapko kahin jaana na pade, kisi ko dhundhna na pade. Sirf ek call ya form submit karein — baaki sab hum sambhal lenge.</p>
-    <p><strong>Call us today aur farak khud mehsoos karein!</strong></p>
+<!-- ===== GALLERY (preview, full at gallery.html) ===== -->
+<section class="section section-light" id="gallery">
+  <span class="section-eyebrow">Portfolio</span>
+  <h2 class="section-title">Our <span class="accent">Recent Work</span></h2>
+  <div class="title-divider"></div>
+  <p class="section-subtitle">Hamare kaam ki kuch jhalkiyaan. Admin se images add hote hi yahan show ho jayengi.</p>
+  <div id="galleryMount" data-limit="12"></div>
+  <div style="text-align:center; margin-top:40px;">
+    <a href="gallery.html" class="btn btn-outline-dark">📸 View Full Gallery →</a>
   </div>
+</section>
+
+<!-- ===== TESTIMONIALS ===== -->
+<section class="section">
+  <span class="section-eyebrow">Guest Reviews</span>
+  <h2 class="section-title">What Our <span class="accent">Customers Say</span></h2>
+  <div class="title-divider"></div>
+  <div class="testimonials-grid">
+    <div class="testimonial-card">
+      <span class="quote-mark">"</span>
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">Bahut hi acchi service. Last minute pe car chahiye thi shaadi ke liye, Call4All ne 1 ghante mein arrange kar diya. Driver bhi well-behaved tha.</p>
+      <div class="testimonial-author">Vaibhav Sharma</div>
+      <div class="testimonial-meta">Rental Cars · Jaipur</div>
+    </div>
+    <div class="testimonial-card">
+      <span class="quote-mark">"</span>
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">Naya ghar shift hone ke liye 1BHK chahiye tha — same day mein 3 options mil gaye, pricing bhi reasonable. Bharose laayak service.</p>
+      <div class="testimonial-author">Akshay Arya</div>
+      <div class="testimonial-meta">Rooms & Flats · Jaipur</div>
+    </div>
+    <div class="testimonial-card">
+      <span class="quote-mark">"</span>
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">Wedding ke liye decoration aur catering dono Call4All se hi karwaye. Ek hi point of contact, koi tension nahi. Strongly recommend!</p>
+      <div class="testimonial-author">Kush Maidh</div>
+      <div class="testimonial-meta">Marriage Services · Jaipur</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA STRIP ===== -->
+<section class="cta-strip">
+  <h2>Need Something <em>Right Now?</em></h2>
+  <p>Hamari team 24/7 available hai. Ek call mein hum aapko trusted provider se connect kar denge — chahe car ho, room ho, ya koi bhi service.</p>
+  <div class="cta-buttons">
+    <a href="tel:" data-call-link class="btn btn-accent btn-lg">📞 Call Now: <span data-brand-phone></span></a>
+    <a href="#" data-whatsapp-link target="_blank" class="btn btn-outline btn-lg">💬 WhatsApp Us</a>
+  </div>
+</section>
+
+<!-- ===== BOOKING FORM ===== -->
+<section class="booking-section" id="book">
+  <div id="bookingFormSlot"></div>
 </section>
 
 <div id="site-footer"></div>
@@ -131,10 +211,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (grid) {
     grid.innerHTML = window.SITE_CONFIG.services.map(s => `
       <div class="service-card">
-        <div class="service-icon">${s.icon}</div>
-        <h3>${s.name}</h3>
-        <p>${s.desc}</p>
-        <a href="${s.page}" class="btn btn-primary btn-sm">Learn More</a>
+        <div class="service-image" style="background-image:url('${s.image || ''}');">
+          <div class="service-icon-overlay">${s.icon}</div>
+        </div>
+        <div class="service-body">
+          <h3>${s.name}</h3>
+          <p>${s.desc}</p>
+          <a href="${s.page}" class="btn btn-outline-dark btn-sm" style="align-self:center;">Learn More →</a>
+        </div>
       </div>
     `).join('');
   }

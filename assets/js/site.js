@@ -15,12 +15,12 @@ window.SITE_CONFIG = {
   address: 'India',
   aboutText: 'Your one-call solution for every need. From rental cars and rooms to construction labor, home tutors, and event services - we connect you to trusted providers.',
   theme: {
-    preset: 'default',
-    primary: '#1e3c72',
-    primary_dark: '#142850',
-    accent: '#ffcc00',
-    accent_dark: '#e6b800',
-    background: '#ffffff',
+    preset: 'resort',
+    primary: '#1f3a2e',
+    primary_dark: '#122318',
+    accent: '#c9a36a',
+    accent_dark: '#a17f47',
+    background: '#faf6ef',
     festival_overlay: 'none',
     festival_banner: ''
   },
@@ -31,28 +31,28 @@ window.SITE_CONFIG = {
     branch: 'main'
   },
   services: [
-    { id: 'rental-cars', name: 'Rental Cars', icon: '🚗', desc: 'Premium & budget car rental for events and travel.', page: 'rental-cars.html' },
-    { id: 'rooms-flats', name: 'Rooms & Flats', icon: '🏠', desc: 'Rent rooms, flats and properties easily.', page: 'rooms-flats.html' },
-    { id: 'manpower-supply', name: 'Manpower Supply', icon: '👷', desc: 'Skilled & unskilled manpower for any requirement.', page: 'manpower-supply.html' },
-    { id: 'construction', name: 'Construction Labor / Thekedar', icon: '🧱', desc: 'Construction labor, contractors and thekedar for your project.', page: 'construction.html' },
-    { id: 'home-tutor', name: 'Home Tutor', icon: '📚', desc: 'Qualified home tutors for all classes and subjects.', page: 'home-tutor.html' },
-    { id: 'marriage-services', name: 'Marriage Services', icon: '💍', desc: 'Complete wedding planning, decoration & rental items.', page: 'marriage-services.html' },
-    { id: 'flower-bouquet', name: 'Hotel Flower Bouquet', icon: '🌸', desc: 'Luxury flower decoration & bouquet service.', page: 'flower-bouquet.html' },
-    { id: 'car-decoration', name: 'Car Decoration', icon: '🎀', desc: 'Luxury car decoration for weddings & events.', page: 'car-decoration.html' },
-    { id: 'other', name: 'Other / Custom Service', icon: '🛎️', desc: 'Need something else? Just tell us, we will arrange it.', page: 'index.html#book' }
+    { id: 'rental-cars', name: 'Rental Cars', icon: '🚗', desc: 'Premium & budget car rental for events and travel.', page: 'rental-cars.html', image: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=900&q=80&auto=format&fit=crop' },
+    { id: 'rooms-flats', name: 'Rooms & Flats', icon: '🏠', desc: 'Rent rooms, flats and properties easily.', page: 'rooms-flats.html', image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=900&q=80&auto=format&fit=crop' },
+    { id: 'manpower-supply', name: 'Manpower Supply', icon: '👷', desc: 'Skilled & unskilled manpower for any requirement.', page: 'manpower-supply.html', image: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=900&q=80&auto=format&fit=crop' },
+    { id: 'construction', name: 'Construction Labor / Thekedar', icon: '🧱', desc: 'Construction labor, contractors and thekedar for your project.', page: 'construction.html', image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=900&q=80&auto=format&fit=crop' },
+    { id: 'home-tutor', name: 'Home Tutor', icon: '📚', desc: 'Qualified home tutors for all classes and subjects.', page: 'home-tutor.html', image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=900&q=80&auto=format&fit=crop' },
+    { id: 'marriage-services', name: 'Marriage Services', icon: '💍', desc: 'Complete wedding planning, decoration & rental items.', page: 'marriage-services.html', image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=900&q=80&auto=format&fit=crop' },
+    { id: 'flower-bouquet', name: 'Hotel Flower Bouquet', icon: '🌸', desc: 'Luxury flower decoration & bouquet service.', page: 'flower-bouquet.html', image: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=900&q=80&auto=format&fit=crop' },
+    { id: 'car-decoration', name: 'Car Decoration', icon: '🎀', desc: 'Luxury car decoration for weddings & events.', page: 'car-decoration.html', image: 'https://images.unsplash.com/photo-1606013519235-f4f8b3ee5ae5?w=900&q=80&auto=format&fit=crop' },
+    { id: 'other', name: 'Other / Custom Service', icon: '🛎️', desc: 'Need something else? Just tell us, we will arrange it.', page: 'index.html#book', image: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=900&q=80&auto=format&fit=crop' }
   ],
   slider: {
     enabled: true,
-    interval_ms: 4500,
+    interval_ms: 5000,
     slides: [
-      { id: 's1', enabled: true, icon: '🚗', title: 'Rental Cars', subtitle: 'Premium & budget cars for travel and events', background_url: '', link: 'rental-cars.html', order: 1 },
-      { id: 's2', enabled: true, icon: '🏠', title: 'Rooms & Flats', subtitle: 'Quick rentals — rooms, flats, PG, properties', background_url: '', link: 'rooms-flats.html', order: 2 },
-      { id: 's3', enabled: true, icon: '🧱', title: 'Construction Labor', subtitle: 'Mistri, mazdoor, thekedar — sab ek call par', background_url: '', link: 'construction.html', order: 3 },
-      { id: 's4', enabled: true, icon: '📚', title: 'Home Tutors', subtitle: 'Qualified tutors for every class & subject', background_url: '', link: 'home-tutor.html', order: 4 },
-      { id: 's5', enabled: true, icon: '👷', title: 'Manpower Supply', subtitle: 'Skilled & unskilled manpower on demand', background_url: '', link: 'manpower-supply.html', order: 5 },
-      { id: 's6', enabled: true, icon: '💍', title: 'Marriage Services', subtitle: 'Decoration, catering, rentals — A to Z', background_url: '', link: 'marriage-services.html', order: 6 },
-      { id: 's7', enabled: true, icon: '🌸', title: 'Hotel Flower Bouquet', subtitle: 'Luxury floral arrangements for hotels & events', background_url: '', link: 'flower-bouquet.html', order: 7 },
-      { id: 's8', enabled: true, icon: '🎀', title: 'Car Decoration', subtitle: 'Wedding & event car decoration', background_url: '', link: 'car-decoration.html', order: 8 }
+      { id: 's1', enabled: true, icon: '🚗', title: 'Rental Cars',           subtitle: 'Premium & budget cars for travel and events',        background_url: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1900&q=80&auto=format&fit=crop', link: 'rental-cars.html',       order: 1 },
+      { id: 's2', enabled: true, icon: '🏠', title: 'Rooms & Flats',         subtitle: 'Quick rentals — rooms, flats, PG, properties',       background_url: 'https://images.unsplash.com/photo-1501183638710-841dd1904471?w=1900&q=80&auto=format&fit=crop', link: 'rooms-flats.html',       order: 2 },
+      { id: 's3', enabled: true, icon: '🧱', title: 'Construction Labor',    subtitle: 'Mistri, mazdoor, thekedar — sab ek call par',         background_url: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=1900&q=80&auto=format&fit=crop', link: 'construction.html',      order: 3 },
+      { id: 's4', enabled: true, icon: '📚', title: 'Home Tutors',           subtitle: 'Qualified tutors for every class & subject',          background_url: 'https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=1900&q=80&auto=format&fit=crop', link: 'home-tutor.html',        order: 4 },
+      { id: 's5', enabled: true, icon: '👷', title: 'Manpower Supply',       subtitle: 'Skilled & unskilled manpower on demand',              background_url: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1900&q=80&auto=format&fit=crop', link: 'manpower-supply.html',   order: 5 },
+      { id: 's6', enabled: true, icon: '💍', title: 'Marriage Services',     subtitle: 'Decoration, catering, rentals — A to Z',              background_url: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=1900&q=80&auto=format&fit=crop', link: 'marriage-services.html', order: 6 },
+      { id: 's7', enabled: true, icon: '🌸', title: 'Hotel Flower Bouquet',  subtitle: 'Luxury floral arrangements for hotels & events',      background_url: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=1900&q=80&auto=format&fit=crop', link: 'flower-bouquet.html',    order: 7 },
+      { id: 's8', enabled: true, icon: '🎀', title: 'Car Decoration',        subtitle: 'Wedding & event car decoration',                      background_url: 'https://images.unsplash.com/photo-1606013519235-f4f8b3ee5ae5?w=1900&q=80&auto=format&fit=crop', link: 'car-decoration.html',    order: 8 }
     ]
   },
   pages: []
@@ -60,8 +60,19 @@ window.SITE_CONFIG = {
 
 /* ===== Festival Theme Presets ===== */
 window.FESTIVAL_PRESETS = {
+  resort: {
+    label: 'Luxury Resort (Forest + Gold) — RECOMMENDED',
+    emoji: '🌿',
+    primary: '#1f3a2e',
+    primary_dark: '#122318',
+    accent: '#c9a36a',
+    accent_dark: '#a17f47',
+    background: '#faf6ef',
+    festival_overlay: 'none',
+    festival_banner: ''
+  },
   default: {
-    label: 'Default (Navy + Gold)',
+    label: 'Classic (Navy + Gold)',
     emoji: '🏷️',
     primary: '#1e3c72',
     primary_dark: '#142850',

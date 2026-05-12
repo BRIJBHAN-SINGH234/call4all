@@ -5,22 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rental Cars - Call4All</title>
 <meta name="description" content="Premium and budget car rental services for travel, weddings, outstation. Book through Call4All - one call solution.">
-<meta name="theme-color" content="#1e3c72">
+<meta name="theme-color" content="#1f3a2e">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Call4All">
 <meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.unsplash.com">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body data-page="services">
 
 <div id="site-header"></div>
 
-<section class="hero" style="padding: 50px 30px;">
-  <h1>🚗 Rental Cars</h1>
+<section class="service-hero" style="background-image:url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1900&q=80&auto=format&fit=crop');">
+  <span class="hero-eyebrow">🚗 Service</span>
+  <h1>Rental <em>Cars</em></h1>
   <p>Premium aur budget cars — local travel, outstation, weddings ya event ke liye.</p>
+  <div class="hero-cta">
+    <a href="tel:" data-call-link class="btn btn-accent">📞 Call Now</a>
+    <a href="#book" class="btn btn-outline">📋 Book Now</a>
+  </div>
 </section>
 
 <div class="service-detail">
@@ -47,12 +55,16 @@
 </div>
 
 <section class="section section-light">
-  <h2 class="section-title">Rental Cars Gallery</h2>
+  <span class="section-eyebrow">Gallery</span>
+  <h2 class="section-title">Rental Cars <span class="accent">Showcase</span></h2>
+  <div class="title-divider"></div>
   <p class="section-subtitle">Available cars aur previous bookings ki kuch jhalkiyaan.</p>
   <div id="galleryMount" data-category="Rental Cars"></div>
 </section>
 
-<div id="bookingFormSlot"></div>
+<section class="booking-section" id="book">
+  <div id="bookingFormSlot"></div>
+</section>
 
 <div id="site-footer"></div>
 <div id="site-floating"></div>

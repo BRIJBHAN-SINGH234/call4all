@@ -5,13 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gallery - {{brand}}</title>
 <meta name="description" content="Browse our service work gallery — rental cars, rooms, weddings, construction, manpower and more.">
-<meta name="theme-color" content="#1e3c72">
+<meta name="theme-color" content="#1f3a2e">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Call4All">
 <meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.unsplash.com">
 <link rel="stylesheet" href="assets/css/style.css">
 <style>
   .gallery-controls {
@@ -38,15 +41,19 @@
     border-color: var(--primary);
   }
   .gallery-hero {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    position: relative;
     color: white;
     text-align: center;
-    padding: 60px 22px;
+    padding: 100px 22px 80px;
+    background:
+      linear-gradient(135deg, rgba(15,30,20,0.78), rgba(31,58,46,0.6)),
+      url('https://images.unsplash.com/photo-1496062031456-07b8f162a322?w=1900&q=80&auto=format&fit=crop') center/cover no-repeat;
   }
-  .gallery-hero h1 { font-size: 42px; margin-bottom: 10px; }
-  .gallery-hero p { font-size: 17px; opacity: 0.9; max-width: 700px; margin: 0 auto; }
+  .gallery-hero h1 { color: #fff; font-size: clamp(32px, 5vw, 52px); margin-bottom: 14px; }
+  .gallery-hero h1 em { color: var(--accent); font-style: italic; }
+  .gallery-hero p { font-size: 17px; opacity: 0.92; max-width: 700px; margin: 0 auto; font-weight: 300; }
   @media (max-width: 768px) {
-    .gallery-hero { padding: 40px 16px; }
+    .gallery-hero { padding: 70px 16px 50px; }
     .gallery-hero h1 { font-size: 30px; }
     .gallery-controls input[type="text"],
     .gallery-controls select { min-width: 100%; }
@@ -58,7 +65,8 @@
 <div id="site-header"></div>
 
 <section class="gallery-hero">
-  <h1>📸 Our Work Gallery</h1>
+  <span class="hero-eyebrow">Portfolio</span>
+  <h1>Our <em>Gallery</em></h1>
   <p>Hamare service work ki saari photos ek jagah. Filter ya search karke specific images dekhein.</p>
 </section>
 
