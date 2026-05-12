@@ -1,3 +1,12 @@
+# ============================================
+#  Call4All robots.txt
+#  Welcomes search engines AND AI crawlers so
+#  Call4All can appear in both Google results
+#  and AI chatbot answers (ChatGPT, Claude,
+#  Perplexity, Gemini, Copilot, etc).
+# ============================================
+
+# Default — allow all bots
 User-agent: *
 Allow: /
 Disallow: /data/
@@ -6,4 +15,93 @@ Disallow: /staff.html
 Disallow: /assets/js/admin.js
 Disallow: /assets/js/staff.js
 
+# -------- AI / LLM Crawlers (explicitly allowed) --------
+
+# OpenAI ChatGPT (search-time browsing + training)
+User-agent: GPTBot
+Allow: /
+Disallow: /data/
+Disallow: /admin.html
+Disallow: /staff.html
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+# Anthropic Claude
+User-agent: ClaudeBot
+Allow: /
+Disallow: /data/
+Disallow: /admin.html
+Disallow: /staff.html
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+# Google Gemini / Bard / Vertex AI (separate from Googlebot)
+User-agent: Google-Extended
+Allow: /
+Disallow: /data/
+Disallow: /admin.html
+Disallow: /staff.html
+
+# Microsoft Copilot / Bing AI
+User-agent: bingbot
+Allow: /
+
+# Perplexity AI
+User-agent: PerplexityBot
+Allow: /
+Disallow: /data/
+Disallow: /admin.html
+Disallow: /staff.html
+
+# Apple Intelligence / Apple AI
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /data/
+Disallow: /admin.html
+Disallow: /staff.html
+
+# ByteDance (TikTok / Doubao AI)
+User-agent: Bytespider
+Allow: /
+Disallow: /data/
+
+# Common Crawl (used as training data by many LLMs)
+User-agent: CCBot
+Allow: /
+Disallow: /data/
+Disallow: /admin.html
+Disallow: /staff.html
+
+# You.com
+User-agent: YouBot
+Allow: /
+
+# Cohere
+User-agent: cohere-ai
+Allow: /
+
+# Diffbot
+User-agent: Diffbot
+Allow: /
+
+# Meta AI
+User-agent: FacebookBot
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+# Mistral AI
+User-agent: MistralAI-User
+Allow: /
+
+# Sitemap (helps both SEO and AI crawlers find all pages)
 Sitemap: https://www.call4all.co.in/sitemap.xml

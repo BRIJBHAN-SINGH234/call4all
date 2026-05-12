@@ -1,0 +1,18 @@
+/* TEAM */
+Name: Call4All
+Role: Local service aggregator — Jaipur, Rajasthan
+Contact: call4all.info@gmail.com
+Phone: +91 7737353588
+Location: Jaipur, Rajasthan, India
+
+/* THANKS */
+To every verified service provider, every customer who trusted us,
+and to the open-web community whose tools (HTML, CSS, JS, GitHub Pages,
+Schema.org, Unsplash) make a project like this possible.
+
+/* SITE */
+Standards: HTML5, CSS3, ES2020, PWA, Schema.org JSON-LD
+Components: Vanilla JavaScript (no heavy framework)
+Hosting: GitHub Pages
+Languages: English, Hindi, Hinglish
+Last update: 2026-05-12
