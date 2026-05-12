@@ -306,6 +306,180 @@ function escapeAttr(s) {
   return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+/* ===== Areas We Serve (loads from data/areas.csv) =====
+ * Renders a list of active service areas as clickable chips, and feeds
+ * the data into JSON-LD LocalBusiness schema via injectStructuredData().
+ * Public: window.renderAreasServed */
+window.SITE_AREAS = []; // populated after load
+function parseCsvLine(line) {
+  // Simple CSV parser (no quoted commas in our area data, but handle quotes anyway)
+  const out = []; let cur = ''; let inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"' && line[i+1] === '"') { cur += '"'; i++; continue; }
+    if (c === '"') { inQ = !inQ; continue; }
+    if (c === ',' && !inQ) { out.push(cur); cur = ''; continue; }
+    cur += c;
+  }
+  out.push(cur);
+  return out;
+}
+async function loadAreasCsv() {
+  try {
+    const url = 'data/areas.csv?t=' + Date.now();
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error('areas.csv ' + res.status);
+    const text = (await res.text()).trim();
+    if (!text) return [];
+    const lines = text.split(/\r?\n/);
+    const header = parseCsvLine(lines.shift()).map(h => h.trim().toLowerCase());
+    const idx = {
+      id: header.indexOf('id'),
+      city: header.indexOf('city'),
+      area: header.indexOf('area'),
+      status: header.indexOf('status')
+    };
+    const rows = [];
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      const cols = parseCsvLine(line);
+      const status = (cols[idx.status] || '').trim().toLowerCase();
+      if (status && status !== 'active') continue; // only active areas
+      rows.push({
+        id: (cols[idx.id] || '').trim(),
+        city: (cols[idx.city] || '').trim(),
+        area: (cols[idx.area] || '').trim()
+      });
+    }
+    return rows;
+  } catch (e) {
+    console.warn('[Call4All] loadAreasCsv failed:', e);
+    return [];
+  }
+}
+
+async function renderAreasServed() {
+  const mount = document.getElementById('areasMount');
+  if (!mount) return;
+  const areas = await loadAreasCsv();
+  window.SITE_AREAS = areas;
+  if (!areas.length) return; // keep fallback static chip in HTML
+  // Group by city → list of areas
+  const byCity = {};
+  areas.forEach(a => {
+    if (!a.city) return;
+    if (!byCity[a.city]) byCity[a.city] = [];
+    if (a.area) byCity[a.city].push(a.area);
+  });
+  const cities = Object.keys(byCity).sort();
+  const chips = [];
+  cities.forEach(city => {
+    const subs = byCity[city];
+    if (!subs.length) {
+      chips.push(`<a href="#book" class="area-chip" title="Service available in ${escapeAttr(city)}"><span class="area-pin">📍</span><span class="area-city">${city}</span></a>`);
+    } else {
+      subs.forEach(sub => {
+        chips.push(`<a href="#book" class="area-chip" title="Service in ${escapeAttr(sub)}, ${escapeAttr(city)}"><span class="area-pin">📍</span><span class="area-city">${city}</span> · ${sub}</a>`);
+      });
+    }
+  });
+  mount.innerHTML = chips.join('');
+  // Re-inject structured data with live area list
+  if (typeof window.injectStructuredData === 'function') window.injectStructuredData();
+}
+window.renderAreasServed = renderAreasServed;
+
+/* ===== SEO: JSON-LD Structured Data (LocalBusiness + Service) =====
+ * Replaces the baseline schema in index.html with a live version
+ * that includes real phone, address, services and serviced areas
+ * pulled from SITE_CONFIG and data/areas.csv.
+ * Public: window.injectStructuredData */
+function injectStructuredData() {
+  const cfg = window.SITE_CONFIG || {};
+  const origin = (location.protocol === 'http:' || location.protocol === 'https:')
+    ? (location.origin || 'https://www.call4all.co.in')
+    : 'https://www.call4all.co.in';
+  const areas = Array.isArray(window.SITE_AREAS) ? window.SITE_AREAS : [];
+
+  // Build unique city list + sub-area list for areaServed
+  const cities = Array.from(new Set(areas.map(a => a.city).filter(Boolean)));
+  const areaServed = (cities.length ? cities : ['Jaipur']).map(c => ({
+    '@type': 'City', name: c
+  }));
+  // Also add specific localities for hyper-local SEO
+  areas.forEach(a => {
+    if (a.area && a.city) areaServed.push({ '@type': 'AdministrativeArea', name: `${a.area}, ${a.city}` });
+  });
+
+  const phone = cfg.phone || '+91-7737353588';
+  const email = cfg.email || 'call4all.info@gmail.com';
+  const brand = cfg.businessName || 'Call4All';
+  const desc  = cfg.aboutText || "Call4All is Jaipur's trusted service aggregator offering rental cars, rooms & flats, construction labor, home tutors, manpower supply, marriage services, flower bouquets and car decoration — one call for every service.";
+
+  const localBusiness = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    '@id': origin + '/#business',
+    name: brand,
+    image: origin + '/assets/icons/icon-512.png',
+    url: origin + '/',
+    telephone: phone,
+    email: email,
+    description: desc,
+    priceRange: '₹₹',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: cities[0] || 'Jaipur',
+      addressRegion: 'Rajasthan',
+      addressCountry: 'IN'
+    },
+    areaServed: areaServed,
+    openingHoursSpecification: {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
+      opens: '00:00',
+      closes: '23:59'
+    }
+  };
+
+  // Service catalog
+  const services = Array.isArray(cfg.services) ? cfg.services : [];
+  const serviceItems = services
+    .filter(s => s.id !== 'other')
+    .map((s, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'Service',
+        name: `${s.name} in ${cities[0] || 'Jaipur'}`,
+        description: s.desc || '',
+        url: origin + '/' + (s.page || ''),
+        provider: { '@id': origin + '/#business' },
+        areaServed: areaServed
+      }
+    }));
+  const serviceList = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Services offered by ' + brand,
+    itemListElement: serviceItems
+  };
+
+  function setOrCreate(id, obj) {
+    let el = document.getElementById(id);
+    if (!el) {
+      el = document.createElement('script');
+      el.type = 'application/ld+json';
+      el.id = id;
+      document.head.appendChild(el);
+    }
+    el.textContent = JSON.stringify(obj);
+  }
+  setOrCreate('ldjson-localbusiness', localBusiness);
+  if (serviceItems.length) setOrCreate('ldjson-services', serviceList);
+}
+window.injectStructuredData = injectStructuredData;
+
 /* ===== Apply Branding (logo + names + phone/email links) =====
  * Public: window.applyBranding — call after injecting any HTML that
  * contains data-brand-* attributes so values stay in sync with config. */
@@ -477,6 +651,10 @@ function rerenderSiteShell() {
   insertFestivalBannerIfNeeded();
   // Re-paint slider if the home page is showing one
   if (document.getElementById('sliderMount') && typeof renderSlider === 'function') renderSlider();
+  // Re-paint Areas Served (chips + JSON-LD schema)
+  if (document.getElementById('areasMount') && typeof renderAreasServed === 'function') renderAreasServed();
+  // Re-inject JSON-LD with latest config (phone/email/services)
+  if (typeof injectStructuredData === 'function') injectStructuredData();
   // Re-paint dynamic page if we're on page.html (fresh config may now contain it)
   if (document.getElementById('dynamicPageRoot') && typeof renderDynamicPage === 'function') {
     const slug = new URLSearchParams(window.location.search).get('slug') || '';

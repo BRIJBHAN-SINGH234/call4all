@@ -3,8 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Call4All - One Call, Every Service | Cars, Rooms, Labor, Tutors & More</title>
-<meta name="description" content="Call4All is your one-stop service aggregator. Rental cars, rooms & flats, construction labor, manpower supply, home tutors, marriage services and more — just one call away.">
+
+<!-- Primary SEO -->
+<title>Call4All Jaipur | Rental Cars, Rooms, Labor, Home Tutor, Manpower & Wedding Services</title>
+<meta name="description" content="Call4All — Jaipur ka trusted service aggregator. Rental cars, rooms & flats, construction labor, home tutors, manpower supply, marriage decoration, flower bouquets & car decoration. Ek call par har service. 24/7 support.">
+<meta name="keywords" content="Call4All, service aggregator Jaipur, rental cars Jaipur, rooms for rent Jaipur, construction labor Jaipur, mistri thekedar Jaipur, home tutor Jaipur, manpower supply Jaipur, marriage services Jaipur, wedding decoration Jaipur, car decoration Jaipur, flower bouquet Jaipur, Kukas services, one call all services">
+<meta name="author" content="Call4All">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="geo.region" content="IN-RJ">
+<meta name="geo.placename" content="Jaipur">
+<link rel="canonical" href="https://www.call4all.co.in/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Call4All">
+<meta property="og:title" content="Call4All Jaipur — One Call, Every Service. Trusted Service Aggregator">
+<meta property="og:description" content="If you are being haunted by your problems, surrounded by darkness — Call4All will help you at any cost. Rental cars, rooms, labor, tutors, manpower, weddings — sab kuch ek call par.">
+<meta property="og:url" content="https://www.call4all.co.in/">
+<meta property="og:image" content="https://images.unsplash.com/photo-1542401886-65d6c61db217?w=1200&q=80&auto=format&fit=crop">
+<meta property="og:locale" content="en_IN">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Call4All Jaipur — One Call, Every Service">
+<meta name="twitter:description" content="Rental cars, rooms, labor, tutors, manpower, weddings — Jaipur's trusted service aggregator. 24/7.">
+<meta name="twitter:image" content="https://images.unsplash.com/photo-1542401886-65d6c61db217?w=1200&q=80&auto=format&fit=crop">
+
 <meta name="theme-color" content="#1f3a2e">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
@@ -25,10 +49,15 @@
 
 <div id="site-header"></div>
 
-<!-- ===== HERO ===== -->
+<!-- ===== HERO (with top manifesto banner integrated) ===== -->
 <section class="hero">
-  <span class="hero-eyebrow">Trusted Service Aggregator</span>
-  <h1>One Call. <em>Every Service.</em><br>Done Right.</h1>
+  <span class="hero-tag-strong">We Stand By You · 24/7</span>
+  <p class="hero-manifesto-quote">
+    If you are being <em>haunted by your problems</em>, surrounded by <em>darkness</em> — feel free to contact us, we will help you at <em>any cost</em>.
+  </p>
+  <div class="hero-divider"></div>
+  <span class="hero-eyebrow">Trusted Service Aggregator · Jaipur</span>
+  <h1>One Call. <em>Every Service.</em> Done Right.</h1>
   <p>Cars, rooms, labor, tutors, manpower, weddings — jo bhi chahiye, hum aapko trusted service provider tak pohchayenge. Aapko kahin jaana nahi, dhundhna nahi.</p>
   <div class="hero-cta">
     <a href="tel:" data-call-link class="btn btn-accent btn-lg">📞 Call Now: <span data-brand-phone></span></a>
@@ -190,22 +219,16 @@
   </div>
 </section>
 
-<!-- ===== MANIFESTO BLOCK (Slogan: haunted by problems) ===== -->
-<section class="manifesto-block">
-  <div class="manifesto-inner">
-    <span class="manifesto-eyebrow">We Stand By You</span>
-    <span class="quote-mark-decorative">"</span>
-    <p class="manifesto-text">
-      If you are being <em>haunted by your problems</em>,<br>
-      surrounded by <em>darkness</em>, feel free to contact us<br>
-      — we will help you at <em>any cost</em>.
-    </p>
-    <div class="manifesto-cta">
-      <a href="tel:" data-call-link class="btn btn-accent btn-lg">📞 Call Us Anytime</a>
-      <a href="#" data-whatsapp-link target="_blank" class="btn btn-outline btn-lg">💬 WhatsApp Us</a>
-    </div>
-    <div class="manifesto-signature">— Team <span data-brand-name></span></div>
+<!-- ===== AREAS WE SERVE (dynamic from areas.csv — SEO local discovery) ===== -->
+<section class="areas-served" id="areas">
+  <span class="section-eyebrow">Service Coverage</span>
+  <h2 class="section-title">Areas We <span class="accent">Serve</span></h2>
+  <div class="title-divider"></div>
+  <p class="section-subtitle">Hum in areas mein active hain. Admin se naye areas add karte hi yahan automatically show ho jayenge — aur Google par bhi index ho jayenge.</p>
+  <div class="areas-grid" id="areasMount">
+    <a href="#book" class="area-chip"><span class="area-pin">📍</span><span class="area-city">Jaipur</span></a>
   </div>
+  <p class="areas-note">Aapke area mein service chahiye? <strong>Form bhar dein</strong> — hum aapko callback denge.</p>
 </section>
 
 <!-- ===== CTA STRIP ===== -->
@@ -226,11 +249,77 @@
 <div id="site-footer"></div>
 <div id="site-floating"></div>
 
+<!-- ===== SEO: Structured Data (LocalBusiness + Services) =====
+     Baseline schema. Dynamic version is injected at runtime by site.js
+     using live data from data/site-config.json + data/areas.csv. -->
+<script type="application/ld+json" id="ldjson-localbusiness">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "@id": "https://www.call4all.co.in/#business",
+  "name": "Call4All",
+  "image": "https://www.call4all.co.in/assets/icons/icon-512.png",
+  "url": "https://www.call4all.co.in/",
+  "telephone": "+91-7737353588",
+  "email": "call4all.info@gmail.com",
+  "description": "Call4All is Jaipur's trusted service aggregator offering rental cars, rooms & flats, construction labor, home tutors, manpower supply, marriage services, flower bouquets and car decoration — one call for every service.",
+  "priceRange": "₹₹",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Jaipur",
+    "addressRegion": "Rajasthan",
+    "addressCountry": "IN"
+  },
+  "areaServed": [
+    { "@type": "City", "name": "Jaipur" }
+  ],
+  "openingHoursSpecification": {
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+    "opens": "00:00",
+    "closes": "23:59"
+  },
+  "sameAs": []
+}
+</script>
+<script type="application/ld+json" id="ldjson-services">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Services offered by Call4All",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Rental Cars in Jaipur",       "url": "https://www.call4all.co.in/rental-cars.html" },
+    { "@type": "ListItem", "position": 2, "name": "Rooms & Flats for Rent",      "url": "https://www.call4all.co.in/rooms-flats.html" },
+    { "@type": "ListItem", "position": 3, "name": "Construction Labor & Thekedar","url": "https://www.call4all.co.in/construction.html" },
+    { "@type": "ListItem", "position": 4, "name": "Home Tutor Services",          "url": "https://www.call4all.co.in/home-tutor.html" },
+    { "@type": "ListItem", "position": 5, "name": "Manpower Supply",              "url": "https://www.call4all.co.in/manpower-supply.html" },
+    { "@type": "ListItem", "position": 6, "name": "Marriage & Wedding Services",  "url": "https://www.call4all.co.in/marriage-services.html" },
+    { "@type": "ListItem", "position": 7, "name": "Hotel Flower Bouquet",         "url": "https://www.call4all.co.in/flower-bouquet.html" },
+    { "@type": "ListItem", "position": 8, "name": "Car Decoration",               "url": "https://www.call4all.co.in/car-decoration.html" }
+  ]
+}
+</script>
+<script type="application/ld+json" id="ldjson-website">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Call4All",
+  "url": "https://www.call4all.co.in/",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://www.call4all.co.in/gallery.html?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+
 <script src="assets/js/site.js"></script>
 <script src="assets/js/booking.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof window.renderSlider === 'function') window.renderSlider();
+  if (typeof window.renderAreasServed === 'function') window.renderAreasServed();
+  if (typeof window.injectStructuredData === 'function') window.injectStructuredData();
 
   const grid = document.getElementById('serviceGrid');
   if (grid) {
