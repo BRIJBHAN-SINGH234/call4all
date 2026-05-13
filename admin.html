@@ -33,6 +33,144 @@
   }
   .admin-card-section h3 { color: var(--primary); margin-bottom: 6px; font-size: 18px; }
   .admin-card-section .subtitle { color: var(--text-light); font-size: 14px; margin-bottom: 16px; }
+
+  /* ===== Dashboard widgets ===== */
+  .dash-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .dash-widget {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 18px 20px;
+  }
+  .dash-widget h4 {
+    color: var(--primary);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .dash-bar-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 8px; font-size: 13px;
+  }
+  .dash-bar-row .name { min-width: 140px; color: #333; }
+  .dash-bar-row .bar {
+    flex: 1; height: 18px; background: #eef0f4; border-radius: 9px; overflow: hidden;
+    position: relative;
+  }
+  .dash-bar-row .bar > span {
+    display: block; height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 9px;
+  }
+  .dash-bar-row .count { min-width: 38px; text-align: right; font-weight: 700; color: var(--primary); }
+  .dash-activity { font-size: 13px; line-height: 1.5; }
+  .dash-activity .row {
+    display: flex; gap: 10px; padding: 8px 0;
+    border-bottom: 1px solid #eef0f4;
+  }
+  .dash-activity .row:last-child { border-bottom: none; }
+  .dash-activity .when { color: #999; min-width: 110px; font-size: 11px; }
+  .dash-activity .what { flex: 1; }
+  .dash-activity .what strong { color: var(--primary); }
+  .dash-empty { color: var(--text-light); font-style: italic; padding: 12px 0; }
+  .dash-cta {
+    display: inline-block; padding: 4px 10px;
+    background: var(--accent); color: var(--white);
+    border-radius: 14px; font-size: 12px; font-weight: 600;
+    text-decoration: none; margin-left: 8px;
+  }
+  .dash-cta:hover { background: var(--accent-dark); }
+
+  /* Stale booking row markers */
+  tr.row-stale-red > td:first-child {
+    border-left: 4px solid #dc3545;
+    background: rgba(220, 53, 69, 0.04);
+  }
+  tr.row-stale-red > td { background: rgba(220, 53, 69, 0.04); }
+  tr.row-stale-yellow > td:first-child {
+    border-left: 4px solid #e6b800;
+    background: rgba(230, 184, 0, 0.05);
+  }
+  tr.row-stale-yellow > td { background: rgba(230, 184, 0, 0.05); }
+
+  /* Bulk action bar */
+  .bulk-bar {
+    display: none;
+    align-items: center; gap: 12px; flex-wrap: wrap;
+    background: #fffbe6; border: 1px solid #f5d96e;
+    padding: 10px 14px; border-radius: 8px; margin-bottom: 12px;
+  }
+  .bulk-bar.show { display: flex; }
+  .bulk-bar .count-pill {
+    background: var(--accent); color: white;
+    padding: 3px 10px; border-radius: 12px; font-weight: 700; font-size: 13px;
+  }
+
+  /* WhatsApp template dropdown */
+  .wa-template-wrap { display: inline-block; position: relative; }
+  .wa-template-menu {
+    display: none; position: absolute; right: 0; top: 100%;
+    background: white; border: 1px solid #e1e5eb; border-radius: 8px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12); min-width: 220px;
+    z-index: 50; padding: 4px 0;
+  }
+  .wa-template-menu.show { display: block; }
+  .wa-template-menu button {
+    display: block; width: 100%; text-align: left;
+    background: transparent; border: none;
+    padding: 8px 14px; font-size: 13px; cursor: pointer;
+    color: #333;
+  }
+  .wa-template-menu button:hover { background: #f5f8ff; }
+
+  /* Booking detail / timeline modal */
+  .timeline { padding: 4px 0; }
+  .timeline .event {
+    display: flex; gap: 14px; padding: 10px 0;
+    border-bottom: 1px solid #eef0f4;
+  }
+  .timeline .event:last-child { border-bottom: none; }
+  .timeline .event .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--primary); margin-top: 6px; flex-shrink: 0;
+  }
+  .timeline .event.kind-note .dot { background: #999; }
+  .timeline .event.kind-assigned .dot { background: var(--accent); }
+  .timeline .event.kind-status .dot { background: #0a6b2c; }
+  .timeline .event.kind-complete .dot { background: var(--success); }
+  .timeline .event.kind-created .dot { background: #6b7280; }
+  .timeline .event .body { flex: 1; font-size: 13px; line-height: 1.5; }
+  .timeline .event .meta { color: #999; font-size: 11px; margin-top: 2px; }
+  .timeline .event .text { color: #333; margin-top: 3px; }
+
+  /* Mobile card view for staff bookings */
+  .booking-cards { display: none; }
+  @media (max-width: 768px) {
+    .booking-cards-wrap .admin-table { display: none; }
+    .booking-cards { display: block; }
+    .booking-card {
+      background: white; border-radius: 10px; padding: 14px;
+      margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      border-left: 4px solid var(--primary);
+    }
+    .booking-card.is-pending { border-left-color: var(--accent-dark); }
+    .booking-card.is-processing { border-left-color: #1976d2; }
+    .booking-card.is-complete { border-left-color: var(--success); }
+    .booking-card.is-cancelled { border-left-color: var(--danger); }
+    .booking-card .bc-row { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; margin-bottom: 4px; }
+    .booking-card .bc-row .k { color: #888; }
+    .booking-card .bc-row .v { color: #222; font-weight: 500; text-align: right; }
+    .booking-card .bc-actions { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .booking-card .bc-id { font-size: 11px; color: #888; }
+    .booking-card .bc-title { font-weight: 700; color: var(--primary); margin-top: 4px; margin-bottom: 8px; font-size: 15px; }
+  }
 </style>
 </head>
 <body>
@@ -84,6 +222,7 @@
       <span>🛠️ Call4All Admin</span>
     </h1>
     <div class="right">
+      <button class="btn btn-accent btn-sm" id="enableAdminNotifBtn" style="display:none;" title="Get sound + browser notification when new bookings arrive">🔔 Enable Alerts</button>
       <span class="user-chip">👤 <span id="adminUser">admin</span></span>
       <button class="btn btn-outline btn-sm" id="logoutBtn" style="border-color:#fff;color:#fff;">🚪 Logout</button>
     </div>
@@ -100,7 +239,10 @@
       </div>
       <nav class="admin-nav">
         <div class="nav-section">Operations</div>
-        <button class="admin-tab active" data-tab="bookings">
+        <button class="admin-tab active" data-tab="dashboard">
+          <span class="icon">📊</span> <span>Dashboard</span>
+        </button>
+        <button class="admin-tab" data-tab="bookings">
           <span class="icon">📋</span> <span>Bookings</span>
           <span class="badge" id="badgeBookings">0</span>
         </button>
@@ -152,8 +294,57 @@
     <!-- ===== MAIN CONTENT ===== -->
     <main class="admin-content">
 
+    <!-- ===== DASHBOARD TAB ===== -->
+    <div class="tab-pane active" id="tab-dashboard">
+
+      <div class="admin-stats">
+        <div class="stat-card"><div class="label">📅 Today's Bookings</div><div class="value" id="dashToday">0</div></div>
+        <div class="stat-card"><div class="label">📆 This Week</div><div class="value" id="dashWeek">0</div></div>
+        <div class="stat-card"><div class="label">🗓️ This Month</div><div class="value" id="dashMonth">0</div></div>
+        <div class="stat-card"><div class="label">📚 Total (All Time)</div><div class="value" id="dashTotal">0</div></div>
+      </div>
+
+      <div class="admin-stats">
+        <div class="stat-card warn"><div class="label">⏳ Pending</div><div class="value" id="dashPending">0</div></div>
+        <div class="stat-card warn"><div class="label">⚙️ Processing</div><div class="value" id="dashProcessing">0</div></div>
+        <div class="stat-card ok"><div class="label">✅ Completed</div><div class="value" id="dashComplete">0</div></div>
+        <div class="stat-card danger"><div class="label">🚨 Stale (need action)</div><div class="value" id="dashStale">0</div></div>
+      </div>
+
+      <div class="dash-grid">
+
+        <div class="dash-widget">
+          <h4>🧰 Bookings by Service</h4>
+          <div id="dashByService"><p class="dash-empty">Loading...</p></div>
+        </div>
+
+        <div class="dash-widget">
+          <h4>👥 Top Staff (by completed)</h4>
+          <div id="dashTopStaff"><p class="dash-empty">Loading...</p></div>
+        </div>
+
+        <div class="dash-widget">
+          <h4>📍 Top Service Areas</h4>
+          <div id="dashByArea"><p class="dash-empty">Loading...</p></div>
+        </div>
+
+        <div class="dash-widget">
+          <h4>📤 Unassigned Bookings
+            <a href="#" class="dash-cta" onclick="document.querySelector('[data-tab=bookings]').click(); document.getElementById('assignedFilter').value='__unassigned__'; renderBookingsTable(); return false;">Assign now →</a>
+          </h4>
+          <div id="dashUnassigned"><p class="dash-empty">Loading...</p></div>
+        </div>
+
+        <div class="dash-widget" style="grid-column: 1 / -1;">
+          <h4>🕒 Recent Activity (last 12)</h4>
+          <div id="dashRecent" class="dash-activity"><p class="dash-empty">Loading...</p></div>
+        </div>
+
+      </div>
+    </div>
+
     <!-- ===== BOOKINGS TAB ===== -->
-    <div class="tab-pane active" id="tab-bookings">
+    <div class="tab-pane" id="tab-bookings">
 
       <!-- Auto-save status banner (shown when public token is missing) -->
       <div id="autoSaveBanner" class="alert-banner" style="display:none;">
@@ -186,20 +377,47 @@
             <option value="">All Staff</option>
             <option value="__unassigned__">— Unassigned</option>
           </select>
+          <select id="dateFilter" title="Date range">
+            <option value="">📅 All time</option>
+            <option value="today">Today</option>
+            <option value="7d">Last 7 days</option>
+            <option value="30d">Last 30 days</option>
+            <option value="custom">Custom range...</option>
+          </select>
+          <input type="date" id="dateFrom" style="display:none;" title="From date">
+          <input type="date" id="dateTo" style="display:none;" title="To date">
           <button class="btn btn-success" id="addNewBtn">➕ Add Booking</button>
           <button class="btn btn-primary" id="refreshBtn">🔄 Refresh</button>
           <button class="btn btn-accent" id="exportBtn">⬇️ Export CSV</button>
+        </div>
+        <div class="bulk-bar" id="bulkBar">
+          <span class="count-pill" id="bulkCount">0</span> selected
+          <select id="bulkAssign" title="Assign to staff">
+            <option value="">— Bulk assign...</option>
+            <option value="__unassign__">⬜ Unassign</option>
+          </select>
+          <select id="bulkStatus" title="Set status">
+            <option value="">— Bulk status...</option>
+            <option value="Pending">⏳ Pending</option>
+            <option value="Processing">⚙️ Processing</option>
+            <option value="Complete">✅ Complete</option>
+            <option value="Cancelled">❌ Cancelled</option>
+          </select>
+          <button class="btn btn-accent btn-sm" id="bulkExportBtn">⬇️ Export selected</button>
+          <button class="btn btn-danger btn-sm" id="bulkDeleteBtn">🗑️ Delete selected</button>
+          <button class="btn btn-outline btn-sm" id="bulkClearBtn">✕ Clear</button>
         </div>
         <div style="overflow-x:auto;">
           <table class="admin-table">
             <thead>
               <tr>
+                <th style="width:30px;"><input type="checkbox" id="bulkSelectAll" title="Select all visible"></th>
                 <th>Ref ID</th><th>Date</th><th>Name</th><th>Phone</th><th>Service</th>
                 <th>City / Area</th><th>Address</th><th>Message</th>
                 <th>Status</th><th>Assigned</th><th>Actions</th>
               </tr>
             </thead>
-            <tbody id="bookingsBody"><tr><td colspan="11" style="text-align:center;padding:30px;">Loading...</td></tr></tbody>
+            <tbody id="bookingsBody"><tr><td colspan="12" style="text-align:center;padding:30px;">Loading...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -757,6 +975,31 @@
           <button type="submit" class="btn btn-primary">💾 Save Booking</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- ===== Booking Detail / Timeline Modal ===== -->
+  <div class="modal-backdrop" id="bookingDetailModal">
+    <div class="modal" style="max-width:720px;">
+      <button class="modal-close" id="bookingDetailCloseBtn" type="button">&times;</button>
+      <h2 id="bookingDetailTitle">Booking Detail</h2>
+      <div id="bookingDetailBody" style="max-height:55vh;overflow-y:auto;"></div>
+      <form id="bookingNoteForm" style="margin-top:16px;border-top:1px solid #eef0f4;padding-top:14px;">
+        <label style="font-size:13px;color:var(--text-light);">Add internal note (visible to admin & assigned staff)</label>
+        <textarea name="note" rows="2" required placeholder="e.g. Called customer, will visit at 4pm. Customer asked for blue decorations."></textarea>
+        <div class="modal-actions" style="margin-top:8px;">
+          <button type="submit" class="btn btn-primary">➕ Add note</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== Customer History Modal ===== -->
+  <div class="modal-backdrop" id="customerHistoryModal">
+    <div class="modal" style="max-width:820px;">
+      <button class="modal-close" id="customerHistoryCloseBtn" type="button">&times;</button>
+      <h2 id="customerHistoryTitle">Customer History</h2>
+      <div id="customerHistoryBody" style="max-height:60vh;overflow-y:auto;"></div>
     </div>
   </div>
 

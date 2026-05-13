@@ -79,6 +79,688 @@ function genId(prefix) {
 }
 function defaultHeaders(path) { return window.CsvAPI.DEFAULT_HEADERS[path]; }
 
+/* ===== internal_notes (timeline) helpers ===== */
+function parseNotesLog(jsonStr) {
+  if (!jsonStr) return [];
+  try {
+    const arr = JSON.parse(jsonStr);
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) { return []; }
+}
+function serializeNotesLog(arr) {
+  return JSON.stringify(Array.isArray(arr) ? arr : []);
+}
+function appendBookingLog(booking, by, role, kind, text) {
+  const log = parseNotesLog(booking.internal_notes);
+  log.push({
+    at: new Date().toISOString(),
+    by: String(by || 'admin'),
+    role: String(role || 'admin'),
+    kind: String(kind || 'note'),
+    text: String(text || '')
+  });
+  booking.internal_notes = serializeNotesLog(log);
+  return booking;
+}
+function currentAdminUser() {
+  return localStorage.getItem(STORAGE_USER) || 'admin';
+}
+
+/* ===== Stale-booking helpers (also used by dashboard) ===== */
+const STALE_PENDING_HOURS = 2;
+const STALE_PROCESSING_HOURS = 24;
+function isStaleBooking(item) {
+  const status = normalizeStatus(item.status);
+  if (status !== 'Pending' && status !== 'Processing') return false;
+  const refIso = (status === 'Pending') ? item.timestamp : (item.assigned_at || item.timestamp);
+  if (!refIso) return false;
+  const refMs = Date.parse(refIso);
+  if (isNaN(refMs)) return false;
+  const hours = (Date.now() - refMs) / 3600000;
+  const limit = (status === 'Pending') ? STALE_PENDING_HOURS : STALE_PROCESSING_HOURS;
+  return hours >= limit;
+}
+function staleSeverity(item) {
+  const status = normalizeStatus(item.status);
+  if (status === 'Pending' && isStaleBooking(item)) return 'red';
+  if (status === 'Processing' && isStaleBooking(item)) return 'yellow';
+  return '';
+}
+
+/* ===========================================================================
+ * ADMIN REAL-TIME POLLING + NEW-BOOKING NOTIFICATION
+ * =========================================================================== */
+const STORAGE_ADMIN_SEEN = 'c4a_admin_seen_bookings';
+const STORAGE_ADMIN_NOTIF = 'c4a_admin_notif_enabled';
+const ADMIN_POLL_MS = 30000;
+let _adminAudioCtx = null;
+let _adminPollTimer = null;
+let _adminLastSeenInit = false;
+
+function startAdminPolling() {
+  if (_adminPollTimer) clearInterval(_adminPollTimer);
+  _adminPollTimer = setInterval(() => {
+    // Only refresh if user is on dashboard or bookings tab to save API calls
+    const activeTab = document.querySelector('.admin-tab.active');
+    if (!activeTab) return;
+    const t = activeTab.dataset.tab;
+    if (t === 'dashboard' || t === 'bookings') loadBookings();
+  }, ADMIN_POLL_MS);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') loadBookings();
+  });
+}
+
+function playAdminTone() {
+  try {
+    if (!_adminAudioCtx && (window.AudioContext || window.webkitAudioContext)) {
+      _adminAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (!_adminAudioCtx) return;
+    const ctx = _adminAudioCtx;
+    const now = ctx.currentTime;
+    const blip = (freq, start, dur) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, now + start);
+      gain.gain.linearRampToValueAtTime(0.5, now + start + 0.02);
+      gain.gain.linearRampToValueAtTime(0, now + start + dur);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + start);
+      osc.stop(now + start + dur + 0.02);
+    };
+    blip(660, 0, 0.20);
+    blip(990, 0.22, 0.20);
+  } catch (e) { /* ignore */ }
+}
+
+function showAdminBookingNotification(count, sample) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    const title = count > 1
+      ? `📋 ${count} new bookings`
+      : `📋 New booking: ${sample.service || 'Service'}`;
+    const body = count > 1
+      ? `Open the admin panel to see and assign.`
+      : `Customer: ${sample.name || '-'}\nPhone: ${sample.phone || '-'}\nCity: ${sample.city || '-'}`;
+    try {
+      const n = new Notification(title, {
+        body,
+        icon: 'assets/icons/icon-192.png',
+        badge: 'assets/icons/icon-192.png',
+        tag: 'c4a-admin-new-booking',
+        renotify: true
+      });
+      n.onclick = () => {
+        window.focus();
+        document.querySelector('[data-tab=bookings]').click();
+        n.close();
+      };
+    } catch (e) { /* ignore */ }
+  }
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+  playAdminTone();
+}
+
+function checkForNewAdminBookings() {
+  const items = bookingsData.items || [];
+  const allIds = items.map(i => i.id);
+  let seen = [];
+  try { seen = JSON.parse(localStorage.getItem(STORAGE_ADMIN_SEEN) || '[]'); } catch (e) {}
+  const seenSet = new Set(seen);
+  const newOnes = items.filter(i => !seenSet.has(i.id));
+  const updatedSeen = [...new Set([...seen.filter(id => allIds.includes(id)), ...allIds])];
+  try { localStorage.setItem(STORAGE_ADMIN_SEEN, JSON.stringify(updatedSeen)); } catch (e) {}
+  // First load — just record, don't alert
+  if (!_adminLastSeenInit) { _adminLastSeenInit = true; return; }
+  if (newOnes.length > 0 && localStorage.getItem(STORAGE_ADMIN_NOTIF) === '1') {
+    showAdminBookingNotification(newOnes.length, newOnes[0]);
+  }
+}
+
+async function enableAdminNotifications(ev) {
+  if (ev) ev.preventDefault();
+  try {
+    if (!_adminAudioCtx && (window.AudioContext || window.webkitAudioContext)) {
+      _adminAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    playAdminTone();
+    if (navigator.vibrate) navigator.vibrate([120, 60, 120]);
+    if ('Notification' in window && Notification.permission !== 'granted') {
+      const perm = await Notification.requestPermission();
+      if (perm === 'granted') {
+        new Notification('Call4All Admin', {
+          body: 'Alerts enabled. You will get a sound + notification for every new booking.',
+          icon: 'assets/icons/icon-192.png'
+        });
+      }
+    }
+    localStorage.setItem(STORAGE_ADMIN_NOTIF, '1');
+  } catch (e) { console.warn('[admin] notif enable failed:', e); }
+  refreshAdminNotifUi();
+}
+
+function refreshAdminNotifUi() {
+  const enabled = localStorage.getItem(STORAGE_ADMIN_NOTIF) === '1';
+  const permission = ('Notification' in window) ? Notification.permission : 'denied';
+  const ok = enabled && (permission === 'granted' || !('Notification' in window));
+  const btn = document.getElementById('enableAdminNotifBtn');
+  if (btn) btn.style.display = ok ? 'none' : 'inline-block';
+}
+
+/* ===========================================================================
+ * DASHBOARD / OVERVIEW
+ * =========================================================================== */
+function renderDashboard() {
+  const items = bookingsData.items || [];
+  const now = Date.now();
+  const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
+  const dayMs = 86400000;
+  const startOfWeek = startOfDay.getTime() - 6 * dayMs;
+  const startOfMonth = startOfDay.getTime() - 29 * dayMs;
+
+  let today = 0, week = 0, month = 0, total = items.length;
+  const statusCount = { Pending: 0, Processing: 0, Complete: 0, Cancelled: 0 };
+  const byService = {};
+  const byArea = {};
+  const byStaffComplete = {};
+  let staleCount = 0;
+  const unassigned = [];
+
+  for (const it of items) {
+    const t = Date.parse(it.timestamp || 0);
+    if (!isNaN(t)) {
+      if (t >= startOfDay.getTime()) today++;
+      if (t >= startOfWeek) week++;
+      if (t >= startOfMonth) month++;
+    }
+    const s = normalizeStatus(it.status);
+    statusCount[s] = (statusCount[s] || 0) + 1;
+    if (it.service) byService[it.service] = (byService[it.service] || 0) + 1;
+    if (it.city || it.area) {
+      const key = [it.city, it.area].filter(Boolean).join(' / ');
+      byArea[key] = (byArea[key] || 0) + 1;
+    }
+    if (s === 'Complete' && it.assigned_to) {
+      byStaffComplete[it.assigned_to] = (byStaffComplete[it.assigned_to] || 0) + 1;
+    }
+    if (isStaleBooking(it)) staleCount++;
+    if (!it.assigned_to && s !== 'Complete' && s !== 'Cancelled') unassigned.push(it);
+  }
+
+  setText('dashToday', today);
+  setText('dashWeek', week);
+  setText('dashMonth', month);
+  setText('dashTotal', total);
+  setText('dashPending', statusCount.Pending);
+  setText('dashProcessing', statusCount.Processing);
+  setText('dashComplete', statusCount.Complete);
+  setText('dashStale', staleCount);
+
+  renderBarList('dashByService', byService, 6);
+  renderBarList('dashByArea', byArea, 6);
+
+  // Top staff — resolve email → name
+  const staffMap = {};
+  (staffData.items || []).forEach(s => { if (s.email) staffMap[s.email] = s.name || s.email; });
+  const namedStaff = {};
+  Object.entries(byStaffComplete).forEach(([email, n]) => {
+    namedStaff[staffMap[email] || email] = n;
+  });
+  renderBarList('dashTopStaff', namedStaff, 6);
+
+  // Unassigned
+  const ua = document.getElementById('dashUnassigned');
+  if (ua) {
+    if (!unassigned.length) {
+      ua.innerHTML = '<p class="dash-empty">🎉 All bookings are assigned.</p>';
+    } else {
+      const top = unassigned
+        .sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''))
+        .slice(0, 6);
+      ua.innerHTML = top.map(b => `
+        <div class="dash-bar-row" style="cursor:pointer;" onclick="openBookingDetail('${escapeAttr(b.id)}')">
+          <div class="name" style="min-width:auto;flex:1;">
+            <strong>${escapeHtml(b.name || '-')}</strong>
+            <span style="color:#888;font-size:12px;">· ${escapeHtml(b.service || '')}</span>
+          </div>
+          <span class="count" style="min-width:auto;">${escapeHtml(formatDate(b.timestamp))}</span>
+        </div>
+      `).join('');
+    }
+  }
+
+  // Recent activity
+  const recent = document.getElementById('dashRecent');
+  if (recent) {
+    const sorted = [...items].sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || '')).slice(0, 12);
+    if (!sorted.length) {
+      recent.innerHTML = '<p class="dash-empty">No bookings yet.</p>';
+    } else {
+      recent.innerHTML = sorted.map(b => {
+        const s = normalizeStatus(b.status);
+        const cityArea = [b.city, b.area].filter(Boolean).join(' / ');
+        return `
+          <div class="row">
+            <div class="when">${escapeHtml(formatDate(b.timestamp))}</div>
+            <div class="what">
+              <strong>${escapeHtml(b.name || '-')}</strong>
+              · <span style="color:#666;">${escapeHtml(b.service || '')}</span>
+              ${cityArea ? `· <span style="color:#888;">${escapeHtml(cityArea)}</span>` : ''}
+              <span class="status-badge status-${s.toLowerCase()}" style="margin-left:6px;">${escapeHtml(s)}</span>
+              <a href="#" onclick="openBookingDetail('${escapeAttr(b.id)}');return false;" style="margin-left:8px;font-size:11px;">View</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+}
+
+function setText(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+/* ===========================================================================
+ * BULK ACTIONS
+ * =========================================================================== */
+function getBulkSelection() {
+  const set = new Set();
+  document.querySelectorAll('.bulk-row-check:checked').forEach(cb => set.add(cb.dataset.id));
+  return set;
+}
+
+function refreshBulkBar() {
+  const bar = document.getElementById('bulkBar');
+  const cnt = document.getElementById('bulkCount');
+  if (!bar || !cnt) return;
+  const sel = getBulkSelection();
+  cnt.textContent = sel.size;
+  bar.classList.toggle('show', sel.size > 0);
+  // Sync header checkbox state
+  const all = document.querySelectorAll('.bulk-row-check');
+  const head = document.getElementById('bulkSelectAll');
+  if (head) {
+    if (all.length === 0) head.checked = false;
+    else if (sel.size === all.length) head.checked = true;
+    else head.checked = false;
+  }
+}
+
+function toggleBulkSelectAll(e) {
+  const checked = e.target.checked;
+  document.querySelectorAll('.bulk-row-check').forEach(cb => { cb.checked = checked; });
+  refreshBulkBar();
+}
+
+function clearBulkSelection() {
+  document.querySelectorAll('.bulk-row-check').forEach(cb => { cb.checked = false; });
+  const head = document.getElementById('bulkSelectAll');
+  if (head) head.checked = false;
+  refreshBulkBar();
+}
+
+function populateBulkAssignDropdown(activeStaff) {
+  const sel = document.getElementById('bulkAssign');
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML =
+    '<option value="">— Bulk assign...</option>' +
+    '<option value="__unassign__">⬜ Unassign</option>' +
+    activeStaff.map(s => `<option value="${escapeAttr(s.email)}">${escapeHtml(s.name || s.email)}</option>`).join('');
+  if (current) sel.value = current;
+}
+
+async function handleBulkAssign(value) {
+  if (!value) return;
+  const ids = [...getBulkSelection()];
+  if (!ids.length) { document.getElementById('bulkAssign').value = ''; return; }
+  const isUnassign = value === '__unassign__';
+  const targetEmail = isUnassign ? '' : value;
+  const label = isUnassign ? 'Unassign' : `assign to ${value}`;
+  if (!confirm(`${ids.length} bookings ko ${label}? Yeh sab ek hi commit mein update honge.`)) {
+    document.getElementById('bulkAssign').value = ''; return;
+  }
+  const nowIso = new Date().toISOString();
+  const idSet = new Set(ids);
+  bookingsData.items.forEach(b => {
+    if (!idSet.has(b.id)) return;
+    b.assigned_to = targetEmail;
+    b.assigned_at = targetEmail ? nowIso : '';
+    appendBookingLog(b, currentAdminUser(), 'admin', 'assigned',
+      isUnassign ? 'Unassigned (bulk)' : `Assigned to ${targetEmail} (bulk)`);
+    if (targetEmail && normalizeStatus(b.status) === 'Pending') {
+      b.status = 'Processing';
+      appendBookingLog(b, currentAdminUser(), 'admin', 'status', 'Auto: → Processing on bulk assign');
+    }
+  });
+  try {
+    await window.CsvAPI.saveAll(defaultHeaders(PATH_BOOKINGS), bookingsData.items, bookingsData.sha, getToken(),
+      `Bulk ${label} (${ids.length} bookings)`, PATH_BOOKINGS);
+    clearBulkSelection();
+    document.getElementById('bulkAssign').value = '';
+    await loadBookings();
+  } catch (err) {
+    alert('Bulk assign failed: ' + err.message);
+    document.getElementById('bulkAssign').value = '';
+    await loadBookings();
+  }
+}
+
+async function handleBulkStatus(newStatus) {
+  if (!newStatus) return;
+  const ids = [...getBulkSelection()];
+  if (!ids.length) { document.getElementById('bulkStatus').value = ''; return; }
+  const normalized = normalizeStatus(newStatus);
+  let note = '';
+  if (normalized === 'Complete') {
+    note = prompt(`${ids.length} bookings ko Complete mark karne ke liye ek common note daalein:`, '') || '';
+    if (!note.trim()) {
+      alert('Please enter a completion note.');
+      document.getElementById('bulkStatus').value = '';
+      return;
+    }
+  } else {
+    if (!confirm(`${ids.length} bookings ka status ${normalized} kar du?`)) {
+      document.getElementById('bulkStatus').value = ''; return;
+    }
+  }
+  const idSet = new Set(ids);
+  bookingsData.items.forEach(b => {
+    if (!idSet.has(b.id)) return;
+    b.status = normalized;
+    if (normalized === 'Complete') {
+      b.completion_notes = note;
+      b.completed_at = new Date().toISOString();
+    } else {
+      b.completion_notes = '';
+      b.completed_at = '';
+    }
+    appendBookingLog(b, currentAdminUser(), 'admin', 'status', `Status → ${normalized} (bulk)` + (note ? ` — ${note}` : ''));
+  });
+  try {
+    await window.CsvAPI.saveAll(defaultHeaders(PATH_BOOKINGS), bookingsData.items, bookingsData.sha, getToken(),
+      `Bulk status → ${normalized} (${ids.length} bookings)`, PATH_BOOKINGS);
+    clearBulkSelection();
+    document.getElementById('bulkStatus').value = '';
+    await loadBookings();
+  } catch (err) {
+    alert('Bulk status failed: ' + err.message);
+    document.getElementById('bulkStatus').value = '';
+    await loadBookings();
+  }
+}
+
+async function handleBulkDelete() {
+  const ids = [...getBulkSelection()];
+  if (!ids.length) return;
+  if (!confirm(`⚠️ ${ids.length} bookings ko PERMANENTLY delete karna hai? Yeh undo nahi ho sakta.`)) return;
+  const idSet = new Set(ids);
+  const remaining = bookingsData.items.filter(b => !idSet.has(b.id));
+  try {
+    await window.CsvAPI.saveAll(defaultHeaders(PATH_BOOKINGS), remaining, bookingsData.sha, getToken(),
+      `Bulk delete ${ids.length} bookings`, PATH_BOOKINGS);
+    clearBulkSelection();
+    await loadBookings();
+  } catch (err) {
+    alert('Bulk delete failed: ' + err.message);
+  }
+}
+
+function handleBulkExport() {
+  const ids = [...getBulkSelection()];
+  if (!ids.length) return;
+  const idSet = new Set(ids);
+  const items = bookingsData.items.filter(b => idSet.has(b.id));
+  const csv = window.CsvAPI.objectsToCsv(defaultHeaders(PATH_BOOKINGS), items);
+  downloadCsv(csv, 'call4all-bookings-selected');
+}
+
+/* ===========================================================================
+ * CUSTOMER HISTORY (click phone -> show all past bookings for that phone)
+ * =========================================================================== */
+function openCustomerHistory(phone) {
+  const modal = document.getElementById('customerHistoryModal');
+  if (!modal) return;
+  const cleaned = (phone || '').replace(/[^0-9]/g, '');
+  const all = (bookingsData.items || []).filter(b => (b.phone || '').replace(/[^0-9]/g, '') === cleaned);
+  all.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+
+  document.getElementById('customerHistoryTitle').textContent =
+    `Customer History — ${phone} (${all.length} booking${all.length === 1 ? '' : 's'})`;
+
+  const body = document.getElementById('customerHistoryBody');
+  if (!all.length) {
+    body.innerHTML = '<p class="dash-empty">No bookings found for this phone.</p>';
+  } else {
+    const totalsByStatus = { Pending: 0, Processing: 0, Complete: 0, Cancelled: 0 };
+    all.forEach(b => { totalsByStatus[normalizeStatus(b.status)]++; });
+    const meta = `
+      <div class="admin-stats" style="margin-bottom:14px;">
+        <div class="stat-card"><div class="label">Total</div><div class="value">${all.length}</div></div>
+        <div class="stat-card ok"><div class="label">Complete</div><div class="value">${totalsByStatus.Complete}</div></div>
+        <div class="stat-card warn"><div class="label">Active</div><div class="value">${totalsByStatus.Pending + totalsByStatus.Processing}</div></div>
+        <div class="stat-card danger"><div class="label">Cancelled</div><div class="value">${totalsByStatus.Cancelled}</div></div>
+      </div>
+    `;
+    const rows = all.map(b => {
+      const s = normalizeStatus(b.status);
+      const cityArea = [b.city, b.area].filter(Boolean).join(' / ');
+      return `
+        <tr>
+          <td><strong>${escapeHtml(b.id)}</strong><br>
+            <a href="#" onclick="closeCustomerHistory();openBookingDetail('${escapeAttr(b.id)}');return false;" style="font-size:11px;">View</a>
+          </td>
+          <td>${formatDate(b.timestamp)}</td>
+          <td>${escapeHtml(b.service || '-')}</td>
+          <td>${escapeHtml(cityArea || '-')}</td>
+          <td class="msg-cell">${escapeHtml(b.message || '-')}</td>
+          <td><span class="status-badge status-${s.toLowerCase()}">${s}</span></td>
+        </tr>
+      `;
+    }).join('');
+    body.innerHTML = meta + `
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead><tr><th>Ref</th><th>Date</th><th>Service</th><th>City / Area</th><th>Message</th><th>Status</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    `;
+  }
+  modal.classList.add('show');
+}
+function closeCustomerHistory() {
+  const m = document.getElementById('customerHistoryModal');
+  if (m) m.classList.remove('show');
+}
+
+/* ===========================================================================
+ * BOOKING DETAIL + ACTIVITY TIMELINE + INTERNAL NOTES
+ * =========================================================================== */
+let _detailBookingId = null;
+
+function openBookingDetail(id) {
+  const item = (bookingsData.items || []).find(b => b.id === id);
+  if (!item) { alert('Booking not found.'); return; }
+  _detailBookingId = id;
+
+  document.getElementById('bookingDetailTitle').textContent = `Booking ${id} — Activity & Notes`;
+
+  const status = normalizeStatus(item.status);
+  const cityArea = [item.city, item.area].filter(Boolean).join(' / ');
+  const meta = `
+    <div style="background:#f8f9fb;padding:12px 14px;border-radius:8px;margin-bottom:14px;font-size:13px;line-height:1.6;">
+      <strong>${escapeHtml(item.name)}</strong> · ${escapeHtml(item.phone || '-')}
+      <br>${escapeHtml(item.service || '-')} · ${escapeHtml(cityArea || '-')}
+      <br><span class="status-badge status-${status.toLowerCase()}">${status}</span>
+      ${item.assigned_to ? ` · Assigned to <strong>${escapeHtml(item.assigned_to)}</strong>` : ' · <em>Unassigned</em>'}
+      <br><span style="color:#888;font-size:12px;">Created: ${escapeHtml(formatDate(item.timestamp))}</span>
+      ${item.message ? `<br><div style="margin-top:6px;background:white;padding:6px 10px;border-radius:6px;border:1px solid #eef0f4;"><em>Customer:</em> ${escapeHtml(item.message)}</div>` : ''}
+    </div>
+  `;
+
+  // Build synthetic events from booking history (created, assigned, completed) merged with log entries
+  const events = buildTimelineEvents(item);
+  const timelineHtml = events.length
+    ? `<div class="timeline">` + events.map(e => `
+        <div class="event kind-${e.kind}">
+          <div class="dot"></div>
+          <div class="body">
+            <div><strong>${escapeHtml(e.title)}</strong>${e.by ? ` <span style="color:#666;font-size:12px;">· ${escapeHtml(e.by)}</span>` : ''}</div>
+            <div class="meta">${escapeHtml(formatDate(e.at))}</div>
+            ${e.text ? `<div class="text">${escapeHtml(e.text)}</div>` : ''}
+          </div>
+        </div>
+      `).join('') + `</div>`
+    : '<p class="dash-empty">No activity yet.</p>';
+
+  document.getElementById('bookingDetailBody').innerHTML = meta + `
+    <h4 style="color:var(--primary);margin-bottom:10px;font-size:14px;text-transform:uppercase;">🕒 Timeline</h4>
+    ${timelineHtml}
+  `;
+
+  const form = document.getElementById('bookingNoteForm');
+  if (form) {
+    form.reset();
+    form.dataset.bookingId = id;
+  }
+  document.getElementById('bookingDetailModal').classList.add('show');
+}
+
+function closeBookingDetail() {
+  document.getElementById('bookingDetailModal').classList.remove('show');
+  _detailBookingId = null;
+}
+
+function buildTimelineEvents(item) {
+  const events = [];
+  // Synthetic: creation
+  if (item.timestamp) {
+    events.push({ at: item.timestamp, by: 'customer', kind: 'created', title: 'Booking submitted', text: item.message || '' });
+  }
+  // Synthetic: assignment (single, latest)
+  if (item.assigned_to && item.assigned_at) {
+    events.push({ at: item.assigned_at, by: item.assigned_to, kind: 'assigned', title: `Assigned to ${item.assigned_to}`, text: '' });
+  }
+  // Synthetic: completion
+  if (item.completed_at) {
+    events.push({ at: item.completed_at, by: item.assigned_to || 'admin', kind: 'complete', title: 'Marked Complete', text: item.completion_notes || '' });
+  }
+  // Notes log entries (rich)
+  parseNotesLog(item.internal_notes).forEach(n => {
+    if (!n) return;
+    events.push({
+      at: n.at,
+      by: n.by,
+      kind: n.kind || 'note',
+      title: (n.kind === 'note') ? `Note (${n.role || 'admin'})` : (n.kind === 'status' ? 'Status change' : (n.kind === 'assigned' ? 'Assignment' : (n.kind === 'complete' ? 'Completion' : 'Activity'))),
+      text: n.text || ''
+    });
+  });
+  events.sort((a, b) => (a.at || '').localeCompare(b.at || ''));
+  return events;
+}
+
+async function handleAddBookingNote(e) {
+  e.preventDefault();
+  const form = e.target;
+  const id = form.dataset.bookingId || _detailBookingId;
+  if (!id) return;
+  const txt = form.note.value.trim();
+  if (!txt) return;
+  const item = bookingsData.items.find(b => b.id === id);
+  if (!item) { alert('Booking not found.'); return; }
+
+  const submitBtn = form.querySelector('button[type="submit"]');
+  submitBtn.disabled = true; submitBtn.textContent = 'Saving...';
+
+  appendBookingLog(item, currentAdminUser(), 'admin', 'note', txt);
+  try {
+    await window.CsvAPI.saveAll(defaultHeaders(PATH_BOOKINGS), bookingsData.items, bookingsData.sha, getToken(),
+      `Note on booking ${id}`, PATH_BOOKINGS);
+    form.note.value = '';
+    submitBtn.disabled = false; submitBtn.textContent = '➕ Add note';
+    await loadBookings();
+    // Re-open detail to show new entry
+    openBookingDetail(id);
+  } catch (err) {
+    alert('Save failed: ' + err.message);
+    submitBtn.disabled = false; submitBtn.textContent = '➕ Add note';
+  }
+}
+
+/* ===========================================================================
+ * WHATSAPP TEMPLATES
+ * =========================================================================== */
+const WA_TEMPLATES = [
+  { id: 'ack',     label: '👋 Acknowledge', text: 'Hi {name}, this is Call4All. We have received your request for {service} and will get back to you shortly.' },
+  { id: 'eta',     label: '🛵 On the way',  text: 'Hi {name}, our agent for {service} will reach you in approximately 30 minutes. Please keep your phone reachable.' },
+  { id: 'quote',   label: '💰 Send quote',  text: 'Hi {name}, here is the quote for your {service} request. Please confirm and we will proceed.' },
+  { id: 'reschedule', label: '🗓️ Reschedule', text: 'Hi {name}, due to high demand we would like to reschedule your {service} booking. Please share a convenient time.' },
+  { id: 'thanks',  label: '🙏 Thanks + review', text: 'Hi {name}, thanks for choosing Call4All for {service}! If you are happy with our service, please share a Google review. It really helps us.' },
+  { id: 'payment', label: '💳 Payment reminder', text: 'Hi {name}, this is a friendly reminder regarding payment for your {service} booking. Please complete it at your earliest convenience.' }
+];
+
+function toggleWaTemplateMenu(ev, id) {
+  ev.preventDefault();
+  ev.stopPropagation();
+  const menu = document.getElementById('waTpl-' + id);
+  if (!menu) return;
+  // Close other menus
+  document.querySelectorAll('.wa-template-menu.show').forEach(m => { if (m !== menu) m.classList.remove('show'); });
+  // Lazy-fill menu
+  if (!menu.children.length) {
+    menu.innerHTML = WA_TEMPLATES.map(t =>
+      `<button onclick="sendWaTemplate('${escapeAttr(id)}', '${t.id}')">${escapeHtml(t.label)}</button>`
+    ).join('');
+  }
+  menu.classList.toggle('show');
+}
+
+function sendWaTemplate(bookingId, tplId) {
+  const tpl = WA_TEMPLATES.find(t => t.id === tplId);
+  const item = (bookingsData.items || []).find(b => b.id === bookingId);
+  if (!tpl || !item) return;
+  const phone = (item.phone || '').replace(/[^0-9]/g, '');
+  if (!phone) { alert('No phone number on this booking.'); return; }
+  const msg = tpl.text
+    .replace(/\{name\}/g, item.name || 'Customer')
+    .replace(/\{service\}/g, item.service || 'your request')
+    .replace(/\{id\}/g, item.id || '');
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+  document.querySelectorAll('.wa-template-menu.show').forEach(m => m.classList.remove('show'));
+  // Record in timeline
+  appendBookingLog(item, currentAdminUser(), 'admin', 'note', `WhatsApp template sent: "${tpl.label}"`);
+  window.CsvAPI.saveAll(defaultHeaders(PATH_BOOKINGS), bookingsData.items, bookingsData.sha, getToken(),
+    `Log WA template on booking ${bookingId}`, PATH_BOOKINGS).then(() => loadBookings()).catch(() => {});
+}
+
+function renderBarList(mountId, dataObj, limit) {
+  const mount = document.getElementById(mountId);
+  if (!mount) return;
+  const entries = Object.entries(dataObj).sort((a, b) => b[1] - a[1]).slice(0, limit || 5);
+  if (!entries.length) {
+    mount.innerHTML = '<p class="dash-empty">No data yet.</p>';
+    return;
+  }
+  const max = entries[0][1] || 1;
+  mount.innerHTML = entries.map(([name, count]) => {
+    const pct = Math.max(4, Math.round((count / max) * 100));
+    return `
+      <div class="dash-bar-row">
+        <div class="name">${escapeHtml(name)}</div>
+        <div class="bar"><span style="width:${pct}%"></span></div>
+        <div class="count">${count}</div>
+      </div>
+    `;
+  }).join('');
+}
+
 /* ===== Login ===== */
 function initLogin() {
   const form = document.getElementById('loginForm');
@@ -151,9 +833,14 @@ function initAdmin() {
 
   document.getElementById('logoutBtn').addEventListener('click', logout);
 
+  const notifBtn = document.getElementById('enableAdminNotifBtn');
+  if (notifBtn) notifBtn.addEventListener('click', enableAdminNotifications);
+  refreshAdminNotifUi();
+
   refreshAutoSaveUi();  // banner state on first paint
   loadAllSections();
   loadSiteConfig();
+  startAdminPolling();
 }
 
 function setupTabs() {
@@ -172,6 +859,7 @@ function switchTab(tabName) {
   if (tabName === 'gallery' && (!galleryData.items || !galleryData.items.length)) loadGallery();
   if (tabName === 'slider') refreshSliderUI();
   if (tabName === 'pages') refreshPagesUI();
+  if (tabName === 'dashboard') renderDashboard();
 }
 
 function setupSidebarToggle() {
@@ -231,19 +919,67 @@ function bindBookingEvents() {
   document.getElementById('editForm').addEventListener('submit', handleSaveBooking);
   document.getElementById('modalCloseBtn').addEventListener('click', closeBookingModal);
   document.getElementById('modalCancelBtn').addEventListener('click', closeBookingModal);
+
+  // Date filter
+  const df = document.getElementById('dateFilter');
+  const dFrom = document.getElementById('dateFrom');
+  const dTo = document.getElementById('dateTo');
+  if (df) {
+    df.addEventListener('change', () => {
+      const isCustom = df.value === 'custom';
+      if (dFrom) dFrom.style.display = isCustom ? 'inline-block' : 'none';
+      if (dTo)   dTo.style.display   = isCustom ? 'inline-block' : 'none';
+      renderBookingsTable();
+    });
+  }
+  if (dFrom) dFrom.addEventListener('change', renderBookingsTable);
+  if (dTo)   dTo.addEventListener('change',   renderBookingsTable);
+
+  // Bulk actions
+  const selAll = document.getElementById('bulkSelectAll');
+  if (selAll) selAll.addEventListener('change', toggleBulkSelectAll);
+  const bAssign = document.getElementById('bulkAssign');
+  if (bAssign) bAssign.addEventListener('change', () => handleBulkAssign(bAssign.value));
+  const bStatus = document.getElementById('bulkStatus');
+  if (bStatus) bStatus.addEventListener('change', () => handleBulkStatus(bStatus.value));
+  const bDel = document.getElementById('bulkDeleteBtn');
+  if (bDel) bDel.addEventListener('click', handleBulkDelete);
+  const bExp = document.getElementById('bulkExportBtn');
+  if (bExp) bExp.addEventListener('click', handleBulkExport);
+  const bClear = document.getElementById('bulkClearBtn');
+  if (bClear) bClear.addEventListener('click', clearBulkSelection);
+
+  // Booking detail modal
+  const bdClose = document.getElementById('bookingDetailCloseBtn');
+  if (bdClose) bdClose.addEventListener('click', closeBookingDetail);
+  const noteForm = document.getElementById('bookingNoteForm');
+  if (noteForm) noteForm.addEventListener('submit', handleAddBookingNote);
+
+  // Customer history modal
+  const chClose = document.getElementById('customerHistoryCloseBtn');
+  if (chClose) chClose.addEventListener('click', closeCustomerHistory);
+
+  // Close WA template menus on outside click
+  document.addEventListener('click', (ev) => {
+    if (!ev.target.closest('.wa-template-wrap')) {
+      document.querySelectorAll('.wa-template-menu.show').forEach(m => m.classList.remove('show'));
+    }
+  });
 }
 
 async function loadBookings() {
   const tbody = document.getElementById('bookingsBody');
-  tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:30px;">Loading...</td></tr>';
+  if (tbody) tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;">Loading...</td></tr>';
   try {
     bookingsData = await window.CsvAPI.loadAll(getToken(), PATH_BOOKINGS);
     if (!bookingsData.headers.length) bookingsData.headers = defaultHeaders(PATH_BOOKINGS);
     updateBookingsStats();
     populateAssignedFilter();
     renderBookingsTable();
+    renderDashboard();
+    checkForNewAdminBookings();
   } catch (err) {
-    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:30px;color:#dc3545;">❌ ${escapeHtml(err.message)}</td></tr>`;
+    if (tbody) tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:30px;color:#dc3545;">❌ ${escapeHtml(err.message)}</td></tr>`;
   }
 }
 
@@ -275,26 +1011,61 @@ function renderBookingsTable() {
   const search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
   const statusFilter = document.getElementById('statusFilter').value;
   const assignedFilter = (document.getElementById('assignedFilter') || {}).value || '';
+  const dateFilter = (document.getElementById('dateFilter') || {}).value || '';
+  const dateFrom = (document.getElementById('dateFrom') || {}).value || '';
+  const dateTo = (document.getElementById('dateTo') || {}).value || '';
 
   let items = [...bookingsData.items];
   items.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
   if (statusFilter) items = items.filter(i => normalizeStatus(i.status).toLowerCase() === statusFilter.toLowerCase());
   if (assignedFilter === '__unassigned__') items = items.filter(i => !i.assigned_to);
   else if (assignedFilter) items = items.filter(i => (i.assigned_to || '') === assignedFilter);
+
+  // Date range
+  if (dateFilter) {
+    let from = null, to = null;
+    const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
+    const dayMs = 86400000;
+    if (dateFilter === 'today') {
+      from = startOfDay.getTime();
+      to = from + dayMs;
+    } else if (dateFilter === '7d') {
+      from = startOfDay.getTime() - 6 * dayMs;
+    } else if (dateFilter === '30d') {
+      from = startOfDay.getTime() - 29 * dayMs;
+    } else if (dateFilter === 'custom') {
+      if (dateFrom) from = new Date(dateFrom + 'T00:00:00').getTime();
+      if (dateTo)   to   = new Date(dateTo   + 'T23:59:59').getTime();
+    }
+    items = items.filter(i => {
+      const t = Date.parse(i.timestamp || 0);
+      if (isNaN(t)) return false;
+      if (from !== null && t < from) return false;
+      if (to !== null && t > to) return false;
+      return true;
+    });
+  }
+
   if (search) items = items.filter(i => Object.values(i).some(v => String(v).toLowerCase().includes(search)));
 
   if (items.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state"><div class="icon">📭</div><div>No bookings found.</div></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="12"><div class="empty-state"><div class="icon">📭</div><div>No bookings found.</div></div></td></tr>';
+    refreshBulkBar();
     return;
   }
 
   const activeStaff = (staffData.items || []).filter(s => (s.status || '').toLowerCase() !== 'blocked');
+  populateBulkAssignDropdown(activeStaff);
+  const selected = getBulkSelection();
 
   tbody.innerHTML = items.map(item => {
     const cityArea = [item.city, item.area].filter(Boolean).join(' / ');
     const phoneClean = (item.phone || '').replace(/[^0-9]/g, '');
     const status = normalizeStatus(item.status);
     const statusKey = status.toLowerCase();
+    const stale = staleSeverity(item);
+    const rowClass = stale === 'red' ? 'row-stale-red' : (stale === 'yellow' ? 'row-stale-yellow' : '');
+    const isChecked = selected.has(item.id);
 
     const statusOptions = ['Pending','Processing','Complete','Cancelled']
       .map(s => `<option value="${s}" ${s === status ? 'selected' : ''}>${s}</option>`).join('');
@@ -310,22 +1081,38 @@ function renderBookingsTable() {
         (item.assigned_at ? `<span>${formatDate(item.assigned_at)}</span>` : '');
     }
 
-    const completionInfo = (status === 'Complete' && item.completion_notes)
-      ? `<div style="margin-top:6px;font-size:11px;color:#0a6b2c;background:#defbe7;padding:4px 8px;border-radius:6px;cursor:pointer;"
-              title="${escapeAttr(item.completion_notes)}"
-              onclick="alert('Completion Notes:\\n\\n' + this.dataset.notes + '\\n\\nCompleted: ${escapeAttr(formatDate(item.completed_at))}')"
-              data-notes="${escapeAttr(item.completion_notes)}">
-           📝 View notes
-         </div>`
+    const noteCount = parseNotesLog(item.internal_notes).length;
+    const noteBadge = noteCount > 0
+      ? `<span style="background:#eef2ff;color:#3949ab;padding:1px 7px;border-radius:9px;font-size:11px;margin-left:4px;">${noteCount}</span>`
       : '';
 
+    const staleBadge = stale === 'red'
+      ? '<span title="Pending > 2 hrs" style="display:inline-block;background:#dc3545;color:white;font-size:10px;padding:1px 6px;border-radius:9px;margin-left:4px;">🚨 STALE</span>'
+      : stale === 'yellow'
+        ? '<span title="Processing > 24 hrs" style="display:inline-block;background:#e6b800;color:white;font-size:10px;padding:1px 6px;border-radius:9px;margin-left:4px;">⏰ STUCK</span>'
+        : '';
+
     return `
-      <tr>
-        <td><strong>${escapeHtml(item.id)}</strong></td>
+      <tr class="${rowClass}">
+        <td><input type="checkbox" class="bulk-row-check" data-id="${escapeAttr(item.id)}" ${isChecked ? 'checked' : ''}></td>
+        <td>
+          <strong>${escapeHtml(item.id)}</strong>${staleBadge}
+          <br><a href="#" onclick="openBookingDetail('${escapeAttr(item.id)}');return false;" style="font-size:11px;">📝 Details${noteBadge}</a>
+        </td>
         <td>${formatDate(item.timestamp)}</td>
-        <td>${escapeHtml(item.name)}</td>
-        <td><a href="tel:${escapeAttr(item.phone)}">${escapeHtml(item.phone)}</a><br>
-            <a href="https://wa.me/${phoneClean}" target="_blank" style="font-size:12px;">💬 WhatsApp</a></td>
+        <td>
+          ${escapeHtml(item.name)}
+          <br><a href="#" onclick="openCustomerHistory('${escapeAttr(item.phone)}');return false;" style="font-size:11px;color:var(--accent-dark);">🕒 History</a>
+        </td>
+        <td>
+          <a href="tel:${escapeAttr(item.phone)}">${escapeHtml(item.phone)}</a>
+          <div class="wa-template-wrap">
+            <a href="https://wa.me/${phoneClean}" target="_blank" style="font-size:12px;">💬 WhatsApp</a>
+            <button class="btn btn-outline btn-sm" style="padding:1px 6px;font-size:11px;margin-left:4px;"
+                    onclick="toggleWaTemplateMenu(event, '${escapeAttr(item.id)}')">▾ Templates</button>
+            <div class="wa-template-menu" id="waTpl-${escapeAttr(item.id)}"></div>
+          </div>
+        </td>
         <td>${escapeHtml(item.service)}</td>
         <td>${escapeHtml(cityArea || (item.location || '-'))}</td>
         <td class="msg-cell">${escapeHtml(item.address || '-')}</td>
@@ -335,7 +1122,6 @@ function renderBookingsTable() {
                   onchange="quickUpdateStatus('${escapeAttr(item.id)}', this.value)">
             ${statusOptions}
           </select>
-          ${completionInfo}
         </td>
         <td class="assigned-cell">
           <select class="inline-status-select" style="margin-bottom:4px;width:100%;"
@@ -346,13 +1132,19 @@ function renderBookingsTable() {
         </td>
         <td>
           <div class="actions">
-            <button class="btn btn-primary btn-sm" onclick="openBookingModal('${escapeAttr(item.id)}')">✏️ Edit</button>
+            <button class="btn btn-primary btn-sm" onclick="openBookingModal('${escapeAttr(item.id)}')">✏️</button>
             <button class="btn btn-danger btn-sm" onclick="deleteBooking('${escapeAttr(item.id)}')">🗑️</button>
           </div>
         </td>
       </tr>
     `;
   }).join('');
+
+  // Wire row checkboxes
+  tbody.querySelectorAll('.bulk-row-check').forEach(cb => {
+    cb.addEventListener('change', refreshBulkBar);
+  });
+  refreshBulkBar();
 }
 
 /* Quick inline update — change status without opening the modal */
@@ -379,6 +1171,9 @@ async function quickUpdateStatus(id, newStatus) {
     item.completed_at = '';
   }
   item.status = normalized;
+  appendBookingLog(item, currentAdminUser(), 'admin',
+    normalized === 'Complete' ? 'complete' : 'status',
+    `Status → ${normalized}` + (item.completion_notes ? ` — ${item.completion_notes}` : ''));
 
   try {
     await window.CsvAPI.saveAll(defaultHeaders(PATH_BOOKINGS), bookingsData.items, bookingsData.sha, getToken(),
@@ -402,7 +1197,10 @@ async function quickAssignStaff(id, email) {
   // If newly assigned and status was Pending, auto-bump to Processing
   if (email && normalizeStatus(item.status) === 'Pending') {
     item.status = 'Processing';
+    appendBookingLog(item, currentAdminUser(), 'admin', 'status', 'Auto: → Processing on assignment');
   }
+  appendBookingLog(item, currentAdminUser(), 'admin', 'assigned',
+    email ? `Assigned to ${email}` : 'Unassigned');
   try {
     await window.CsvAPI.saveAll(defaultHeaders(PATH_BOOKINGS), bookingsData.items, bookingsData.sha, getToken(),
       email ? `Assign booking ${id} to ${email}` : `Unassign booking ${id}`, PATH_BOOKINGS);
@@ -507,8 +1305,23 @@ async function handleSaveBooking(e) {
     assigned_to: newAssigned,
     assigned_at: assignedAt,
     completion_notes: existing ? (existing.completion_notes || '') : '',
-    completed_at: completedAt
+    completed_at: completedAt,
+    internal_notes: existing ? (existing.internal_notes || '') : JSON.stringify([
+      { at: new Date().toISOString(), by: currentAdminUser(), role: 'admin', kind: 'created', text: 'Created via admin panel' }
+    ])
   };
+
+  // Log diffs on edit
+  if (existing) {
+    if (existing.status !== row.status) {
+      appendBookingLog(row, currentAdminUser(), 'admin',
+        row.status === 'Complete' ? 'complete' : 'status', `Status: ${normalizeStatus(existing.status)} → ${row.status}`);
+    }
+    if ((existing.assigned_to || '') !== row.assigned_to) {
+      appendBookingLog(row, currentAdminUser(), 'admin', 'assigned',
+        row.assigned_to ? `Assigned to ${row.assigned_to}` : 'Unassigned');
+    }
+  }
 
   try {
     let items = [...bookingsData.items];
@@ -819,6 +1632,7 @@ async function loadStaff() {
     if (bookingsData.items && bookingsData.items.length) {
       populateAssignedFilter();
       renderBookingsTable();
+      renderDashboard();
     }
   } catch (err) {
     tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:30px;color:#dc3545;">❌ ${escapeHtml(err.message)}</td></tr>`;

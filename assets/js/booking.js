@@ -207,7 +207,10 @@ function handleBookingSubmit(e) {
     assigned_to: '',
     assigned_at: '',
     completion_notes: '',
-    completed_at: ''
+    completed_at: '',
+    internal_notes: JSON.stringify([
+      { at: timestamp, by: 'customer', role: 'system', kind: 'created', text: 'Booking submitted via public form' }
+    ])
   };
 
   const waText = buildWhatsAppMessage(row);
@@ -376,7 +379,7 @@ window.CsvAPI = (function () {
   }
 
   const DEFAULT_HEADERS = {
-    'data/bookings.csv': ['id', 'timestamp', 'name', 'phone', 'service', 'city', 'area', 'address', 'message', 'status', 'assigned_to', 'assigned_at', 'completion_notes', 'completed_at'],
+    'data/bookings.csv': ['id', 'timestamp', 'name', 'phone', 'service', 'city', 'area', 'address', 'message', 'status', 'assigned_to', 'assigned_at', 'completion_notes', 'completed_at', 'internal_notes'],
     'data/sources.csv': ['id', 'timestamp', 'category', 'name', 'city', 'area', 'address', 'contact_person', 'contact_phone', 'price', 'availability', 'notes', 'added_by'],
     'data/staff.csv': ['id', 'email', 'password_hash', 'name', 'phone', 'role', 'status', 'created_at', 'created_by'],
     'data/areas.csv': ['id', 'city', 'area', 'status', 'created_at'],

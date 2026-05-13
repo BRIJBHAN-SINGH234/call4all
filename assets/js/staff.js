@@ -80,6 +80,25 @@ function sanitizeError(msg) {
     .replace(/github/gi, 'storage');
 }
 function genId(prefix) { return prefix + Date.now() + Math.floor(Math.random() * 100); }
+
+/* internal_notes (timeline) helpers — same format as admin.js */
+function parseStaffNotesLog(jsonStr) {
+  if (!jsonStr) return [];
+  try { const a = JSON.parse(jsonStr); return Array.isArray(a) ? a : []; }
+  catch (e) { return []; }
+}
+function appendStaffLog(booking, kind, text) {
+  const log = parseStaffNotesLog(booking.internal_notes);
+  log.push({
+    at: new Date().toISOString(),
+    by: localStorage.getItem(SS_EMAIL) || 'staff',
+    role: 'staff',
+    kind: kind || 'note',
+    text: String(text || '')
+  });
+  booking.internal_notes = JSON.stringify(log);
+  return booking;
+}
 function fmtDate(iso) {
   if (!iso) return '-';
   const d = new Date(iso);
@@ -216,6 +235,14 @@ function initStaffDashboard() {
   document.getElementById('completeForm').addEventListener('submit', handleCompleteBooking);
   document.getElementById('completeModalCloseBtn').addEventListener('click', closeCompleteModal);
   document.getElementById('completeCancelBtn').addEventListener('click', closeCompleteModal);
+
+  // Staff note modal events
+  const noteForm = document.getElementById('staffNoteForm');
+  if (noteForm) noteForm.addEventListener('submit', handleStaffAddNote);
+  const noteClose = document.getElementById('staffNoteCloseBtn');
+  if (noteClose) noteClose.addEventListener('click', closeStaffNoteModal);
+  const noteCancel = document.getElementById('staffNoteCancelBtn');
+  if (noteCancel) noteCancel.addEventListener('click', closeStaffNoteModal);
 
   // Tab switching
   document.querySelectorAll('[data-stab]').forEach(btn => {
@@ -409,73 +436,242 @@ function updateMyBookingsStats(myEmail) {
   document.getElementById('myStatProcessing').textContent = counts.Processing;
   document.getElementById('myStatComplete').textContent = counts.Complete;
   document.getElementById('myStatCancelled').textContent = counts.Cancelled;
+
+  // Extended performance metrics
+  const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
+  const dayMs = 86400000;
+  const startOfWeek = startOfDay.getTime() - 6 * dayMs;
+  let todayCount = 0, weekDone = 0;
+  mine.forEach(i => {
+    const aT = Date.parse(i.assigned_at || i.timestamp || 0);
+    if (!isNaN(aT) && aT >= startOfDay.getTime()) todayCount++;
+    const cT = Date.parse(i.completed_at || 0);
+    if (!isNaN(cT) && cT >= startOfWeek && normStatus(i.status) === 'Complete') weekDone++;
+  });
+  const totalDoneOrCancel = counts.Complete + counts.Cancelled;
+  const rate = (counts.Complete + counts.Pending + counts.Processing + counts.Cancelled) > 0
+    ? Math.round((counts.Complete / Math.max(1, totalDoneOrCancel + counts.Pending + counts.Processing)) * 100)
+    : null;
+  const todayEl = document.getElementById('myStatToday');
+  const weekEl = document.getElementById('myStatWeekDone');
+  const rateEl = document.getElementById('myStatCompletionRate');
+  const activeEl = document.getElementById('myStatActive');
+  if (todayEl) todayEl.textContent = todayCount;
+  if (weekEl) weekEl.textContent = weekDone;
+  if (rateEl) rateEl.textContent = rate === null ? '—' : (rate + '%');
+  if (activeEl) activeEl.textContent = counts.Pending + counts.Processing;
 }
 
 function renderMyBookingsTable() {
   const tbody = document.getElementById('myBookingsBody');
+  const cards = document.getElementById('myBookingsCards');
   const myEmail = (localStorage.getItem(SS_EMAIL) || '').toLowerCase();
   const search = (document.getElementById('myBookingSearch').value || '').toLowerCase().trim();
   const statusFilter = document.getElementById('myBookingStatusFilter').value;
 
-  // Once a booking is assigned to this staff, it ALWAYS stays in their list
-  // (regardless of status). Filter only narrows the visible subset; it does
-  // NOT remove the booking from the underlying assignment.
   let items = myBookingsData.items.filter(i => (i.assigned_to || '').toLowerCase() === myEmail);
   items.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
   if (statusFilter) items = items.filter(i => normStatus(i.status).toLowerCase() === statusFilter.toLowerCase());
   if (search) items = items.filter(i => Object.values(i).some(v => String(v).toLowerCase().includes(search)));
 
   if (items.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><div class="icon">📭</div><div>No bookings match the current filter. Try changing the filter or wait for the admin to assign one.</div></div></td></tr>';
+    const emptyMsg = '<div class="empty-state"><div class="icon">📭</div><div>No bookings match the current filter. Try changing the filter or wait for the admin to assign one.</div></div>';
+    tbody.innerHTML = `<tr><td colspan="10">${emptyMsg}</td></tr>`;
+    if (cards) cards.innerHTML = emptyMsg;
     return;
   }
 
-  tbody.innerHTML = items.map(item => {
-    const cityArea = [item.city, item.area].filter(Boolean).join(' / ');
-    const phoneClean = (item.phone || '').replace(/[^0-9]/g, '');
-    const status = normStatus(item.status);
-    const statusKey = status.toLowerCase();
-    const isCompleted = status === 'Complete';
-    const isCancelled = status === 'Cancelled';
+  // Table rows
+  tbody.innerHTML = items.map(item => buildStaffBookingRow(item)).join('');
+  // Mobile cards (same data)
+  if (cards) cards.innerHTML = items.map(item => buildStaffBookingCard(item)).join('');
+}
 
-    // Staff cannot change status arbitrarily — only mark Complete (with notes).
-    // Already-Complete or Cancelled rows are read-only.
-    const actionCell = isCompleted
-      ? `<div style="font-size:12px;">
-           <span style="color:#0a6b2c;font-weight:600;">✅ Done</span>
-           ${item.completion_notes ? `<br><span style="color:#666;font-size:11px;cursor:pointer;text-decoration:underline;"
-              onclick="showStaffCompletionNote('${escAttr(item.id)}')">📝 View notes</span>` : ''}
-         </div>`
-      : isCancelled
-        ? `<span style="color:#93181f;font-weight:600;font-size:12px;">❌ Cancelled by admin</span>`
-        : `<button class="btn btn-success btn-sm"
-                  onclick="openCompleteModal('${escAttr(item.id)}')">
-             ✅ Mark Complete
-           </button>`;
+function buildStaffActions(item) {
+  const status = normStatus(item.status);
+  const noteCount = parseStaffNotesLog(item.internal_notes).length;
+  const isCompleted = status === 'Complete';
+  const isCancelled = status === 'Cancelled';
+  const isPending = status === 'Pending';
+  const isProcessing = status === 'Processing';
 
-    const completedLabel = isCompleted && item.completed_at
-      ? `<div style="font-size:11px;color:#666;margin-top:3px;">${escHtml(fmtDate(item.completed_at))}</div>`
-      : '';
+  if (isCompleted) {
+    return `<div style="font-size:12px;">
+        <span style="color:#0a6b2c;font-weight:600;">✅ Done</span>
+        <br><button class="btn btn-outline btn-sm" style="margin-top:4px;font-size:11px;"
+                    onclick="openStaffNoteModal('${escAttr(item.id)}', true)">
+          📝 View timeline${noteCount ? ' ('+noteCount+')' : ''}
+        </button>
+      </div>`;
+  }
+  if (isCancelled) {
+    return `<span style="color:#93181f;font-weight:600;font-size:12px;">❌ Cancelled by admin</span>
+      <br><button class="btn btn-outline btn-sm" style="margin-top:4px;font-size:11px;"
+                  onclick="openStaffNoteModal('${escAttr(item.id)}', true)">📝 View notes</button>`;
+  }
 
-    return `
-      <tr>
-        <td><strong>${escHtml(item.id)}</strong></td>
-        <td style="font-size:12px;">${escHtml(fmtDate(item.timestamp))}</td>
-        <td>${escHtml(item.name)}</td>
-        <td><a href="tel:${escAttr(item.phone)}">${escHtml(item.phone)}</a><br>
-            <a href="https://wa.me/${phoneClean}" target="_blank" style="font-size:12px;">💬 WhatsApp</a></td>
-        <td>${escHtml(item.service)}</td>
-        <td>${escHtml(cityArea || '-')}</td>
-        <td class="msg-cell">${escHtml(item.address || '-')}</td>
-        <td class="msg-cell">${escHtml(item.message)}</td>
-        <td>
-          <span class="status-badge status-${statusKey}">${escHtml(status)}</span>
-          ${completedLabel}
-        </td>
-        <td>${actionCell}</td>
-      </tr>
+  // Active row — show Start (if Pending), Add Update, Mark Complete
+  return `
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      ${isPending
+        ? `<button class="btn btn-primary btn-sm" onclick="staffMarkProcessing('${escAttr(item.id)}')">▶️ Start work</button>`
+        : ''}
+      <button class="btn btn-outline btn-sm" onclick="openStaffNoteModal('${escAttr(item.id)}', false)">
+        📝 Add Update${noteCount ? ' ('+noteCount+')' : ''}
+      </button>
+      <button class="btn btn-success btn-sm" onclick="openCompleteModal('${escAttr(item.id)}')">✅ Complete</button>
+    </div>
+  `;
+}
+
+function buildStaffBookingRow(item) {
+  const cityArea = [item.city, item.area].filter(Boolean).join(' / ');
+  const phoneClean = (item.phone || '').replace(/[^0-9]/g, '');
+  const status = normStatus(item.status);
+  const statusKey = status.toLowerCase();
+  const isCompleted = status === 'Complete';
+  const completedLabel = isCompleted && item.completed_at
+    ? `<div style="font-size:11px;color:#666;margin-top:3px;">${escHtml(fmtDate(item.completed_at))}</div>`
+    : '';
+
+  return `
+    <tr>
+      <td><strong>${escHtml(item.id)}</strong></td>
+      <td style="font-size:12px;">${escHtml(fmtDate(item.timestamp))}</td>
+      <td>${escHtml(item.name)}</td>
+      <td><a href="tel:${escAttr(item.phone)}">${escHtml(item.phone)}</a><br>
+          <a href="https://wa.me/${phoneClean}" target="_blank" style="font-size:12px;">💬 WhatsApp</a></td>
+      <td>${escHtml(item.service)}</td>
+      <td>${escHtml(cityArea || '-')}</td>
+      <td class="msg-cell">${escHtml(item.address || '-')}</td>
+      <td class="msg-cell">${escHtml(item.message)}</td>
+      <td>
+        <span class="status-badge status-${statusKey}">${escHtml(status)}</span>
+        ${completedLabel}
+      </td>
+      <td>${buildStaffActions(item)}</td>
+    </tr>
+  `;
+}
+
+function buildStaffBookingCard(item) {
+  const cityArea = [item.city, item.area].filter(Boolean).join(' / ');
+  const phoneClean = (item.phone || '').replace(/[^0-9]/g, '');
+  const status = normStatus(item.status);
+  const statusKey = status.toLowerCase();
+  return `
+    <div class="booking-card is-${statusKey}">
+      <div class="bc-id">${escHtml(item.id)} · ${escHtml(fmtDate(item.timestamp))}</div>
+      <div class="bc-title">${escHtml(item.name || '-')} · ${escHtml(item.service || '-')}</div>
+      <div class="bc-row"><span class="k">📞 Phone</span><span class="v">
+        <a href="tel:${escAttr(item.phone)}">${escHtml(item.phone)}</a>
+        ${phoneClean ? `· <a href="https://wa.me/${phoneClean}" target="_blank">💬</a>` : ''}
+      </span></div>
+      <div class="bc-row"><span class="k">📍 City / Area</span><span class="v">${escHtml(cityArea || '-')}</span></div>
+      ${item.address ? `<div class="bc-row"><span class="k">🏠 Address</span><span class="v">${escHtml(item.address)}</span></div>` : ''}
+      ${item.message ? `<div class="bc-row"><span class="k">📝 Need</span><span class="v" style="text-align:left;flex:2;">${escHtml(item.message)}</span></div>` : ''}
+      <div class="bc-row"><span class="k">Status</span><span class="v"><span class="status-badge status-${statusKey}">${escHtml(status)}</span></span></div>
+      <div class="bc-actions">${buildStaffActions(item)}</div>
+    </div>
+  `;
+}
+
+/* ===== Feature: Staff Mark Processing (Pending → Processing) ===== */
+async function staffMarkProcessing(id) {
+  const idx = myBookingsData.items.findIndex(i => i.id === id);
+  if (idx < 0) return;
+  const item = myBookingsData.items[idx];
+  if (normStatus(item.status) !== 'Pending') return;
+  const original = { status: item.status, internal_notes: item.internal_notes };
+  item.status = 'Processing';
+  appendStaffLog(item, 'status', 'Started work — status → Processing');
+  const token = localStorage.getItem(SS_TOKEN);
+  try {
+    await window.CsvAPI.saveAll(window.CsvAPI.DEFAULT_HEADERS[PATH_BOOKINGS],
+      myBookingsData.items, myBookingsData.sha, token,
+      `Staff started booking ${id}`, PATH_BOOKINGS);
+    await loadMyBookings();
+  } catch (err) {
+    alert('Save failed: ' + sanitizeError(err.message));
+    Object.assign(item, original);
+    renderMyBookingsTable();
+  }
+}
+
+/* ===== Feature: Staff add interim notes (without completing) ===== */
+function openStaffNoteModal(id, viewOnly) {
+  const item = myBookingsData.items.find(i => i.id === id);
+  if (!item) { alert('Booking not found.'); return; }
+  const info = document.getElementById('staffNoteBookingInfo');
+  const cityArea = [item.city, item.area].filter(Boolean).join(' / ');
+  if (info) {
+    info.innerHTML = `
+      <strong>${escHtml(item.name || '-')}</strong> · ${escHtml(item.phone || '-')}<br>
+      ${escHtml(item.service || '-')} · ${escHtml(cityArea || '-')}<br>
+      <span style="color:#888;font-size:12px;">Status: ${escHtml(normStatus(item.status))}</span>
     `;
-  }).join('');
+  }
+  // Timeline
+  const tl = document.getElementById('staffNoteTimeline');
+  if (tl) {
+    const log = parseStaffNotesLog(item.internal_notes);
+    // Synthetic events
+    const synthetic = [];
+    if (item.timestamp) synthetic.push({ at: item.timestamp, kind: 'created', by: 'customer', text: 'Booking submitted by customer' });
+    if (item.assigned_at) synthetic.push({ at: item.assigned_at, kind: 'assigned', by: 'admin', text: `Assigned to ${item.assigned_to}` });
+    if (item.completed_at) synthetic.push({ at: item.completed_at, kind: 'complete', by: item.assigned_to, text: `Completed — ${item.completion_notes || ''}` });
+    const events = synthetic.concat(log).sort((a, b) => (a.at || '').localeCompare(b.at || ''));
+    if (!events.length) {
+      tl.innerHTML = '<div class="ev" style="color:#999;font-style:italic;">No activity yet.</div>';
+    } else {
+      tl.innerHTML = events.map(e => `
+        <div class="ev">
+          <div class="meta">${escHtml(fmtDate(e.at))} · ${escHtml(e.by || '-')} · ${escHtml(e.kind || 'note')}</div>
+          <div class="text">${escHtml(e.text || '')}</div>
+        </div>
+      `).join('');
+    }
+  }
+  const form = document.getElementById('staffNoteForm');
+  if (form) {
+    form.reset();
+    form.booking_id.value = id;
+    form.note.disabled = !!viewOnly;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.style.display = viewOnly ? 'none' : 'inline-block';
+  }
+  document.getElementById('staffNoteModal').classList.add('show');
+}
+
+function closeStaffNoteModal() {
+  document.getElementById('staffNoteModal').classList.remove('show');
+}
+
+async function handleStaffAddNote(e) {
+  e.preventDefault();
+  const form = e.target;
+  const id = form.booking_id.value;
+  const txt = form.note.value.trim();
+  if (!txt) return;
+  const item = myBookingsData.items.find(i => i.id === id);
+  if (!item) { alert('Booking not found.'); return; }
+  const original = { internal_notes: item.internal_notes };
+  appendStaffLog(item, 'note', txt);
+  const submitBtn = form.querySelector('button[type="submit"]');
+  submitBtn.disabled = true; submitBtn.textContent = 'Saving...';
+  const token = localStorage.getItem(SS_TOKEN);
+  try {
+    await window.CsvAPI.saveAll(window.CsvAPI.DEFAULT_HEADERS[PATH_BOOKINGS],
+      myBookingsData.items, myBookingsData.sha, token,
+      `Staff note on booking ${id}`, PATH_BOOKINGS);
+    closeStaffNoteModal();
+    submitBtn.disabled = false; submitBtn.textContent = '➕ Save Note';
+    await loadMyBookings();
+  } catch (err) {
+    alert('Save failed: ' + sanitizeError(err.message));
+    item.internal_notes = original.internal_notes;
+    submitBtn.disabled = false; submitBtn.textContent = '➕ Save Note';
+  }
 }
 
 /* Show a stored completion note in a simple alert */
@@ -533,6 +729,7 @@ async function handleCompleteBooking(e) {
   item.status = 'Complete';
   item.completion_notes = notes;
   item.completed_at = new Date().toISOString();
+  appendStaffLog(item, 'complete', notes);
 
   const token = localStorage.getItem(SS_TOKEN);
   try {

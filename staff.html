@@ -30,6 +30,38 @@
     padding: 16px 18px; border-radius: 8px; margin-bottom: 18px;
     font-size: 14px; line-height: 1.6;
   }
+
+  /* Mobile-friendly card view for staff bookings */
+  .booking-cards { display: none; }
+  @media (max-width: 768px) {
+    .booking-cards-wrap > div:first-child { display: none; } /* hide the table wrapper */
+    .booking-cards { display: block; }
+    .booking-card {
+      background: white; border-radius: 10px; padding: 14px;
+      margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      border-left: 4px solid var(--primary);
+    }
+    .booking-card.is-pending { border-left-color: var(--accent-dark); }
+    .booking-card.is-processing { border-left-color: #1976d2; }
+    .booking-card.is-complete { border-left-color: var(--success); }
+    .booking-card.is-cancelled { border-left-color: var(--danger); }
+    .booking-card .bc-row { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; margin-bottom: 4px; }
+    .booking-card .bc-row .k { color: #888; }
+    .booking-card .bc-row .v { color: #222; font-weight: 500; text-align: right; }
+    .booking-card .bc-actions { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .booking-card .bc-id { font-size: 11px; color: #888; }
+    .booking-card .bc-title { font-weight: 700; color: var(--primary); margin-top: 4px; margin-bottom: 8px; font-size: 15px; }
+  }
+
+  /* Timeline list for staff note view */
+  .staff-timeline { padding: 4px 0; max-height: 260px; overflow-y: auto; }
+  .staff-timeline .ev {
+    padding: 8px 0; border-bottom: 1px solid #eef0f4;
+    font-size: 13px; line-height: 1.5;
+  }
+  .staff-timeline .ev:last-child { border-bottom: none; }
+  .staff-timeline .ev .meta { color: #999; font-size: 11px; }
+  .staff-timeline .ev .text { color: #333; }
 </style>
 </head>
 <body>
@@ -121,9 +153,18 @@
       <div class="step-card">
         <strong>📋 Bookings Assigned To You</strong>
         — Any booking the admin assigns to you appears here instantly (auto-refresh every 30 seconds).
-        You can update the status: <strong>Processing</strong> (work started), <strong>Complete</strong> (work done), or <strong>Cancelled</strong>.
+        Click <strong>Start</strong> when you begin work, <strong>Mark Complete</strong> when finished, or add a quick update note.
       </div>
 
+      <!-- Performance summary -->
+      <div class="admin-stats">
+        <div class="stat-card"><div class="label">📅 Today's Assigned</div><div class="value" id="myStatToday">0</div></div>
+        <div class="stat-card"><div class="label">📆 This Week Completed</div><div class="value" id="myStatWeekDone">0</div></div>
+        <div class="stat-card ok"><div class="label">📈 Completion Rate</div><div class="value" id="myStatCompletionRate">—</div></div>
+        <div class="stat-card warn"><div class="label">🚨 Active (action needed)</div><div class="value" id="myStatActive">0</div></div>
+      </div>
+
+      <!-- Status breakdown -->
       <div class="admin-stats">
         <div class="stat-card warn"><div class="label">⏳ Pending</div><div class="value" id="myStatPending">0</div></div>
         <div class="stat-card warn"><div class="label">⚙️ Processing</div><div class="value" id="myStatProcessing">0</div></div>
@@ -134,8 +175,8 @@
       <div class="admin-card">
         <h3 style="color:var(--primary); margin-bottom:14px;">📋 My Assigned Bookings</h3>
         <p style="color:var(--text-light); font-size:13px; margin-bottom:14px;">
-          🔒 Note: You can only mark bookings <strong>Complete</strong> — along with notes (description).
-          To change the status or cancel a booking, talk to the admin. Once a booking is assigned, it stays on your dashboard.
+          🔒 Note: You can <strong>Start</strong> (Pending → Processing), <strong>Add Update</strong> notes anytime, and finally <strong>Mark Complete</strong>.
+          Cancellations and admin overrides remain controlled by the admin.
         </p>
         <div class="admin-toolbar">
           <input type="text" id="myBookingSearch" placeholder="🔍 Search name, phone, service, city...">
@@ -148,19 +189,23 @@
           </select>
           <button class="btn btn-primary" id="myBookingsRefreshBtn">🔄 Refresh</button>
         </div>
-        <div style="overflow-x:auto;">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Ref ID</th><th>Date</th><th>Customer</th><th>Phone</th>
-                <th>Service</th><th>City / Area</th><th>Address</th>
-                <th>Requirement</th><th>Status</th><th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="myBookingsBody">
-              <tr><td colspan="10" style="text-align:center;padding:30px;">Loading...</td></tr>
-            </tbody>
-          </table>
+        <div class="booking-cards-wrap">
+          <div style="overflow-x:auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Ref ID</th><th>Date</th><th>Customer</th><th>Phone</th>
+                  <th>Service</th><th>City / Area</th><th>Address</th>
+                  <th>Requirement</th><th>Status</th><th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="myBookingsBody">
+                <tr><td colspan="10" style="text-align:center;padding:30px;">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Mobile-friendly card view: same data, auto-switches via CSS on small screens -->
+          <div class="booking-cards" id="myBookingsCards"></div>
         </div>
       </div>
     </div>
@@ -235,6 +280,32 @@
         <div class="modal-actions">
           <button type="button" class="btn btn-outline" id="completeCancelBtn" style="border-color:#999;color:#666;">Cancel</button>
           <button type="submit" class="btn btn-success">✅ Confirm Complete</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== Staff Add Interim Note Modal ===== -->
+  <div class="modal-backdrop" id="staffNoteModal">
+    <div class="modal" style="max-width:560px;">
+      <button class="modal-close" id="staffNoteCloseBtn" type="button">&times;</button>
+      <h2>📝 Add Update Note</h2>
+      <div id="staffNoteBookingInfo" style="background:#f3f7ff; padding:10px 14px; border-radius:8px; margin-bottom:14px; font-size:13px;"></div>
+
+      <h4 style="font-size:13px; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">🕒 Previous Activity</h4>
+      <div id="staffNoteTimeline" class="staff-timeline"></div>
+
+      <form id="staffNoteForm" style="margin-top:14px;border-top:1px solid #eef0f4;padding-top:14px;">
+        <input type="hidden" name="booking_id">
+        <div class="form-group">
+          <label>Your update *</label>
+          <textarea name="note" required rows="3"
+                    placeholder="e.g. Called customer at 2pm, will reach site by 4pm. They want extra towels."></textarea>
+          <p class="help-text">Admin can see all your notes. Add updates whenever something important happens.</p>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="staffNoteCancelBtn" style="border-color:#999;color:#666;">Cancel</button>
+          <button type="submit" class="btn btn-primary">➕ Save Note</button>
         </div>
       </form>
     </div>
