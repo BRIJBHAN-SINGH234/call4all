@@ -457,6 +457,57 @@ window.CsvAPI = (function () {
     return res.json();
   }
 
+  /* Fetch only the current SHA of a file (so we can overwrite it).
+   * Returns null if the file does not exist (404). */
+  async function getFileSha(path, token) {
+    if (!path) throw new Error('path required');
+    const headers = { 'Accept': 'application/vnd.github+json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(`${apiUrlFor(path)}?ref=${cfg.branch}&t=${Date.now()}`, { headers, cache: 'no-store' });
+    if (res.status === 404) return null;
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || `Failed to inspect ${path} (${res.status})`);
+    }
+    const json = await res.json();
+    return json.sha || null;
+  }
+
+  /* PUT a file using pre-encoded base64 content.
+   * Used for binary uploads (PNG icons) where we cannot pass a string
+   * through b64encode (which would corrupt the bytes). */
+  async function putFileBase64(path, base64, sha, token, message) {
+    if (!path) throw new Error('path required');
+    const body = {
+      message: message || `Update ${path} via Call4All admin`,
+      content: base64,
+      branch: cfg.branch
+    };
+    if (sha) body.sha = sha;
+    const res = await fetch(apiUrlFor(path), {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/vnd.github+json',
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      let msg = err.message || `Failed to save ${path} (${res.status})`;
+      if (res.status === 403 || /Resource not accessible/i.test(msg)) {
+        msg = 'Your GitHub token does not have "Contents: Read and write" permission.';
+      } else if (res.status === 409) {
+        msg = `Conflict on ${path}: someone else updated it. Refresh and try again.`;
+      } else if (res.status === 401) {
+        msg = 'Token is invalid or expired.';
+      }
+      throw new Error(msg);
+    }
+    return res.json();
+  }
+
   async function appendRow(row, token, path) {
     path = path || cfg.csvPath;
     const file = await getFile(path, token);
@@ -630,6 +681,8 @@ window.CsvAPI = (function () {
     getFile,
     getFilePublic,
     putFile,
+    putFileBase64,
+    getFileSha,
     loadJson,
     saveJson,
     uploadImage,

@@ -828,6 +828,56 @@
           <div class="form-message" id="brandingMsg"></div>
         </form>
       </div>
+
+      <!-- ===== App Icon (PWA) — auto-sync with website logo ===== -->
+      <div class="admin-card-section" style="margin-top:20px;">
+        <h3>📱 App Icon (PWA)</h3>
+        <p class="subtitle">
+          Yeh wo icon hai jo mobile pe "Install" karne par home-screen pe dikhega.
+          Default mein same website logo use hota hai. Yahaan se aap apne current logo ko
+          PWA ke saare sizes (72/96/144/152/167/180/192/512 + maskable) mein
+          auto-generate karke upload kar sakte hain.
+        </p>
+
+        <div class="form-row" style="align-items:flex-start;">
+          <div class="form-group">
+            <label>Preview (192×192)</label>
+            <div style="background:#f8f9fb;padding:14px;border-radius:8px;text-align:center;border:1px solid #e1e5eb;">
+              <canvas id="appIconPreview" width="192" height="192" style="width:128px;height:128px;border-radius:24px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.12);"></canvas>
+              <div style="font-size:11px;color:var(--text-light);margin-top:8px;">Live preview of generated PWA icon</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Icon Background</label>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <input type="color" id="appIconBg" value="#ffffff" style="width:54px;height:40px;padding:0;border:1px solid #e1e5eb;border-radius:6px;cursor:pointer;">
+              <label style="font-size:13px;display:flex;gap:6px;align-items:center;cursor:pointer;">
+                <input type="checkbox" id="appIconTransparent"> Transparent background
+              </label>
+              <button type="button" class="btn btn-outline btn-sm" id="appIconUseTheme" style="border-color:var(--primary);color:var(--primary);">🎨 Use theme color</button>
+            </div>
+            <p class="help-text">Logo ke peeche kya color ho. White (default) generally sabse safe hai. Maskable variants automatic padding rakhte hain.</p>
+
+            <label style="margin-top:14px;font-size:13px;display:flex;gap:6px;align-items:center;cursor:pointer;">
+              <input type="checkbox" id="appIconAutoSync" checked>
+              <span>Auto-sync app icon every time I save the logo</span>
+            </label>
+            <p class="help-text">Tick rakhne par jab bhi naya logo upload karenge ya branding save karenge, PWA icons automatically refresh ho jayenge.</p>
+
+            <div class="modal-actions" style="justify-content:flex-start;margin-top:14px;flex-wrap:wrap;gap:8px;">
+              <button type="button" class="btn btn-accent" id="appIconSyncBtn">🔄 Sync current logo to app icons now</button>
+              <button type="button" class="btn btn-outline btn-sm" id="appIconRefreshPreviewBtn">👁️ Refresh preview</button>
+            </div>
+            <p class="help-text" style="margin-top:6px;">
+              ⚠️ Note: Already-installed users ko old icon dikhega jab tak wo app reinstall na karein.
+              New visitors ko turant naya icon milega.
+            </p>
+            <div id="appIconProgress" style="margin-top:10px;font-size:13px;"></div>
+            <div class="form-message" id="appIconMsg"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ===== CONTACT TAB ===== -->

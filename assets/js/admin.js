@@ -2288,12 +2288,215 @@ function bindBrandingEvents() {
         '✅ Branding saved! Refresh the page to see the new logo/name in the header. ' +
         'There may be a ~5 minute CDN delay for public visitors.',
         'success');
+
+      // If "auto-sync" is checked, also push this logo into all PWA icon files
+      const autoSync = document.getElementById('appIconAutoSync');
+      if (autoSync && autoSync.checked) {
+        try {
+          await syncLogoToPwaIcons();
+        } catch (e) {
+          showMsg('appIconMsg', '⚠️ Auto-sync of app icon failed: ' + e.message, 'error');
+        }
+      }
     } catch (err) {
       showMsg('brandingMsg', '❌ ' + err.message, 'error');
     } finally {
       submitBtn.disabled = false; submitBtn.textContent = '💾 Save Branding';
     }
   });
+
+  // ===== PWA App Icon controls =====
+  const syncBtn = document.getElementById('appIconSyncBtn');
+  const refreshPreviewBtn = document.getElementById('appIconRefreshPreviewBtn');
+  const bgPicker = document.getElementById('appIconBg');
+  const bgTransparent = document.getElementById('appIconTransparent');
+  const useThemeBtn = document.getElementById('appIconUseTheme');
+
+  if (syncBtn) {
+    syncBtn.addEventListener('click', async () => {
+      syncBtn.disabled = true;
+      const originalText = syncBtn.textContent;
+      syncBtn.textContent = 'Syncing...';
+      try {
+        await syncLogoToPwaIcons();
+      } catch (err) {
+        showMsg('appIconMsg', '❌ ' + err.message, 'error');
+      } finally {
+        syncBtn.disabled = false; syncBtn.textContent = originalText;
+      }
+    });
+  }
+  if (refreshPreviewBtn) refreshPreviewBtn.addEventListener('click', refreshAppIconPreview);
+  if (bgPicker) bgPicker.addEventListener('input', refreshAppIconPreview);
+  if (bgTransparent) bgTransparent.addEventListener('change', () => {
+    if (bgPicker) bgPicker.disabled = bgTransparent.checked;
+    refreshAppIconPreview();
+  });
+  if (useThemeBtn) useThemeBtn.addEventListener('click', () => {
+    const themeColor = (siteConfigData.json && siteConfigData.json.theme && siteConfigData.json.theme.primary) || '#1e3c72';
+    if (bgPicker) { bgPicker.value = themeColor; bgPicker.disabled = false; }
+    if (bgTransparent) bgTransparent.checked = false;
+    refreshAppIconPreview();
+  });
+}
+
+/* ===========================================================================
+ * PWA APP ICON — auto-generate from current website logo
+ * =========================================================================== */
+const PWA_ICON_SIZES = [
+  { size: 72,  path: 'assets/icons/icon-72.png',  maskable: false },
+  { size: 96,  path: 'assets/icons/icon-96.png',  maskable: false },
+  { size: 144, path: 'assets/icons/icon-144.png', maskable: false },
+  { size: 152, path: 'assets/icons/icon-152.png', maskable: false },
+  { size: 167, path: 'assets/icons/icon-167.png', maskable: false },
+  { size: 180, path: 'assets/icons/icon-180.png', maskable: false },
+  { size: 192, path: 'assets/icons/icon-192.png', maskable: false },
+  { size: 512, path: 'assets/icons/icon-512.png', maskable: false },
+  { size: 192, path: 'assets/icons/icon-maskable-192.png', maskable: true },
+  { size: 512, path: 'assets/icons/icon-maskable-512.png', maskable: true },
+  { size: 32,  path: 'assets/icons/favicon-32.png', maskable: false },
+  { size: 16,  path: 'assets/icons/favicon-16.png', maskable: false }
+];
+
+function getAppIconBg() {
+  const transparent = document.getElementById('appIconTransparent');
+  if (transparent && transparent.checked) return 'transparent';
+  const picker = document.getElementById('appIconBg');
+  return (picker && picker.value) || '#ffffff';
+}
+
+function currentLogoUrl() {
+  const b = (siteConfigData.json && siteConfigData.json.branding) || {};
+  const url = b.logo_url || 'Imagelogo.png';
+  if (url.startsWith('http')) return url;
+  if (url.startsWith('assets/uploads/')) {
+    return `https://raw.githubusercontent.com/${window.SITE_CONFIG.github.owner}/${window.SITE_CONFIG.github.repo}/${window.SITE_CONFIG.github.branch}/${url}`;
+  }
+  // Local file at site root (e.g. Imagelogo.png)
+  return url;
+}
+
+function loadLogoForCanvas() {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('Could not load the logo image. Make sure a logo is saved in branding.'));
+    const url = currentLogoUrl();
+    img.src = url + (url.includes('?') ? '&' : '?') + 't=' + Date.now();
+  });
+}
+
+function renderLogoToSquareCanvas(img, size, maskable) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const bg = getAppIconBg();
+  if (bg === 'transparent') {
+    ctx.clearRect(0, 0, size, size);
+  } else {
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, size, size);
+  }
+  // Maskable icons need a safe zone — 20% padding all around so platform
+  // shape masks (circles/squircles) don't cut into the logo.
+  const paddingPct = maskable ? 0.20 : 0.08;
+  const safeSize = size * (1 - 2 * paddingPct);
+  const iw = img.naturalWidth || img.width;
+  const ih = img.naturalHeight || img.height;
+  if (!iw || !ih) throw new Error('Logo has zero dimensions.');
+  const scale = Math.min(safeSize / iw, safeSize / ih);
+  const dw = iw * scale;
+  const dh = ih * scale;
+  const dx = (size - dw) / 2;
+  const dy = (size - dh) / 2;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, dx, dy, dw, dh);
+  return canvas;
+}
+
+function canvasToPngBase64(canvas) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (!blob) return reject(new Error('Canvas → PNG conversion failed.'));
+      const r = new FileReader();
+      r.onload = () => {
+        const url = String(r.result || '');
+        const idx = url.indexOf(',');
+        resolve(idx >= 0 ? url.slice(idx + 1) : url);
+      };
+      r.onerror = () => reject(r.error || new Error('FileReader error'));
+      r.readAsDataURL(blob);
+    }, 'image/png');
+  });
+}
+
+async function refreshAppIconPreview() {
+  const canvas = document.getElementById('appIconPreview');
+  if (!canvas) return;
+  try {
+    const img = await loadLogoForCanvas();
+    const c = renderLogoToSquareCanvas(img, 192, false);
+    const ctx = canvas.getContext('2d');
+    canvas.width = 192; canvas.height = 192;
+    ctx.clearRect(0, 0, 192, 192);
+    ctx.drawImage(c, 0, 0);
+  } catch (e) {
+    const ctx = canvas.getContext('2d');
+    canvas.width = 192; canvas.height = 192;
+    ctx.fillStyle = '#fee';
+    ctx.fillRect(0, 0, 192, 192);
+    ctx.fillStyle = '#933';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Logo load failed', 96, 96);
+  }
+}
+
+async function syncLogoToPwaIcons() {
+  const progressEl = document.getElementById('appIconProgress');
+  const msgEl = document.getElementById('appIconMsg');
+  if (msgEl) { msgEl.className = 'form-message'; msgEl.textContent = ''; }
+
+  const setProgress = (txt) => { if (progressEl) progressEl.textContent = txt; };
+
+  setProgress('📥 Loading current logo...');
+  const img = await loadLogoForCanvas();
+
+  const total = PWA_ICON_SIZES.length;
+  let done = 0;
+  let failed = [];
+
+  for (const spec of PWA_ICON_SIZES) {
+    setProgress(`📤 Uploading ${spec.path} (${++done}/${total})...`);
+    try {
+      const canvas = renderLogoToSquareCanvas(img, spec.size, spec.maskable);
+      const base64 = await canvasToPngBase64(canvas);
+      const sha = await window.CsvAPI.getFileSha(spec.path, getToken());
+      await window.CsvAPI.putFileBase64(spec.path, base64, sha, getToken(),
+        `Sync PWA icon ${spec.path} from website logo`);
+    } catch (e) {
+      failed.push({ path: spec.path, error: e.message });
+    }
+  }
+
+  if (failed.length === 0) {
+    setProgress(`✅ All ${total} app icons updated successfully.`);
+    showMsg('appIconMsg',
+      `✅ ${total} PWA icons synced from the current website logo. ` +
+      `New installs will see the new icon immediately. ` +
+      `Already-installed users may need to reinstall the app on their phone to refresh the icon. ` +
+      `Public CDN may take ~5 minutes.`,
+      'success');
+  } else {
+    setProgress(`⚠️ Synced ${total - failed.length}/${total} icons — ${failed.length} failed.`);
+    showMsg('appIconMsg',
+      '⚠️ Some icons failed:\n' + failed.map(f => `• ${f.path}: ${f.error}`).join('\n'),
+      'error');
+  }
+  await refreshAppIconPreview();
 }
 
 function populateBrandingForm() {
@@ -2311,6 +2514,8 @@ function populateBrandingForm() {
       preview.src = b.logo_url;
     }
   }
+  // Refresh the PWA icon live preview from the current logo
+  refreshAppIconPreview();
 }
 
 /* ===== CONTACT ===== */

@@ -8,7 +8,7 @@
  *   - GitHub API calls:  network-only (sensitive, never cache)
  */
 
-const CACHE_VERSION = 'v9-2026-05-12-aeo';
+const CACHE_VERSION = 'v10-2026-05-13-pwa-icon-sync';
 const STATIC_CACHE = 'c4a-static-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'c4a-runtime-' + CACHE_VERSION;
 
