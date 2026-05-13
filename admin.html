@@ -158,9 +158,9 @@
       <!-- Auto-save status banner (shown when public token is missing) -->
       <div id="autoSaveBanner" class="alert-banner" style="display:none;">
         <strong>⚠️ Auto-save OFF —</strong>
-        Customer ke form submission abhi sirf WhatsApp pe aate hain, admin panel mein nahi.
-        <a href="#" onclick="document.querySelector('[data-tab=settings]').click();return false;">⚙️ Settings → Public Auto-Save Token</a> set karein
-        taaki har new booking yahan apne aap dikhe.
+        Customer form submissions currently only arrive on WhatsApp, not the admin panel.
+        Set the <a href="#" onclick="document.querySelector('[data-tab=settings]').click();return false;">⚙️ Settings → Public Auto-Save Token</a>
+        so every new booking shows up here automatically.
       </div>
 
       <div class="admin-stats">
@@ -211,8 +211,8 @@
       <div class="admin-card">
         <h3 class="admin-section-title">🗂️ Sources / Inventory (synced with <code>data/sources.csv</code>)</h3>
         <p style="color:var(--text-light); margin-bottom:14px; font-size:14px;">
-          Yahan apne service providers / inventory list karein — kis location pe kya available hai.
-          Staff bhi yahan se add kar sakte hain (apne staff login se).
+          List your service providers / inventory here — what is available at which location.
+          Staff can also add entries from here (using their staff login).
         </p>
         <div class="admin-toolbar">
           <input type="text" id="srcSearchInput" placeholder="🔍 Search name, contact, area, address, notes...">
@@ -241,8 +241,8 @@
       <div class="admin-card">
         <h3 class="admin-section-title">👥 Staff Members (synced with <code>data/staff.csv</code>)</h3>
         <p style="color:var(--text-light); margin-bottom:14px; font-size:14px;">
-          Staff members create karein. Inhe email + password milega login ke liye.
-          Block kar sakte hain anytime — blocked staff login nahi kar payenge.
+          Create staff members. They will receive an email + password for login.
+          You can block them anytime — blocked staff will not be able to log in.
           Staff URL: <a href="staff.html" target="_blank"><strong>staff.html</strong></a>
         </p>
         <div class="admin-toolbar">
@@ -271,8 +271,8 @@
       <div class="admin-card">
         <h3 class="admin-section-title">📍 Service Areas (synced with <code>data/areas.csv</code>)</h3>
         <p style="color:var(--text-light); margin-bottom:14px; font-size:14px;">
-          Aap kis city/area mein service de rahe hain — yahan add karein.
-          Customer booking form ke city/area dropdown mein sirf <strong>Active</strong> areas dikhenge.
+          Add the cities/areas where you provide service.
+          Only <strong>Active</strong> areas will appear in the customer booking form's city/area dropdown.
         </p>
         <div class="admin-toolbar">
           <input type="text" id="areaSearchInput" placeholder="🔍 Search city or area...">
@@ -300,8 +300,8 @@
       <div class="admin-card-section">
         <h3>🖼️ Image Gallery</h3>
         <p class="subtitle">
-          Service-wise images upload karein. Har image ek service category se tag hoti hai
-          aur uss service ke page par auto-show hoti hai. <strong>Featured</strong> images homepage gallery mein dikhti hain.
+          Upload images by service. Each image is tagged with a service category
+          and auto-appears on that service's page. <strong>Featured</strong> images appear in the homepage gallery.
         </p>
         <div class="admin-toolbar">
           <input type="text" id="gallerySearchInput" placeholder="🔍 Search title, description...">
@@ -320,8 +320,8 @@
       <div class="admin-card-section">
         <h3>🎞️ Hero Slider</h3>
         <p class="subtitle">
-          Homepage ke top par jo slider chalta hai uska content yahan se manage karein.
-          Har slide ka icon, title, subtitle, background image aur link customize karein.
+          Manage the content of the slider that runs at the top of the homepage.
+          Customize each slide's icon, title, subtitle, background image and link.
         </p>
         <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:14px;background:#f7f9fc;padding:14px;border-radius:8px;">
           <label style="display:flex;align-items:center;gap:8px;font-weight:600;">
@@ -388,13 +388,13 @@
           <div class="form-group">
             <label>Background Image (optional)</label>
             <input type="file" id="slideBgFile" accept="image/*">
-            <p class="help-text">Upload an image — slide background ke liye. Empty rakhne pe brand gradient use hoga.</p>
+            <p class="help-text">Upload an image for the slide background. If left empty, the brand gradient is used.</p>
             <div id="slideBgPreview" style="margin-top:10px;"></div>
           </div>
           <div class="form-group">
             <label>Link / URL (optional)</label>
             <input name="link" placeholder="rental-cars.html or https://...">
-            <p class="help-text">Slide click karne pe yahan navigate hoga. Empty = no link.</p>
+            <p class="help-text">Clicking the slide navigates here. Leave empty for no link.</p>
           </div>
           <div class="form-group">
             <label style="display:flex;align-items:center;gap:8px;">
@@ -414,8 +414,8 @@
       <div class="admin-card-section">
         <h3>📄 Custom Pages</h3>
         <p class="subtitle">
-          Naye pages create karein (Privacy Policy, Terms, FAQ, etc.) — admin se HTML content add ho jayega.
-          <strong>Show in menu</strong> check karne pe page navigation menu mein bhi automatically appear hoga.
+          Create new pages (Privacy Policy, Terms, FAQ, etc.) — HTML content is added from the admin panel.
+          Tick <strong>Show in menu</strong> to make the page appear automatically in the navigation menu.
           URL format: <code>page.html?slug=your-slug</code>
         </p>
         <div class="admin-toolbar">
@@ -460,14 +460,14 @@
             <div class="form-group">
               <label>Slug (URL-safe) *</label>
               <input name="slug" required placeholder="privacy-policy" pattern="[a-z0-9\-]+">
-              <p class="help-text">Sirf small letters, digits aur dashes. URL: <code>page.html?slug=...</code></p>
+              <p class="help-text">Lowercase letters, digits and dashes only. URL: <code>page.html?slug=...</code></p>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
               <label>Nav Menu Label</label>
               <input name="nav_label" placeholder="Privacy">
-              <p class="help-text">Empty = title use hoga.</p>
+              <p class="help-text">If empty, the title is used.</p>
             </div>
             <div class="form-group">
               <label>Order (sort)</label>
@@ -508,13 +508,13 @@
     <div class="tab-pane" id="tab-theme">
       <div class="admin-card-section">
         <h3>🎨 Festival Theme Presets</h3>
-        <p class="subtitle">Ek click mein puri website ka theme festival ke liye change karein.</p>
+        <p class="subtitle">Change the whole website's theme for a festival in a single click.</p>
         <div id="festivalPresetGrid" class="preset-grid"></div>
       </div>
 
       <div class="admin-card-section">
         <h3>🎨 Custom Colors</h3>
-        <p class="subtitle">Apne hisab se colors set karein. Live preview neeche dikhega.</p>
+        <p class="subtitle">Set colors to your liking. A live preview is shown below.</p>
         <form id="themeForm">
           <div class="color-row">
             <label for="th_primary">Primary Color (header, buttons)</label>
@@ -570,7 +570,7 @@
     <div class="tab-pane" id="tab-branding">
       <div class="admin-card-section">
         <h3>🏷️ Site Branding</h3>
-        <p class="subtitle">Logo, name aur tagline change karein.</p>
+        <p class="subtitle">Change the logo, name and tagline.</p>
         <form id="brandingForm">
           <div class="form-group">
             <label>Site Name *</label>
@@ -598,7 +598,7 @@
           <div class="form-group">
             <label>Logo Height (px)</label>
             <input type="number" id="br_logo_height" min="30" max="120" value="55">
-            <p class="help-text">Header mein logo kitna bada dikhe.</p>
+            <p class="help-text">How large the logo should appear in the header.</p>
           </div>
           <div class="form-group">
             <label>About Text (footer)</label>
@@ -616,7 +616,7 @@
     <div class="tab-pane" id="tab-contact">
       <div class="admin-card-section">
         <h3>📞 Contact Info</h3>
-        <p class="subtitle">Phone, WhatsApp, email — sab admin se manage karein. Site ke har page par yeh apply hoga.</p>
+        <p class="subtitle">Manage phone, WhatsApp and email from the admin panel. Changes apply to every page of the site.</p>
         <form id="contactForm">
           <div class="form-row">
             <div class="form-group">
@@ -632,7 +632,7 @@
             <div class="form-group">
               <label>WhatsApp Number (digits only) *</label>
               <input type="text" id="ct_whatsapp" required placeholder="918387930687">
-              <p class="help-text">Country code + number, koi space nahi.</p>
+              <p class="help-text">Country code + number, no spaces.</p>
             </div>
             <div class="form-group">
               <label>Email *</label>
@@ -667,8 +667,8 @@
           <h3 id="autoSaveTitle">Auto-save: <span id="autoSaveLabel">DISABLED</span></h3>
         </div>
         <p id="autoSaveDesc">
-          Customer ke booking form abhi sirf WhatsApp pe aate hain. <strong>Admin panel mein automatically nahi dikhenge.</strong>
-          Niche "Public Auto-Save Token" set karein taaki har new request <code>data/bookings.csv</code> mein turant save ho jaye.
+          Customer booking forms currently only arrive on WhatsApp. <strong>They will not appear in the admin panel automatically.</strong>
+          Set the "Public Auto-Save Token" below so every new request is saved to <code>data/bookings.csv</code> instantly.
         </p>
       </div>
 
@@ -680,19 +680,19 @@
             <label>🔓 Public Form Auto-Save Token</label>
             <input type="password" name="publicToken" id="publicToken" placeholder="Paste GitHub PAT here (ghp_xxx... or github_pat_xxx...)">
             <p class="help-text">
-              Yeh GitHub PAT set karne par customer ka submitted form turant <code>bookings.csv</code> mein entry add kar dega
-              (status = <strong>Pending</strong>). Aapko alag se add nahi karna padega. WhatsApp bhi normally khulega.
+              Setting this GitHub PAT will add every submitted customer form to <code>bookings.csv</code> instantly
+              (status = <strong>Pending</strong>). You won't need to add entries manually. WhatsApp will still open as usual.
               <br><br>
               <strong>Setup:</strong>
               <ol style="margin: 6px 0 0 18px; padding: 0;">
-                <li>Generate fine-grained PAT: <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">github.com/settings/personal-access-tokens/new</a></li>
+                <li>Generate a fine-grained PAT: <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">github.com/settings/personal-access-tokens/new</a></li>
                 <li>Repository: <code>BRIJBHAN-SINGH234/call4all</code></li>
                 <li>Permissions → Contents → <strong>Read and write</strong></li>
                 <li>Expiration: 1 year (suggested)</li>
-                <li>Copy the token aur yahan paste karein → Save Settings</li>
+                <li>Copy the token, paste it here → Save Settings</li>
               </ol>
-              <strong>⚠️ Security:</strong> Yeh token aapke browser ke localStorage mein save hoga (sirf is browser pe).
-              Site ke har visitor ko bhi yeh exposed hoga (since browser code can read it). Isliye PAT ko sirf <code>Contents: Read &amp; Write</code> permission ke saath limit karein.
+              <strong>⚠️ Security:</strong> This token is stored in your browser's localStorage (in this browser only).
+              It is also exposed to every site visitor (since browser code can read it). Therefore, restrict the PAT to only the <code>Contents: Read &amp; Write</code> permission.
             </p>
             <button type="button" class="btn btn-danger btn-sm" id="clearPublicBtn" style="margin-top:8px;">Clear Public Token</button>
           </div>
@@ -700,7 +700,7 @@
           <div class="form-group">
             <label>🔑 Change Admin Password</label>
             <input type="password" name="newAdminPass" id="newAdminPass" placeholder="Enter new password (or leave empty)">
-            <p class="help-text">New password set karne par next login se yeh use hoga.</p>
+            <p class="help-text">If you set a new password, it will be used from the next login onwards.</p>
             <button type="button" class="btn btn-danger btn-sm" id="clearPassBtn" style="margin-top:8px;">Clear Saved Password</button>
           </div>
           <div class="form-message" id="settingsMsg"></div>
@@ -749,7 +749,7 @@
             <select name="assigned_to" id="em_assigned_to">
               <option value="">— Unassigned —</option>
             </select>
-            <p class="help-text">Staff ko assign karte hi unke dashboard mein dikhega aur sound notification bajegi.</p>
+            <p class="help-text">As soon as you assign it to a staff member, it appears on their dashboard and a sound notification plays.</p>
           </div>
         </div>
         <div class="modal-actions">
@@ -821,7 +821,7 @@
         <div class="form-group">
           <label>Password <span id="staffPassNote" style="font-weight:400;font-size:13px;color:var(--text-light);">(leave empty to keep existing on edit)</span></label>
           <input type="text" name="password" placeholder="Set initial password (share with staff)">
-          <p class="help-text">Password ko hash karke save kiya jayega. Aap is password ko staff ko WhatsApp/email kar sakte hain.</p>
+          <p class="help-text">The password is hashed before saving. You can share this password with the staff member via WhatsApp/email.</p>
         </div>
         <div class="form-row">
           <div class="form-group">
@@ -863,7 +863,7 @@
         <div class="form-group">
           <label>Status</label>
           <select name="status"><option value="Active">Active</option><option value="Inactive">Inactive</option></select>
-          <p class="help-text">Sirf Active areas hi customer ke booking form mein dikhenge.</p>
+          <p class="help-text">Only Active areas appear in the customer booking form.</p>
         </div>
         <div class="modal-actions">
           <button type="button" class="btn btn-outline" id="areaModalCancelBtn" style="border-color:#999;color:#666;">Cancel</button>
@@ -886,7 +886,7 @@
         <div class="form-group">
           <label>Image File <span id="galleryFileNote">*</span></label>
           <input type="file" id="gal_file" accept="image/png,image/jpeg,image/webp">
-          <p class="help-text">JPEG / PNG / WebP. Auto-compress hoga to ~1400px wide.</p>
+          <p class="help-text">JPEG / PNG / WebP. Auto-compressed to ~1400px wide.</p>
           <img id="galleryPreview" class="image-preview" alt="Preview">
           <div id="galleryUploadStatus" class="upload-progress"></div>
         </div>

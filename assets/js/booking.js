@@ -20,7 +20,7 @@ function renderBookingForm(options) {
     <section class="booking-section" id="book">
       <div class="booking-card">
         <h2>📋 Book a Service / Submit Your Requirement</h2>
-        <p class="subtitle">Bharein form ya call karein <a href="tel:" data-call-link><strong data-brand-phone></strong></a> — hum aapko service provider tak pohchayenge.</p>
+        <p class="subtitle">Fill out the form or call <a href="tel:" data-call-link><strong data-brand-phone></strong></a> — we'll connect you to a service provider.</p>
         <form id="bookingForm" novalidate>
           <div class="form-row">
             <div class="form-group">
@@ -58,13 +58,13 @@ function renderBookingForm(options) {
             <input type="text" id="bf_address" name="address" placeholder="e.g. House No 123, Near Shiv Mandir">
           </div>
           <div class="form-group">
-            <label for="bf_message">Aapki Requirement *</label>
+            <label for="bf_message">Your Requirement *</label>
             <textarea id="bf_message" name="message" placeholder="Briefly describe what you need (date, quantity, budget, etc.)" required></textarea>
           </div>
           <button type="submit" class="btn btn-success btn-block" id="bf_submit">
             <span id="bf_submit_text">📤 Submit & Send via WhatsApp</span>
           </button>
-          <p class="form-note">Submit karne par WhatsApp chat khulega, message bhejein. Hum 1 ghante ke andar reply karenge.</p>
+          <p class="form-note">On submit, a WhatsApp chat will open — send the message and we'll reply within 1 hour.</p>
           <div class="form-message" id="bf_msg"></div>
         </form>
       </div>
@@ -236,8 +236,8 @@ function handleBookingSubmit(e) {
         // Show a non-blocking warning so the customer knows their request still
         // reached us via WhatsApp even if backend save failed.
         showFormMessage(
-          '⚠️ Backend save fail (' + (err.message || 'unknown') + '). ' +
-          'Lekin WhatsApp tab khul gaya — wahaan se message bhej do, hum response denge.',
+          '⚠️ Backend save failed (' + (err.message || 'unknown') + '). ' +
+          'But the WhatsApp tab has opened — send the message from there and we will respond.',
           'error'
         );
         return false;
@@ -247,7 +247,7 @@ function handleBookingSubmit(e) {
   if (popupBlocked) {
     // Browser blocked the popup. Render a clickable button so user can open WhatsApp.
     showFormMessage(
-      '⚠️ Browser ne popup block kiya. Neeche button click karein WhatsApp open karne ke liye.',
+      '⚠️ The browser blocked the popup. Click the button below to open WhatsApp.',
       'error'
     );
     submitText.innerHTML = '👉 Click here to open WhatsApp';
@@ -258,7 +258,7 @@ function handleBookingSubmit(e) {
     };
   } else {
     showFormMessage(
-      '✅ Aapki request taiyaar hai (Ref: ' + id + '). WhatsApp tab mein message bhej dein, hum 1 ghante mein reply karenge.',
+      '✅ Your request is ready (Ref: ' + id + '). Send the message in the WhatsApp tab and we will reply within 1 hour.',
       'success'
     );
     // Reset form for next submission after a short delay
@@ -436,18 +436,18 @@ window.CsvAPI = (function () {
       const err = await res.json().catch(() => ({}));
       let msg = err.message || `Failed to save ${path} (${res.status})`;
       if (res.status === 403 || /Resource not accessible/i.test(msg)) {
-        msg = 'Aapke GitHub token mein "Contents: Read and write" permission nahi hai.\n\n' +
-              'Fix karne ke liye:\n' +
-              '1. Logout karein\n' +
-              '2. Naya token banayein: https://github.com/settings/personal-access-tokens/new\n' +
-              '3. Repository: BRIJBHAN-SINGH234/call4all select karein\n' +
-              '4. Permissions → Contents → "Read and write" select karein\n' +
-              '5. Generate token, copy karein, wapas login karein\n\n' +
+        msg = 'Your GitHub token does not have "Contents: Read and write" permission.\n\n' +
+              'To fix this:\n' +
+              '1. Log out\n' +
+              '2. Create a new token at: https://github.com/settings/personal-access-tokens/new\n' +
+              '3. Select repository: BRIJBHAN-SINGH234/call4all\n' +
+              '4. Under Permissions → Contents → choose "Read and write"\n' +
+              '5. Generate the token, copy it, and log in again\n\n' +
               '(Original error: ' + msg + ')';
       } else if (res.status === 409) {
-        msg = 'Conflict: file kisi ne update kar di hai. Refresh karein aur try karein.\n\n(Original: ' + msg + ')';
+        msg = 'Conflict: someone else has updated the file. Refresh and try again.\n\n(Original: ' + msg + ')';
       } else if (res.status === 401) {
-        msg = 'Token invalid ya expired hai. Logout karke naya token use karein.\n\n(Original: ' + msg + ')';
+        msg = 'Token is invalid or expired. Log out and sign in with a new token.\n\n(Original: ' + msg + ')';
       }
       throw new Error(msg);
     }
@@ -601,9 +601,9 @@ window.CsvAPI = (function () {
       const err = await res.json().catch(() => ({}));
       let msg = err.message || `Upload failed (${res.status})`;
       if (res.status === 403 || /Resource not accessible/i.test(msg)) {
-        msg = 'Token mein "Contents: Read and write" permission nahi hai. Naya token banayein.';
+        msg = 'The token does not have "Contents: Read and write" permission. Please create a new token.';
       } else if (res.status === 401) {
-        msg = 'Token invalid ya expired hai. Logout karke naya token use karein.';
+        msg = 'Token is invalid or expired. Log out and sign in with a new token.';
       }
       throw new Error(msg);
     }

@@ -273,7 +273,7 @@ function setupStaffNotifications() {
         const perm = await Notification.requestPermission();
         if (perm === 'granted') {
           new Notification('Call4All Staff', {
-            body: 'Alerts enabled. Naye assigned bookings ke liye sound + notification milegi.',
+            body: 'Alerts enabled. You will receive sound + notifications for new assigned bookings.',
             icon: 'assets/icons/icon-192.png'
           });
         }
@@ -328,7 +328,7 @@ function showBookingNotification(count, sample) {
       ? `📋 ${count} new bookings assigned`
       : `📋 New booking: ${sample.service || 'Service'}`;
     const body = count > 1
-      ? `Apne dashboard mein "My Bookings" tab kholein.`
+      ? `Open the "My Bookings" tab on your dashboard.`
       : `Customer: ${sample.name || '-'}\nPhone: ${sample.phone || '-'}\nCity: ${sample.city || '-'}`;
     try {
       const n = new Notification(title, {

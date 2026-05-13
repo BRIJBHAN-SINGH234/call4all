@@ -366,7 +366,7 @@ async function quickUpdateStatus(id, newStatus) {
   // If admin marks Complete inline, ask for a note (for audit trail consistency
   // with what staff are required to provide).
   if (normalized === 'Complete') {
-    const note = prompt('Completion notes (kaise complete hua, customer feedback, payment etc.):', item.completion_notes || '');
+    const note = prompt('Completion notes (how it was completed, customer feedback, payment, etc.):', item.completion_notes || '');
     if (note === null) {  // user cancelled
       renderBookingsTable();
       return;
@@ -1168,7 +1168,7 @@ function bindSettingsEvents() {
   document.getElementById('clearPublicBtn').addEventListener('click', () => {
     localStorage.removeItem(STORAGE_PUBLIC);
     document.getElementById('publicToken').value = '';
-    showMsg('settingsMsg', 'Public token cleared. Customer ke form ab sirf WhatsApp pe aayenge.', 'info');
+    showMsg('settingsMsg', 'Public token cleared. Customer forms will now only arrive on WhatsApp.', 'info');
     refreshAutoSaveUi();
   });
   document.getElementById('clearPassBtn').addEventListener('click', () => {
@@ -1206,8 +1206,8 @@ function refreshAutoSaveUi() {
     label.textContent = hasToken ? 'ENABLED' : 'DISABLED';
     emoji.textContent = hasToken ? '✅' : '⚠️';
     desc.innerHTML = hasToken
-      ? 'Customer ka koi bhi booking form submission turant <code>data/bookings.csv</code> mein <strong>Pending</strong> status ke saath save ho jayega — admin panel mein turant dikhega.'
-      : 'Customer ke booking form abhi sirf WhatsApp pe aate hain. <strong>Admin panel mein automatically nahi dikhenge.</strong> Niche "Public Auto-Save Token" set karein taaki har new request <code>data/bookings.csv</code> mein turant save ho jaye.';
+      ? 'Any customer booking form submission is saved instantly to <code>data/bookings.csv</code> with <strong>Pending</strong> status — it appears in the admin panel right away.'
+      : 'Customer booking forms currently only go to WhatsApp. <strong>They will not appear in the admin panel automatically.</strong> Set the "Public Auto-Save Token" below so every new request is saved to <code>data/bookings.csv</code> instantly.';
   }
 
   const banner = document.getElementById('autoSaveBanner');
@@ -1337,8 +1337,8 @@ function bindThemeEvents() {
       siteConfigData.json.theme = readThemeFromForm();
       await saveSiteConfig('Update theme');
       showMsg('themeMsg',
-        '✅ Theme saved! Aapke aur logged-in users ke browsers mein turant naya theme dikhega. ' +
-        'Public visitors (logged out) ko ~5 min lag sakte hain (GitHub CDN cache).',
+        '✅ Theme saved! You and other logged-in users will see the new theme immediately. ' +
+        'Public visitors (logged out) may take ~5 minutes (GitHub CDN cache).',
         'success');
       previewTheme();
     } catch (err) {
@@ -1471,8 +1471,8 @@ function bindBrandingEvents() {
 
       await saveSiteConfig('Update branding');
       showMsg('brandingMsg',
-        '✅ Branding saved! Refresh karke header mein naya logo/name dikhega. ' +
-        'Public visitors ke liye ~5 min CDN delay ho sakta hai.',
+        '✅ Branding saved! Refresh the page to see the new logo/name in the header. ' +
+        'There may be a ~5 minute CDN delay for public visitors.',
         'success');
     } catch (err) {
       showMsg('brandingMsg', '❌ ' + err.message, 'error');
@@ -1518,8 +1518,8 @@ function bindContactEvents() {
       cfg.contact.address = document.getElementById('ct_address').value.trim();
       await saveSiteConfig('Update contact info');
       showMsg('contactMsg',
-        '✅ Contact info saved! Aapke browser mein turant apply ho gaya. ' +
-        'Public visitors ko CDN cache ke liye ~5 min lag sakte hain.',
+        '✅ Contact info saved! Applied instantly in your browser. ' +
+        'Public visitors may take ~5 minutes (CDN cache).',
         'success');
     } catch (err) {
       showMsg('contactMsg', '❌ ' + err.message, 'error');
@@ -1930,7 +1930,7 @@ async function handleSaveSlide(e) {
     await saveSiteConfig(`Slider: ${isNew ? 'add' : 'update'} slide ${slide.title}`);
     closeSlideModal();
     refreshSliderUI();
-    alert('✅ Slide saved. Public visitors ko ~5 min lag sakte hain (CDN cache).');
+    alert('✅ Slide saved. Public visitors may take ~5 minutes (CDN cache).');
   } catch (err) {
     alert('Save failed: ' + err.message);
     submitBtn.disabled = false; submitBtn.textContent = '💾 Save Slide';
@@ -2138,7 +2138,7 @@ async function handleSavePage(e) {
     await saveSiteConfig(`Pages: ${isNew ? 'create' : 'update'} "${page.title}"`);
     closePageModal();
     refreshPagesUI();
-    alert(`✅ Page saved. View it at:\npage.html?slug=${page.slug}\n\nNote: Public visitors ko ~5 min lag sakte hain (CDN cache).`);
+    alert(`✅ Page saved. View it at:\npage.html?slug=${page.slug}\n\nNote: Public visitors may take ~5 minutes (CDN cache).`);
   } catch (err) {
     alert('Save failed: ' + err.message);
     submitBtn.disabled = false; submitBtn.textContent = '💾 Save Page';

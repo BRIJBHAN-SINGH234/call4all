@@ -69,9 +69,9 @@
       <h2>🔑 One-Time Setup</h2>
       <p class="lead">Welcome <strong id="tokenWelcomeName">Staff</strong>! Paste your <strong>access key</strong> to start saving data.</p>
       <div class="step-card">
-        <strong>📌 Note:</strong> Aapke admin ne aapko ek <em>access key</em> diya hoga (WhatsApp / email pe).
-        Wo yahan paste karein. Yeh key sirf <em>is browser</em> mein securely save hogi aur sirf data save karne ke liye use hogi.
-        Logout karne par bhi key saved rahegi (jaldi login ke liye).
+        <strong>📌 Note:</strong> Your admin will have shared an <em>access key</em> with you (via WhatsApp or email).
+        Paste it here. This key is stored securely in <em>this browser only</em> and is used solely to save data.
+        It stays saved even after you log out (for quicker future logins).
       </div>
       <form id="tokenForm">
         <div class="form-group">
@@ -100,9 +100,9 @@
 
   <!-- Notification permission banner (shown until allowed) -->
   <div id="notifPermissionBanner" class="alert-banner" style="display:none; margin: 12px 18px 0;">
-    🔔 Naye assigned bookings ke liye <strong>sound + push notification</strong> chalu karein —
-    <a href="#" id="enableNotifLink">Click karke Allow karein</a>.
-    Mobile pe tone aur vibration bhi bajegi jab admin koi naya booking aapko assign kare.
+    🔔 Turn on <strong>sound + push notifications</strong> for newly assigned bookings —
+    <a href="#" id="enableNotifLink">click here to Allow</a>.
+    Your phone will also play a tone and vibrate when the admin assigns you a new booking.
   </div>
 
   <div class="admin-wrap">
@@ -119,9 +119,9 @@
     <!-- ===== MY BOOKINGS ===== -->
     <div class="staff-pane active" id="stab-bookings">
       <div class="step-card">
-        <strong>📋 Aapko Assigned Bookings</strong>
-        — Admin jo bhi booking aapko assign karega, yahan turant dikhegi (har 30 sec mein refresh hoga).
-        Aap status update kar sakte ho: <strong>Processing</strong> (kaam shuru), <strong>Complete</strong> (kaam ho gaya), ya <strong>Cancelled</strong>.
+        <strong>📋 Bookings Assigned To You</strong>
+        — Any booking the admin assigns to you appears here instantly (auto-refresh every 30 seconds).
+        You can update the status: <strong>Processing</strong> (work started), <strong>Complete</strong> (work done), or <strong>Cancelled</strong>.
       </div>
 
       <div class="admin-stats">
@@ -134,8 +134,8 @@
       <div class="admin-card">
         <h3 style="color:var(--primary); margin-bottom:14px;">📋 My Assigned Bookings</h3>
         <p style="color:var(--text-light); font-size:13px; margin-bottom:14px;">
-          🔒 Note: Aap sirf <strong>Complete</strong> mark kar sakte ho — bhi description (notes) ke saath.
-          Status badalne ya cancel karne ke liye admin se baat karein. Ek baar assign ho jane ke baad booking dashboard se hatti nahi.
+          🔒 Note: You can only mark bookings <strong>Complete</strong> — along with notes (description).
+          To change the status or cancel a booking, talk to the admin. Once a booking is assigned, it stays on your dashboard.
         </p>
         <div class="admin-toolbar">
           <input type="text" id="myBookingSearch" placeholder="🔍 Search name, phone, service, city...">
@@ -168,8 +168,8 @@
     <!-- ===== SOURCES ===== -->
     <div class="staff-pane" id="stab-sources" style="display:none;">
       <div class="step-card">
-        <strong>🗂️ Sources / Inventory</strong> — Yahan se aap apne saare service providers / inventory entries add aur manage kar sakte hain.
-        Admin sab kuch dekh sakta hai. Sirf <strong>Active</strong> service areas (city + area) mein hi entries add ki ja sakti hain.
+        <strong>🗂️ Sources / Inventory</strong> — Add and manage all your service providers / inventory entries here.
+        The admin can see everything. Entries can only be added in <strong>Active</strong> service areas (city + area).
       </div>
 
       <div class="admin-stats" id="staffStats"></div>
@@ -229,8 +229,8 @@
         <div class="form-group">
           <label>Completion Notes / Description *</label>
           <textarea name="notes" required rows="5"
-                    placeholder="Yeh kaam kaise complete hua, kitna time laga, customer ka feedback, payment received ya nahi, koi issue tha kya — sab detail likhein."></textarea>
-          <p class="help-text">Yeh notes admin ke dashboard mein dikhenge. Detail mein likhein taaki record clear ho.</p>
+                    placeholder="How was the work completed, how long did it take, customer feedback, whether payment was received, any issues — write everything in detail."></textarea>
+          <p class="help-text">These notes appear on the admin dashboard. Write in detail so the record is clear.</p>
         </div>
         <div class="modal-actions">
           <button type="button" class="btn btn-outline" id="completeCancelBtn" style="border-color:#999;color:#666;">Cancel</button>

@@ -47,7 +47,7 @@ window.SITE_CONFIG = {
     slides: [
       { id: 's1', enabled: true, icon: '🚗', title: 'Rental Cars',           subtitle: 'Premium & budget cars for travel and events',        background_url: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1900&q=80&auto=format&fit=crop', link: 'rental-cars.html',       order: 1 },
       { id: 's2', enabled: true, icon: '🏠', title: 'Rooms & Flats',         subtitle: 'Quick rentals — rooms, flats, PG, properties',       background_url: 'https://images.unsplash.com/photo-1501183638710-841dd1904471?w=1900&q=80&auto=format&fit=crop', link: 'rooms-flats.html',       order: 2 },
-      { id: 's3', enabled: true, icon: '🧱', title: 'Construction Labor',    subtitle: 'Mistri, mazdoor, thekedar — sab ek call par',         background_url: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=1900&q=80&auto=format&fit=crop', link: 'construction.html',      order: 3 },
+      { id: 's3', enabled: true, icon: '🧱', title: 'Construction Labor',    subtitle: 'Mistri, mazdoor, thekedar — all just one call away',  background_url: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=1900&q=80&auto=format&fit=crop', link: 'construction.html',      order: 3 },
       { id: 's4', enabled: true, icon: '📚', title: 'Home Tutors',           subtitle: 'Qualified tutors for every class & subject',          background_url: 'https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=1900&q=80&auto=format&fit=crop', link: 'home-tutor.html',        order: 4 },
       { id: 's5', enabled: true, icon: '👷', title: 'Manpower Supply',       subtitle: 'Skilled & unskilled manpower on demand',              background_url: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1900&q=80&auto=format&fit=crop', link: 'manpower-supply.html',   order: 5 },
       { id: 's6', enabled: true, icon: '💍', title: 'Marriage Services',     subtitle: 'Decoration, catering, rentals — A to Z',              background_url: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=1900&q=80&auto=format&fit=crop', link: 'marriage-services.html', order: 6 },
@@ -508,7 +508,7 @@ function applyBranding() {
   });
   document.querySelectorAll('a[data-whatsapp-link]').forEach(a => {
     const wa = (cfg.whatsappNumber || '').replace(/[^0-9]/g, '');
-    const txt = a.getAttribute('data-message') || `Hi ${cfg.businessName || ''}, mujhe service chahiye.`;
+    const txt = a.getAttribute('data-message') || `Hi ${cfg.businessName || ''}, I need a service.`;
     a.href = `https://wa.me/${wa}?text=${encodeURIComponent(txt)}`;
   });
   document.querySelectorAll('[data-brand-email]').forEach(el => {
@@ -971,7 +971,7 @@ function paintGalleryGrid(mount) {
     if (searchInput || catSelect) {
       mount.innerHTML = `<div class="empty-state" style="padding:60px 20px;text-align:center;color:var(--text-light);">
         <div style="font-size:48px;">🖼️</div>
-        <p>Filter ke hisab se koi image nahi mili. Search clear karein ya alag category select karein.</p>
+        <p>No images match your filter. Clear the search or pick a different category.</p>
       </div>`;
     } else {
       mount.innerHTML = '';
