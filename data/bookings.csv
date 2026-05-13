@@ -1,3 +1,3 @@
-id,timestamp,name,phone,service,city,area,address,message,status,assigned_to,assigned_at,completion_notes,completed_at
-BK177813676958192,2026-05-07T06:52:49.581Z,jeevas helpinghand,0123456789,Rental Cars,Jaipur,,jaipur,test,Processing,,,,
-BK177813689236163,2026-05-07T06:54:52.361Z,jeevas helpinghand,0123456789,Rental Cars,Jaipur,,jaipur,fsdfsdf,Complete,,,,
+id,timestamp,name,phone,service,city,area,address,message,status,assigned_to,assigned_at,completion_notes,completed_at,internal_notes
+BK177813676958192,2026-05-07T06:52:49.581Z,jeevas helpinghand,0123456789,Rental Cars,Jaipur,,jaipur,test,Processing,,,,,
+BK177813689236163,2026-05-07T06:54:52.361Z,jeevas helpinghand,0123456789,Rental Cars,Jaipur,,jaipur,fsdfsdf,Complete,ram@gmail.com,2026-05-13T10:46:03.092Z,,,"[{""at"":""2026-05-13T10:46:03.092Z"",""by"":""admin"",""role"":""admin"",""kind"":""assigned"",""text"":""Assigned to ram@gmail.com""}]"
