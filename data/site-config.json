@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updated_at": "2026-05-13T13:08:30.047Z",
+  "updated_at": "2026-05-13T13:12:44.247Z",
   "branding": {
     "site_name": "Call4All",
     "tagline": "One Call. Every Service. Done.",
@@ -8,14 +8,14 @@
     "logo_height": 55
   },
   "theme": {
-    "preset": "resort",
-    "primary": "#1f3a2e",
-    "primary_dark": "#122318",
-    "accent": "#c9a36a",
-    "accent_dark": "#a17f47",
-    "background": "#faf6ef",
-    "festival_overlay": "none",
-    "festival_banner": ""
+    "preset": "independence",
+    "primary": "#138808",
+    "primary_dark": "#0c5a05",
+    "accent": "#ff9933",
+    "accent_dark": "#cc7a29",
+    "background": "#ffffff",
+    "festival_overlay": "independence",
+    "festival_banner": "🇮🇳 Jai Hind! Happy Independence Day 🇮🇳"
   },
   "contact": {
     "phone": "+917737353588",
