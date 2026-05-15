@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updated_at": "2026-05-15T13:08:38.515Z",
+  "updated_at": "2026-05-15T13:12:52.379Z",
   "branding": {
     "site_name": "Call4All",
     "tagline": "One Call. Every Service. Done.",
@@ -8,12 +8,12 @@
     "logo_height": 55
   },
   "theme": {
-    "preset": "auto",
-    "primary": "#1f3a2e",
-    "primary_dark": "#122318",
-    "accent": "#c9a36a",
-    "accent_dark": "#a17f47",
-    "background": "#faf6ef",
+    "preset": "default",
+    "primary": "#1e3c72",
+    "primary_dark": "#142850",
+    "accent": "#ffcc00",
+    "accent_dark": "#e6b800",
+    "background": "#ffffff",
     "festival_overlay": "none",
     "festival_banner": ""
   },
