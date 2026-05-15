@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updated_at": "2026-05-14T06:35:05.031Z",
+  "updated_at": "2026-05-15T11:00:52.702Z",
   "branding": {
     "site_name": "Call4All",
     "tagline": "One Call. Every Service. Done.",
@@ -9,7 +9,7 @@
   },
   "theme": {
     "preset": "resort",
-    "primary": "#1f3a2e",
+    "primary": "#1e3c72",
     "primary_dark": "#122318",
     "accent": "#c9a36a",
     "accent_dark": "#a17f47",
