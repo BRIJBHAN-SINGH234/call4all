@@ -2178,15 +2178,18 @@ function populateThemeForm() {
 }
 
 function readThemeFromForm() {
+  const existing = (siteConfigData.json && siteConfigData.json.theme) || {};
   return {
-    preset: (siteConfigData.json && siteConfigData.json.theme && siteConfigData.json.theme.preset) || 'custom',
+    preset: existing.preset || 'custom',
     primary: document.getElementById('th_primary').value,
     primary_dark: document.getElementById('th_primary_dark').value,
     accent: document.getElementById('th_accent').value,
     accent_dark: document.getElementById('th_accent_dark').value,
     background: document.getElementById('th_background').value,
     festival_overlay: document.getElementById('th_festival_overlay').value,
-    festival_banner: document.getElementById('th_festival_banner').value
+    festival_banner: document.getElementById('th_festival_banner').value,
+    // Preserve the preset's themed logo so saving Theme keeps logo in sync.
+    logo: existing.logo
   };
 }
 
@@ -2233,7 +2236,21 @@ function applyPresetToForm(presetKey) {
   if (!preset) return;
   if (!siteConfigData.json) siteConfigData.json = buildDefaultSiteConfig();
   siteConfigData.json.theme = { ...preset, preset: presetKey };
+  // Auto-sync the matching themed 3D logo whenever a preset is picked, so
+  // admin doesn't have to also visit the Branding tab. Custom upload still
+  // wins later because the upload writes branding.logo_url at save time.
+  if (preset.logo) {
+    siteConfigData.json.branding = siteConfigData.json.branding || {};
+    siteConfigData.json.branding.logo_url = preset.logo;
+    if (window.SITE_CONFIG) window.SITE_CONFIG.logoUrl = preset.logo;
+  }
   populateThemeForm();
+  // Re-render branding tab pieces (the logo grid + current preview) so the
+  // newly-active logo shows even if user hasn't switched tabs.
+  renderLogoStyleGrid();
+  refreshCurrentLogoPreview();
+  if (typeof applyBranding === 'function') applyBranding();
+  if (typeof rerenderSiteShell === 'function') rerenderSiteShell();
 }
 
 /* ===== BRANDING ===== */
@@ -2506,16 +2523,110 @@ function populateBrandingForm() {
   document.getElementById('br_tagline').value = b.tagline || '';
   document.getElementById('br_logo_height').value = b.logo_height || 55;
   document.getElementById('br_about_text').value = f.about_text || '';
-  const preview = document.getElementById('currentLogoPreview');
-  if (preview && b.logo_url) {
-    if (b.logo_url.startsWith('assets/uploads/')) {
-      preview.src = `https://raw.githubusercontent.com/${window.SITE_CONFIG.github.owner}/${window.SITE_CONFIG.github.repo}/${window.SITE_CONFIG.github.branch}/${b.logo_url}`;
-    } else {
-      preview.src = b.logo_url;
-    }
-  }
+  refreshCurrentLogoPreview();
+  renderLogoStyleGrid();
   // Refresh the PWA icon live preview from the current logo
   refreshAppIconPreview();
+}
+
+/* Re-render the small "Current Logo" thumbnail in branding tab so it always
+ * matches whatever logo_url is in siteConfigData (uploaded file, themed SVG,
+ * or 'auto-3d' inline svg). */
+function refreshCurrentLogoPreview() {
+  const box = document.getElementById('currentLogoPreviewBox');
+  const img = document.getElementById('currentLogoPreview');
+  if (!box) return;
+  const b = (siteConfigData.json && siteConfigData.json.branding) || {};
+  const url = b.logo_url || 'Imagelogo.png';
+  if (url === 'auto-3d') {
+    if (typeof renderAutoLogoSvg === 'function') {
+      box.innerHTML = renderAutoLogoSvg({ size: 80 });
+    } else if (img) {
+      img.src = 'assets/icons/themed-logos/logo-3d-auto.svg';
+    }
+    return;
+  }
+  if (!img) {
+    box.innerHTML = `<img id="currentLogoPreview" src="${url}" alt="Current logo" style="max-height:80px;max-width:100%;">`;
+    return;
+  }
+  if (url.startsWith('assets/uploads/') && window.SITE_CONFIG && window.SITE_CONFIG.github) {
+    img.src = `https://raw.githubusercontent.com/${window.SITE_CONFIG.github.owner}/${window.SITE_CONFIG.github.repo}/${window.SITE_CONFIG.github.branch}/${url}`;
+  } else {
+    img.src = url;
+  }
+}
+
+/* Render the 3D Logo Style picker grid in the Branding tab.
+ * Each card represents one of the themed SVG logos (or the special
+ * inline "auto-3d" logo). Click selects that logo as the active site logo. */
+const LOGO_STYLE_CHOICES = [
+  { id: 'auto', file: 'auto-3d',                                           label: 'Auto 3D',       meta: 'Theme color follows live', badge: 'Recommended' },
+  { id: 'default',     file: 'assets/icons/themed-logos/logo-3d-default.svg',     label: 'Default',       meta: 'Brand classic' },
+  { id: 'resort',      file: 'assets/icons/themed-logos/logo-3d-resort.svg',      label: 'Resort',        meta: 'Calm green & gold' },
+  { id: 'diwali',      file: 'assets/icons/themed-logos/logo-3d-diwali.svg',      label: 'Diwali',        meta: 'Festive lamps' },
+  { id: 'holi',        file: 'assets/icons/themed-logos/logo-3d-holi.svg',        label: 'Holi',          meta: 'Color burst' },
+  { id: 'christmas',   file: 'assets/icons/themed-logos/logo-3d-christmas.svg',   label: 'Christmas',     meta: 'Snow & spruce' },
+  { id: 'eid',         file: 'assets/icons/themed-logos/logo-3d-eid.svg',         label: 'Eid',           meta: 'Crescent moon' },
+  { id: 'independence',file: 'assets/icons/themed-logos/logo-3d-independence.svg',label: 'Independence',  meta: 'Tricolor pride' },
+  { id: 'summer',      file: 'assets/icons/themed-logos/logo-3d-summer.svg',      label: 'Summer',        meta: 'Sun & ocean' }
+];
+
+function renderLogoStyleGrid() {
+  const grid = document.getElementById('logoStyleGrid');
+  if (!grid) return;
+  const b = (siteConfigData.json && siteConfigData.json.branding) || {};
+  const current = b.logo_url || '';
+
+  grid.innerHTML = LOGO_STYLE_CHOICES.map(choice => {
+    const isActive = (choice.file === current) ||
+                     (choice.file === 'auto-3d' && current === 'auto-3d');
+    const thumb = (choice.file === 'auto-3d')
+      ? `<div class="lsc-thumb lsc-thumb-auto">${
+          (typeof renderAutoLogoSvg === 'function')
+            ? renderAutoLogoSvg({ size: 64 })
+            : `<img src="assets/icons/themed-logos/logo-3d-auto.svg" alt="Auto 3D logo">`
+        }</div>`
+      : `<div class="lsc-thumb"><img src="${choice.file}" alt="${choice.label} logo"></div>`;
+    return `
+      <div class="logo-style-card ${isActive ? 'active' : ''}" data-logo-file="${choice.file}" data-logo-id="${choice.id}" role="button" tabindex="0" aria-pressed="${isActive}">
+        ${thumb}
+        <div class="lsc-name">${choice.label}</div>
+        <div class="lsc-meta">${choice.meta}</div>
+        ${choice.badge ? `<div class="lsc-badge">${choice.badge}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+
+  const select = (file) => {
+    siteConfigData.json = siteConfigData.json || buildDefaultSiteConfig();
+    siteConfigData.json.branding = siteConfigData.json.branding || {};
+    siteConfigData.json.branding.logo_url = file;
+    grid.querySelectorAll('.logo-style-card').forEach(c => {
+      const isActiveCard = c.dataset.logoFile === file;
+      c.classList.toggle('active', isActiveCard);
+      c.setAttribute('aria-pressed', isActiveCard ? 'true' : 'false');
+    });
+    refreshCurrentLogoPreview();
+    if (window.SITE_CONFIG) {
+      window.SITE_CONFIG.logoUrl = file;
+      if (typeof applyBranding === 'function') applyBranding();
+      if (typeof rerenderSiteShell === 'function') rerenderSiteShell();
+    }
+    showMsg('brandingMsg',
+      'Logo style selected. Click "💾 Save Branding" to make it live for everyone.',
+      'success');
+  };
+
+  grid.querySelectorAll('.logo-style-card').forEach(card => {
+    card.addEventListener('click', () => select(card.dataset.logoFile));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        select(card.dataset.logoFile);
+      }
+    });
+  });
 }
 
 /* ===== CONTACT ===== */

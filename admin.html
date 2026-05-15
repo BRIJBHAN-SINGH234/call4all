@@ -801,12 +801,12 @@
           <div class="form-row">
             <div class="form-group">
               <label>Current Logo</label>
-              <div style="background:#f8f9fb;padding:14px;border-radius:8px;text-align:center;border:1px solid #e1e5eb;">
+              <div id="currentLogoPreviewBox" style="background:#f8f9fb;padding:14px;border-radius:8px;text-align:center;border:1px solid #e1e5eb;">
                 <img id="currentLogoPreview" src="Imagelogo.png" alt="Current logo" style="max-height:80px;max-width:100%;">
               </div>
             </div>
             <div class="form-group">
-              <label>Upload New Logo</label>
+              <label>Upload Custom Logo (overrides 3D logo below)</label>
               <input type="file" id="br_logo_file" accept="image/png,image/jpeg,image/svg+xml,image/webp">
               <p class="help-text">Recommended: PNG/SVG, transparent background, max 500 KB.</p>
               <img id="newLogoPreview" class="image-preview" alt="Preview">
@@ -817,6 +817,24 @@
             <label>Logo Height (px)</label>
             <input type="number" id="br_logo_height" min="30" max="120" value="55">
             <p class="help-text">How large the logo should appear in the header.</p>
+          </div>
+
+          <!-- ===== 3D LOGO STYLE PICKER ===== -->
+          <div class="form-group" style="margin-top:8px;">
+            <label style="display:flex;align-items:center;gap:8px;">
+              🎨 3D Logo Style
+              <span style="font-weight:400;font-size:12px;color:var(--text-light);">(theme ke according alag logo)</span>
+            </label>
+            <p class="help-text" style="margin-top:0;margin-bottom:10px;">
+              Click any logo below to use it as the active site logo.
+              <strong>"Auto 3D"</strong> wala logo theme color ke saath automatic update hota hai —
+              har preset ke liye alag logo banane ki zaroorat nahi.
+              Custom file upload (upar) ye selection ko override kar dega.
+            </p>
+            <div id="logoStyleGrid" class="logo-style-grid"></div>
+            <p class="help-text" style="margin-top:8px;">
+              Tip: Festival preset (Theme tab) pick karne par yahan ka logo bhi automatic match ho jayega.
+            </p>
           </div>
           <div class="form-group">
             <label>About Text (footer)</label>
