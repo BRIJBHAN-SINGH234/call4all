@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updated_at": "2026-05-15T11:08:45.509Z",
+  "updated_at": "2026-05-15T13:08:29.075Z",
   "branding": {
     "site_name": "Call4All",
     "tagline": "One Call. Every Service. Done.",
@@ -8,7 +8,7 @@
     "logo_height": 55
   },
   "theme": {
-    "preset": "resort",
+    "preset": "auto",
     "primary": "#1f3a2e",
     "primary_dark": "#122318",
     "accent": "#c9a36a",
