@@ -1,60 +1,52 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Call4All - 3D themed logo (Summer: Orange + Cream) -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Call4All Logo">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Call4All summer logo">
+  <title>Call4All summer</title>
   <defs>
-    <radialGradient id="c4_bg" cx="38%" cy="32%" r="78%">
-      <stop offset="0%"  stop-color="#ffffff"/>
-      <stop offset="80%" stop-color="#fffaf0"/>
-      <stop offset="100%" stop-color="#ffe9c4"/>
-    </radialGradient>
-    <linearGradient id="c4_ring" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"   stop-color="#fff0c0"/>
-      <stop offset="35%"  stop-color="#ffd180"/>
-      <stop offset="70%"  stop-color="#e6b366"/>
-      <stop offset="100%" stop-color="#8a5e1e"/>
+    <linearGradient id="ringG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="50%" stop-color="#eab308"/>
+      <stop offset="100%" stop-color="#854d0e"/>
     </linearGradient>
-    <linearGradient id="c4_letters" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"   stop-color="#ffb37a"/>
-      <stop offset="35%"  stop-color="#ff7a1f"/>
-      <stop offset="70%"  stop-color="#e65100"/>
-      <stop offset="100%" stop-color="#7a2c00"/>
+    <linearGradient id="cG" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0%" stop-color="#7dd3fc"/>
+      <stop offset="45%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#075985"/>
     </linearGradient>
-    <filter id="c4_drop" x="-25%" y="-25%" width="150%" height="150%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="3.5"/>
-      <feOffset dx="2" dy="5"/>
-      <feComponentTransfer><feFuncA type="linear" slope="0.45"/></feComponentTransfer>
-      <feMerge>
-        <feMergeNode/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+    <linearGradient id="fourG" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0%" stop-color="#7dd3fc"/>
+      <stop offset="50%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#075985"/>
+    </linearGradient>
+    <filter id="emboss" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.2" flood-color="#000000" flood-opacity="0.45"/>
     </filter>
-    <filter id="c4_emboss" x="-10%" y="-10%" width="120%" height="120%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="1.2"/>
-      <feOffset dx="1.2" dy="1.5"/>
-      <feComponentTransfer><feFuncA type="linear" slope="0.6"/></feComponentTransfer>
-      <feMerge>
-        <feMergeNode/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+    <filter id="ringShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.6" flood-color="#000000" flood-opacity="0.35"/>
     </filter>
   </defs>
-  <g filter="url(#c4_drop)">
-    <circle cx="120" cy="120" r="116" fill="url(#c4_bg)"/>
-    <circle cx="120" cy="120" r="106" fill="none" stroke="url(#c4_ring)" stroke-width="9"/>
-    <circle cx="120" cy="120" r="100.5" fill="none" stroke="#8a5e1e" stroke-width="0.6" opacity="0.35"/>
-    <circle cx="120" cy="120" r="111.5" fill="none" stroke="#ffffff" stroke-width="0.6" opacity="0.7"/>
+
+  <!-- Outer 3D ring: thick gradient stroke + 2 hairlines for bevel -->
+  <g filter="url(#ringShadow)">
+    <circle cx="100" cy="100" r="89" fill="none" stroke="url(#ringG)" stroke-width="9"/>
+    <circle cx="100" cy="100" r="93.5" fill="none" stroke="#854d0e" stroke-width="0.6" opacity="0.55"/>
+    <circle cx="100" cy="100" r="84.5" fill="none" stroke="#854d0e" stroke-width="0.6" opacity="0.55"/>
+    <circle cx="100" cy="100" r="93.5" fill="none" stroke="#fde047" stroke-width="0.5" opacity="0.45" transform="translate(0,-0.6)"/>
   </g>
-  <g filter="url(#c4_emboss)">
-    <text x="120" y="170" font-family="'Playfair Display', Georgia, 'Times New Roman', serif"
-          font-size="160" font-weight="700" text-anchor="middle"
-          fill="url(#c4_letters)" letter-spacing="-6">C4</text>
+
+  <!-- Big serif C, slightly left of centre, large enough to dominate the ring -->
+  <g filter="url(#emboss)">
+    <text x="74" y="155"
+          font-family="Georgia, 'Times New Roman', 'Liberation Serif', serif"
+          font-weight="700" font-size="195"
+          fill="url(#cG)"
+          text-anchor="middle">C</text>
   </g>
-  <path d="M 60 50 A 75 75 0 0 1 175 45" stroke="#ffffff" stroke-width="3.5"
-        fill="none" opacity="0.55" stroke-linecap="round"/>
-  <!-- Sun rays (top) -->
-  <g stroke="#ffd180" stroke-width="2" stroke-linecap="round" opacity="0.75">
-    <line x1="120" y1="6" x2="120" y2="14"/>
-    <line x1="170" y1="20" x2="166" y2="27"/>
-    <line x1="70"  y1="20" x2="74"  y2="27"/>
+
+  <!-- Serif 4 nested in the C's opening -->
+  <g filter="url(#emboss)">
+    <text x="125" y="143"
+          font-family="Georgia, 'Times New Roman', 'Liberation Serif', serif"
+          font-weight="700" font-size="118"
+          fill="url(#fourG)"
+          text-anchor="middle">4</text>
   </g>
 </svg>

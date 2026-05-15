@@ -213,53 +213,48 @@ function applyTheme(theme) {
      opts.size  — pixel height (default 55) */
 function renderAutoLogoSvg(opts) {
   const size = (opts && opts.size) || 55;
+  // Unique IDs per render so multiple logos on the same page (admin preview
+  // + header + grid card thumbnail) don't share / collide on gradients.
+  const u = 'a' + Math.random().toString(36).slice(2, 9);
   return (
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" ' +
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" ' +
     'role="img" aria-label="Call4All Logo" class="c4a-auto-logo c4a-brand-logo" ' +
-    'style="height:' + size + 'px;width:auto;display:block;">' +
+    'style="height:' + size + 'px;width:auto;display:block;color:var(--accent,#c9a36a);">' +
       '<defs>' +
-        '<radialGradient id="c4a_bg_inline" cx="38%" cy="32%" r="78%">' +
-          '<stop offset="0%" stop-color="#ffffff"/>' +
-          '<stop offset="100%" stop-color="#f7f3ec"/>' +
-        '</radialGradient>' +
-        '<linearGradient id="c4a_ring_inline" x1="0" y1="0" x2="0" y2="1">' +
-          '<stop offset="0%"   stop-color="#ffffff" stop-opacity="0.55"/>' +
-          '<stop offset="35%"  stop-color="currentColor"/>' +
-          '<stop offset="70%"  stop-color="currentColor"/>' +
-          '<stop offset="100%" stop-color="#000000" stop-opacity="0.55"/>' +
+        '<linearGradient id="' + u + '_ring" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0%"   stop-color="#ffffff" stop-opacity="0.7"/>' +
+          '<stop offset="50%"  stop-color="currentColor"/>' +
+          '<stop offset="100%" stop-color="var(--accent-dark,#7a5e2e)"/>' +
         '</linearGradient>' +
-        '<linearGradient id="c4a_letters_inline" x1="0" y1="0" x2="0" y2="1">' +
-          '<stop offset="0%"   stop-color="#ffffff" stop-opacity="0.65"/>' +
-          '<stop offset="30%"  stop-color="currentColor"/>' +
-          '<stop offset="70%"  stop-color="currentColor"/>' +
-          '<stop offset="100%" stop-color="#000000" stop-opacity="0.45"/>' +
+        '<linearGradient id="' + u + '_c" x1="0.1" y1="0" x2="0.9" y2="1">' +
+          '<stop offset="0%"   stop-color="#ffffff" stop-opacity="0.7"/>' +
+          '<stop offset="45%"  stop-color="currentColor"/>' +
+          '<stop offset="100%" stop-color="var(--accent-dark,#7a5e2e)"/>' +
         '</linearGradient>' +
-        '<filter id="c4a_drop_inline" x="-25%" y="-25%" width="150%" height="150%">' +
-          '<feGaussianBlur in="SourceAlpha" stdDeviation="3.5"/>' +
-          '<feOffset dx="2" dy="5"/>' +
-          '<feComponentTransfer><feFuncA type="linear" slope="0.45"/></feComponentTransfer>' +
-          '<feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>' +
-        '</filter>' +
-        '<filter id="c4a_emboss_inline" x="-10%" y="-10%" width="120%" height="120%">' +
-          '<feGaussianBlur in="SourceAlpha" stdDeviation="1.2"/>' +
-          '<feOffset dx="1.2" dy="1.5"/>' +
-          '<feComponentTransfer><feFuncA type="linear" slope="0.6"/></feComponentTransfer>' +
-          '<feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>' +
+        '<linearGradient id="' + u + '_4" x1="0" y1="0" x2="0.4" y2="1">' +
+          '<stop offset="0%"   stop-color="#ffffff" stop-opacity="0.7"/>' +
+          '<stop offset="50%"  stop-color="currentColor"/>' +
+          '<stop offset="100%" stop-color="var(--accent-dark,#7a5e2e)"/>' +
+        '</linearGradient>' +
+        '<filter id="' + u + '_emb" x="-20%" y="-20%" width="140%" height="140%">' +
+          '<feDropShadow dx="0" dy="2" stdDeviation="2.2" flood-color="#000000" flood-opacity="0.45"/>' +
         '</filter>' +
       '</defs>' +
-      '<g filter="url(#c4a_drop_inline)">' +
-        '<circle cx="120" cy="120" r="116" fill="url(#c4a_bg_inline)"/>' +
-        '<circle cx="120" cy="120" r="106" fill="none" stroke="url(#c4a_ring_inline)" stroke-width="9"/>' +
-        '<circle cx="120" cy="120" r="100.5" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.35"/>' +
-        '<circle cx="120" cy="120" r="111.5" fill="none" stroke="#ffffff" stroke-width="0.6" opacity="0.7"/>' +
+      '<g filter="url(#' + u + '_emb)">' +
+        '<circle cx="100" cy="100" r="89" fill="none" stroke="url(#' + u + '_ring)" stroke-width="9"/>' +
+        '<circle cx="100" cy="100" r="93.5" fill="none" stroke="var(--accent-dark,#7a5e2e)" stroke-width="0.6" opacity="0.55"/>' +
+        '<circle cx="100" cy="100" r="84.5" fill="none" stroke="var(--accent-dark,#7a5e2e)" stroke-width="0.6" opacity="0.55"/>' +
       '</g>' +
-      '<g filter="url(#c4a_emboss_inline)">' +
-        '<text x="120" y="170" font-family="\'Playfair Display\', Georgia, \'Times New Roman\', serif" ' +
-        'font-size="160" font-weight="700" text-anchor="middle" ' +
-        'fill="url(#c4a_letters_inline)" letter-spacing="-6">C4</text>' +
+      '<g filter="url(#' + u + '_emb)">' +
+        '<text x="74" y="155" font-family="Georgia, \'Times New Roman\', \'Liberation Serif\', serif" ' +
+        'font-weight="700" font-size="195" text-anchor="middle" ' +
+        'fill="url(#' + u + '_c)">C</text>' +
       '</g>' +
-      '<path d="M 60 50 A 75 75 0 0 1 175 45" stroke="#ffffff" stroke-width="3.5" ' +
-      'fill="none" opacity="0.55" stroke-linecap="round"/>' +
+      '<g filter="url(#' + u + '_emb)">' +
+        '<text x="125" y="143" font-family="Georgia, \'Times New Roman\', \'Liberation Serif\', serif" ' +
+        'font-weight="700" font-size="118" text-anchor="middle" ' +
+        'fill="url(#' + u + '_4)">4</text>' +
+      '</g>' +
     '</svg>'
   );
 }
