@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Call4All - 3D themed logo (Holi: Pink + Yellow) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Call4All Logo">
+  <defs>
+    <radialGradient id="c4_bg" cx="38%" cy="32%" r="78%">
+      <stop offset="0%"  stop-color="#ffffff"/>
+      <stop offset="80%" stop-color="#fff5f8"/>
+      <stop offset="100%" stop-color="#ffe2ef"/>
+    </radialGradient>
+    <linearGradient id="c4_ring" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#fff8a8"/>
+      <stop offset="35%"  stop-color="#ffeb3b"/>
+      <stop offset="70%"  stop-color="#fbc02d"/>
+      <stop offset="100%" stop-color="#9c7c1f"/>
+    </linearGradient>
+    <linearGradient id="c4_letters" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#ff7aae"/>
+      <stop offset="35%"  stop-color="#e83e7e"/>
+      <stop offset="70%"  stop-color="#c2185b"/>
+      <stop offset="100%" stop-color="#5e0a30"/>
+    </linearGradient>
+    <filter id="c4_drop" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3.5"/>
+      <feOffset dx="2" dy="5"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.45"/></feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="c4_emboss" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.2"/>
+      <feOffset dx="1.2" dy="1.5"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.6"/></feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#c4_drop)">
+    <circle cx="120" cy="120" r="116" fill="url(#c4_bg)"/>
+    <circle cx="120" cy="120" r="106" fill="none" stroke="url(#c4_ring)" stroke-width="9"/>
+    <circle cx="120" cy="120" r="100.5" fill="none" stroke="#9c7c1f" stroke-width="0.6" opacity="0.35"/>
+    <circle cx="120" cy="120" r="111.5" fill="none" stroke="#ffffff" stroke-width="0.6" opacity="0.7"/>
+  </g>
+  <g filter="url(#c4_emboss)">
+    <text x="120" y="170" font-family="'Playfair Display', Georgia, 'Times New Roman', serif"
+          font-size="160" font-weight="700" text-anchor="middle"
+          fill="url(#c4_letters)" letter-spacing="-6">C4</text>
+  </g>
+  <path d="M 60 50 A 75 75 0 0 1 175 45" stroke="#ffffff" stroke-width="3.5"
+        fill="none" opacity="0.55" stroke-linecap="round"/>
+  <!-- Color splash accents -->
+  <circle cx="50" cy="80" r="5" fill="#56ab2f" opacity="0.65"/>
+  <circle cx="195" cy="100" r="4" fill="#12c2e9" opacity="0.65"/>
+  <circle cx="200" cy="160" r="3" fill="#ff6b9d" opacity="0.7"/>
+</svg>

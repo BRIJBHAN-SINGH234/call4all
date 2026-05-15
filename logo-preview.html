@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logo Preview — Call4All Themed 3D Logos</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+  body {
+    background: linear-gradient(180deg, var(--bg-cream), #fff);
+    min-height: 100vh;
+    padding: 40px 22px 80px;
+    font-family: var(--font-body);
+  }
+  .lp-wrap { max-width: 1240px; margin: 0 auto; }
+  .lp-head {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .lp-head h1 {
+    font-family: var(--font-heading);
+    color: var(--primary);
+    font-size: clamp(28px, 4vw, 42px);
+    margin-bottom: 8px;
+  }
+  .lp-head p {
+    color: var(--text-light);
+    max-width: 720px;
+    margin: 0 auto 14px;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .lp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+  }
+  .lp-card {
+    background: linear-gradient(180deg, #ffffff 0%, #faf6ef 100%);
+    border-radius: 18px;
+    padding: 28px 22px 22px;
+    text-align: center;
+    border: 1px solid rgba(31,58,46,0.06);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.9) inset,
+      0 4px 8px rgba(20,35,24,0.06),
+      0 18px 30px -10px rgba(20,35,24,0.18);
+    transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s ease;
+  }
+  .lp-card:hover {
+    transform: translateY(-6px);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.9) inset,
+      0 24px 40px -10px rgba(20,35,24,0.24),
+      0 50px 90px -30px rgba(20,35,24,0.30);
+  }
+  .lp-card .lp-logo {
+    width: 160px;
+    height: 160px;
+    margin: 0 auto 16px;
+    display: block;
+  }
+  .lp-card h3 {
+    font-family: var(--font-heading);
+    color: var(--primary);
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+  .lp-card .lp-meta {
+    font-size: 12px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .lp-card .lp-path {
+    margin-top: 12px;
+    font-family: monospace;
+    font-size: 11px;
+    color: var(--accent-dark);
+    word-break: break-all;
+    background: var(--bg-cream);
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(74,52,22,0.10);
+  }
+  .lp-swatches {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    margin-top: 10px;
+  }
+  .lp-sw {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+  .lp-auto-card {
+    grid-column: span 2;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .lp-auto-card h3 { color: #fff; }
+  .lp-auto-card .lp-meta { color: rgba(255,255,255,0.75); }
+  .lp-auto-card .lp-path { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.20); color: #fff; }
+  .lp-auto-card .lp-themer {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+  }
+  .lp-auto-card .lp-themer button {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.35);
+    padding: 4px 10px;
+    border-radius: 14px;
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all .25s ease;
+  }
+  .lp-auto-card .lp-themer button:hover {
+    background: rgba(255,255,255,0.30);
+    transform: translateY(-1px);
+  }
+  @media (max-width: 600px) {
+    .lp-auto-card { grid-column: span 1; }
+  }
+</style>
+</head>
+<body>
+<div class="lp-wrap">
+  <div class="lp-head">
+    <h1>Call4All — 3D Themed Logos</h1>
+    <p>Har theme ke liye alag 3D logo. Admin panel mein "Theme &amp; Festival" tab se preset pick karte hi logo automatic swap ho jayega. Yeh page sirf preview ke liye hai — production sitemap par index nahi hota.</p>
+    <p style="font-size:13px; color:var(--accent-dark);"><strong>Tip:</strong> Niche ki "Auto 3D" card par theme buttons click karke dekho — wo logo realtime mein color change karta hai.</p>
+  </div>
+
+  <div class="lp-grid">
+
+    <div class="lp-card">
+      <img src="assets/icons/themed-logos/logo-3d-resort.svg" class="lp-logo" alt="Resort">
+      <h3>Resort (Default)</h3>
+      <div class="lp-meta">Forest Green + Warm Gold</div>
+      <div class="lp-swatches">
+        <span class="lp-sw" style="background:#1f3a2e"></span>
+        <span class="lp-sw" style="background:#c9a36a"></span>
+        <span class="lp-sw" style="background:#a17f47"></span>
+        <span class="lp-sw" style="background:#faf6ef"></span>
+      </div>
+      <div class="lp-path">assets/icons/themed-logos/logo-3d-resort.svg</div>
+    </div>
+
+    <div class="lp-card">
+      <img src="assets/icons/themed-logos/logo-3d-default.svg" class="lp-logo" alt="Default">
+      <h3>Classic</h3>
+      <div class="lp-meta">Navy + Gold</div>
+      <div class="lp-swatches">
+        <span class="lp-sw" style="background:#1e3c72"></span>
+        <span class="lp-sw" style="background:#ffcc00"></span>
+        <span class="lp-sw" style="background:#e6b800"></span>
+        <span class="lp-sw" style="background:#ffffff"></span>
+      </div>
+      <div class="lp-path">assets/icons/themed-logos/logo-3d-default.svg</div>
+    </div>
+
+    <div class="lp-card">
+      <img src="assets/icons/themed-logos/logo-3d-diwali.svg" class="lp-logo" alt="Diwali">
+      <h3>Diwali</h3>
+      <div class="lp-meta">Maroon + Gold</div>
+      <div class="lp-swatches">
+        <span class="lp-sw" style="background:#8b0000"></span>
+        <span class="lp-sw" style="background:#ffd700"></span>
+        <span class="lp-sw" style="background:#daa520"></span>
+        <span class="lp-sw" style="background:#fff8e7"></span>
+      </div>
+      <div class="lp-path">assets/icons/themed-logos/logo-3d-diwali.svg</div>
+    </div>
+
+    <div class="lp-card">
+      <img src="assets/icons/themed-logos/logo-3d-holi.svg" class="lp-logo" alt="Holi">
+      <h3>Holi</h3>
+      <div class="lp-meta">Pink + Yellow</div>
+      <div class="lp-swatches">
+        <span class="lp-sw" style="background:#c2185b"></span>
+        <span class="lp-sw" style="background:#ffeb3b"></span>
+        <span class="lp-sw" style="background:#fbc02d"></span>
+        <span class="lp-sw" style="background:#fff5f8"></span>
+      </div>
+      <div class="lp-path">assets/icons/themed-logos/logo-3d-holi.svg</div>
+    </div>
+
+    <div class="lp-card">
+      <img src="assets/icons/themed-logos/logo-3d-christmas.svg" class="lp-logo" alt="Christmas">
+      <h3>Christmas</h3>
+      <div class="lp-meta">Green + Red</div>
+      <div class="lp-swatches">
+        <span class="lp-sw" style="background:#0a5d2c"></span>
+        <span class="lp-sw" style="background:#d32f2f"></span>
+        <span class="lp-sw" style="background:#a01a1a"></span>
+        <span class="lp-sw" style="background:#f6fff6"></span>
+      </div>
+      <div class="lp-path">assets/icons/themed-logos/logo-3d-christmas.svg</div>
+    </div>
+
+    <div class="lp-card">
+      <img src="assets/icons/themed-logos/logo-3d-eid.svg" class="lp-logo" alt="Eid">
+      <h3>Eid</h3>
+      <div class="lp-meta">Green + Gold</div>
+      <div class="lp-swatches">
+        <span class="lp-sw" style="background:#0e7c5a"></span>
+        <span class="lp-sw" style="background:#ffd54f"></span>
+        <span class="lp-sw" style="background:#ffb300"></span>
+        <span class="lp-sw" style="background:#f3fbf7"></span>
+      </div>
+      <div class="lp-path">assets/icons/themed-logos/logo-3d-eid.svg</div>
+    </div>
+
+    <div class="lp-card">
+      <img src="assets/icons/themed-logos/logo-3d-independence.svg" class="lp-logo" alt="Independence">
+      <h3>Independence Day</h3>
+      <div class="lp-meta">Tricolor — Saffron + White + Green</div>
+      <div class="lp-swatches">
+        <span class="lp-sw" style="background:#ff9933"></span>
+        <span class="lp-sw" style="background:#ffffff"></span>
+        <span class="lp-sw" style="background:#138808"></span>
+        <span class="lp-sw" style="background:#1f3a8a"></span>
+      </div>
+      <div class="lp-path">assets/icons/themed-logos/logo-3d-independence.svg</div>
+    </div>
+
+    <div class="lp-card">
+      <img src="assets/icons/themed-logos/logo-3d-summer.svg" class="lp-logo" alt="Summer">
+      <h3>Summer</h3>
+      <div class="lp-meta">Orange + Cream</div>
+      <div class="lp-swatches">
+        <span class="lp-sw" style="background:#e65100"></span>
+        <span class="lp-sw" style="background:#ffd180"></span>
+        <span class="lp-sw" style="background:#e6b366"></span>
+        <span class="lp-sw" style="background:#fffaf0"></span>
+      </div>
+      <div class="lp-path">assets/icons/themed-logos/logo-3d-summer.svg</div>
+    </div>
+
+    <div class="lp-card lp-auto-card">
+      <div class="lp-logo" id="autoLogoMount"></div>
+      <h3>Auto 3D <span style="font-size:13px; opacity:.7;">(Live theme)</span></h3>
+      <div class="lp-meta">Follows --accent CSS variable</div>
+      <div class="lp-themer" id="autoThemer">
+        <button data-color="#c9a36a">Resort Gold</button>
+        <button data-color="#ffcc00">Classic Yellow</button>
+        <button data-color="#ffd700">Diwali Gold</button>
+        <button data-color="#ffeb3b">Holi Yellow</button>
+        <button data-color="#d32f2f">Christmas Red</button>
+        <button data-color="#ffd54f">Eid Gold</button>
+        <button data-color="#ff9933">Saffron</button>
+        <button data-color="#ffd180">Summer Orange</button>
+      </div>
+      <div class="lp-path">logoUrl: 'auto-3d' &nbsp; (rendered inline by site.js)</div>
+    </div>
+
+  </div>
+</div>
+
+<script src="assets/js/site.js"></script>
+<script>
+  // Mount the auto-themed 3D logo into the demo card
+  const mount = document.getElementById('autoLogoMount');
+  if (mount && typeof window.renderAutoLogoSvg === 'function') {
+    mount.innerHTML = window.renderAutoLogoSvg({ size: 160 });
+  }
+  // Wire the colour buttons to repaint the logo via CSS variable
+  document.getElementById('autoThemer').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    document.documentElement.style.setProperty('--accent', btn.dataset.color);
+  });
+</script>
+</body>
+</html>

@@ -2379,6 +2379,16 @@ body.festival-independence {
 .site-header .logo img {
   filter: drop-shadow(0 4px 8px rgba(20,35,24,0.18));
 }
+.site-header .logo .c4a-auto-logo,
+.site-header .logo .c4a-brand-logo {
+  filter: drop-shadow(0 4px 8px rgba(20,35,24,0.18));
+}
+/* Auto-themed inline SVG logo: takes its gold/accent color from the theme,
+   not from the surrounding link color. */
+.c4a-auto-logo {
+  color: var(--accent, #c9a36a);
+  transition: color .35s ease;
+}
 
 /* ---------- Footer 3D contact icons ---------- */
 .footer-section ul li {

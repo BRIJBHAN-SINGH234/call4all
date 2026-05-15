@@ -58,7 +58,11 @@ window.SITE_CONFIG = {
   pages: []
 };
 
-/* ===== Festival Theme Presets ===== */
+/* ===== Festival Theme Presets =====
+   Each preset can optionally include a `logo` URL — when the admin picks the
+   preset (or the theme is applied), the site logo is swapped to match the
+   theme. Use the special value 'auto-3d' to render the auto-themed inline SVG
+   that follows --primary / --accent CSS variables in real time. */
 window.FESTIVAL_PRESETS = {
   resort: {
     label: 'Luxury Resort (Forest + Gold) — RECOMMENDED',
@@ -69,7 +73,8 @@ window.FESTIVAL_PRESETS = {
     accent_dark: '#a17f47',
     background: '#faf6ef',
     festival_overlay: 'none',
-    festival_banner: ''
+    festival_banner: '',
+    logo: 'assets/icons/themed-logos/logo-3d-resort.svg'
   },
   default: {
     label: 'Classic (Navy + Gold)',
@@ -80,7 +85,8 @@ window.FESTIVAL_PRESETS = {
     accent_dark: '#e6b800',
     background: '#ffffff',
     festival_overlay: 'none',
-    festival_banner: ''
+    festival_banner: '',
+    logo: 'assets/icons/themed-logos/logo-3d-default.svg'
   },
   diwali: {
     label: 'Diwali (Maroon + Gold)',
@@ -91,7 +97,8 @@ window.FESTIVAL_PRESETS = {
     accent_dark: '#daa520',
     background: '#fff8e7',
     festival_overlay: 'diwali',
-    festival_banner: '🪔 Wishing you a Happy & Prosperous Diwali 🪔'
+    festival_banner: '🪔 Wishing you a Happy & Prosperous Diwali 🪔',
+    logo: 'assets/icons/themed-logos/logo-3d-diwali.svg'
   },
   holi: {
     label: 'Holi (Pink + Yellow)',
@@ -102,7 +109,8 @@ window.FESTIVAL_PRESETS = {
     accent_dark: '#fbc02d',
     background: '#fff5f8',
     festival_overlay: 'holi',
-    festival_banner: '🎨 Happy Holi - Colourful greetings to all! 🎨'
+    festival_banner: '🎨 Happy Holi - Colourful greetings to all! 🎨',
+    logo: 'assets/icons/themed-logos/logo-3d-holi.svg'
   },
   christmas: {
     label: 'Christmas (Green + Red)',
@@ -113,7 +121,8 @@ window.FESTIVAL_PRESETS = {
     accent_dark: '#a01a1a',
     background: '#f6fff6',
     festival_overlay: 'christmas',
-    festival_banner: '🎄 Merry Christmas & Happy New Year 🎄'
+    festival_banner: '🎄 Merry Christmas & Happy New Year 🎄',
+    logo: 'assets/icons/themed-logos/logo-3d-christmas.svg'
   },
   eid: {
     label: 'Eid (Green + Gold)',
@@ -124,7 +133,8 @@ window.FESTIVAL_PRESETS = {
     accent_dark: '#ffb300',
     background: '#f3fbf7',
     festival_overlay: 'eid',
-    festival_banner: '🌙 Eid Mubarak to all our customers ⭐'
+    festival_banner: '🌙 Eid Mubarak to all our customers ⭐',
+    logo: 'assets/icons/themed-logos/logo-3d-eid.svg'
   },
   independence: {
     label: 'Independence Day (Tricolor)',
@@ -135,7 +145,8 @@ window.FESTIVAL_PRESETS = {
     accent_dark: '#cc7a29',
     background: '#ffffff',
     festival_overlay: 'independence',
-    festival_banner: '🇮🇳 Jai Hind! Happy Independence Day 🇮🇳'
+    festival_banner: '🇮🇳 Jai Hind! Happy Independence Day 🇮🇳',
+    logo: 'assets/icons/themed-logos/logo-3d-independence.svg'
   },
   summer: {
     label: 'Summer (Orange + Cream)',
@@ -146,7 +157,23 @@ window.FESTIVAL_PRESETS = {
     accent_dark: '#e6b366',
     background: '#fffaf0',
     festival_overlay: 'none',
-    festival_banner: ''
+    festival_banner: '',
+    logo: 'assets/icons/themed-logos/logo-3d-summer.svg'
+  },
+  /* Special "auto-themed" entry — the logo follows --primary / --accent in
+     real time via inline SVG. Pick this if the admin wants ONE logo that
+     re-colors itself whenever the theme changes. */
+  auto: {
+    label: 'Auto 3D (follows current theme color)',
+    emoji: '✨',
+    primary: '#1f3a2e',
+    primary_dark: '#122318',
+    accent: '#c9a36a',
+    accent_dark: '#a17f47',
+    background: '#faf6ef',
+    festival_overlay: 'none',
+    festival_banner: '',
+    logo: 'auto-3d'
   }
 };
 
@@ -169,7 +196,74 @@ function applyTheme(theme) {
     }
     if (theme.background) document.body.style.background = theme.background;
   }
+
+  // Optional: theme can carry a `logo` URL (or the special 'auto-3d' value).
+  // When present, swap the active site logo so it matches the theme color.
+  if (theme.logo && window.SITE_CONFIG) {
+    window.SITE_CONFIG.logoUrl = theme.logo;
+  }
 }
+
+/* ===== Auto-themed 3D logo (inline SVG)  =====
+   Returns an inline SVG string for the auto-themed 3D Call4All monogram.
+   The ring + letters use currentColor / CSS variables, so the logo
+   automatically re-colors whenever the theme's --accent / --accent-dark
+   change (e.g. when the admin picks a different festival preset).
+   Public: window.renderAutoLogoSvg(opts)
+     opts.size  — pixel height (default 55) */
+function renderAutoLogoSvg(opts) {
+  const size = (opts && opts.size) || 55;
+  return (
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" ' +
+    'role="img" aria-label="Call4All Logo" class="c4a-auto-logo c4a-brand-logo" ' +
+    'style="height:' + size + 'px;width:auto;display:block;">' +
+      '<defs>' +
+        '<radialGradient id="c4a_bg_inline" cx="38%" cy="32%" r="78%">' +
+          '<stop offset="0%" stop-color="#ffffff"/>' +
+          '<stop offset="100%" stop-color="#f7f3ec"/>' +
+        '</radialGradient>' +
+        '<linearGradient id="c4a_ring_inline" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0%"   stop-color="#ffffff" stop-opacity="0.55"/>' +
+          '<stop offset="35%"  stop-color="currentColor"/>' +
+          '<stop offset="70%"  stop-color="currentColor"/>' +
+          '<stop offset="100%" stop-color="#000000" stop-opacity="0.55"/>' +
+        '</linearGradient>' +
+        '<linearGradient id="c4a_letters_inline" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0%"   stop-color="#ffffff" stop-opacity="0.65"/>' +
+          '<stop offset="30%"  stop-color="currentColor"/>' +
+          '<stop offset="70%"  stop-color="currentColor"/>' +
+          '<stop offset="100%" stop-color="#000000" stop-opacity="0.45"/>' +
+        '</linearGradient>' +
+        '<filter id="c4a_drop_inline" x="-25%" y="-25%" width="150%" height="150%">' +
+          '<feGaussianBlur in="SourceAlpha" stdDeviation="3.5"/>' +
+          '<feOffset dx="2" dy="5"/>' +
+          '<feComponentTransfer><feFuncA type="linear" slope="0.45"/></feComponentTransfer>' +
+          '<feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>' +
+        '</filter>' +
+        '<filter id="c4a_emboss_inline" x="-10%" y="-10%" width="120%" height="120%">' +
+          '<feGaussianBlur in="SourceAlpha" stdDeviation="1.2"/>' +
+          '<feOffset dx="1.2" dy="1.5"/>' +
+          '<feComponentTransfer><feFuncA type="linear" slope="0.6"/></feComponentTransfer>' +
+          '<feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>' +
+        '</filter>' +
+      '</defs>' +
+      '<g filter="url(#c4a_drop_inline)">' +
+        '<circle cx="120" cy="120" r="116" fill="url(#c4a_bg_inline)"/>' +
+        '<circle cx="120" cy="120" r="106" fill="none" stroke="url(#c4a_ring_inline)" stroke-width="9"/>' +
+        '<circle cx="120" cy="120" r="100.5" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.35"/>' +
+        '<circle cx="120" cy="120" r="111.5" fill="none" stroke="#ffffff" stroke-width="0.6" opacity="0.7"/>' +
+      '</g>' +
+      '<g filter="url(#c4a_emboss_inline)">' +
+        '<text x="120" y="170" font-family="\'Playfair Display\', Georgia, \'Times New Roman\', serif" ' +
+        'font-size="160" font-weight="700" text-anchor="middle" ' +
+        'fill="url(#c4a_letters_inline)" letter-spacing="-6">C4</text>' +
+      '</g>' +
+      '<path d="M 60 50 A 75 75 0 0 1 175 45" stroke="#ffffff" stroke-width="3.5" ' +
+      'fill="none" opacity="0.55" stroke-linecap="round"/>' +
+    '</svg>'
+  );
+}
+window.renderAutoLogoSvg = renderAutoLogoSvg;
 
 /* Resolve any asset path so it loads correctly from anywhere on the site.
  * Newly-uploaded files inside `assets/uploads/` are served via
@@ -489,10 +583,24 @@ window.injectStructuredData = injectStructuredData;
 function applyBranding() {
   const cfg = window.SITE_CONFIG;
   // Logos (uploaded ones are routed via raw.github so they work instantly)
-  document.querySelectorAll('[data-brand-logo]').forEach(img => {
-    img.src = assetUrl(cfg.logoUrl || 'Imagelogo.png');
-    img.alt = (cfg.businessName || 'Call4All') + ' Logo';
-    if (cfg.logoHeight) img.style.height = cfg.logoHeight + 'px';
+  document.querySelectorAll('[data-brand-logo]').forEach(el => {
+    if (cfg.logoUrl === 'auto-3d') {
+      // Replace <img> with inline SVG so it can follow CSS variables
+      const wrapper = document.createElement('span');
+      wrapper.innerHTML = renderAutoLogoSvg({ size: cfg.logoHeight || 55 });
+      const svg = wrapper.firstElementChild;
+      if (svg) {
+        // Preserve any data-attributes the original element had
+        Array.from(el.attributes).forEach(a => {
+          if (a.name.startsWith('data-')) svg.setAttribute(a.name, a.value);
+        });
+        el.replaceWith(svg);
+      }
+    } else if (el.tagName === 'IMG') {
+      el.src = assetUrl(cfg.logoUrl || 'Imagelogo.png');
+      el.alt = (cfg.businessName || 'Call4All') + ' Logo';
+      if (cfg.logoHeight) el.style.height = cfg.logoHeight + 'px';
+    }
   });
   document.querySelectorAll('[data-brand-name]').forEach(el => {
     el.textContent = cfg.businessName || 'Call4All';
@@ -712,14 +820,17 @@ function renderHeader(activePage) {
   const linkHtml = links.map(l =>
     `<li><a href="${l.href}" ${activePage === l.key ? 'class="active"' : ''}>${escapeHtml(l.label)}</a></li>`
   ).join('');
-  const logoStyle = cfg.logoHeight ? `style="height:${cfg.logoHeight}px"` : '';
-  const logoUrl = assetUrl(cfg.logoUrl || 'Imagelogo.png');
+  const logoHeight = cfg.logoHeight || 55;
   const brandName = escapeHtml(cfg.businessName || 'Call4All');
   const tagline = cfg.tagline ? `<span class="brand-tagline">${escapeHtml(cfg.tagline)}</span>` : '';
+  // Special sentinel: 'auto-3d' renders the auto-themed inline SVG instead of an <img>
+  const logoMarkup = (cfg.logoUrl === 'auto-3d')
+    ? renderAutoLogoSvg({ size: logoHeight })
+    : `<img src="${assetUrl(cfg.logoUrl || 'Imagelogo.png')}" alt="${brandName} Logo" style="height:${logoHeight}px">`;
   return `
     <header class="site-header">
       <a class="logo" href="index.html" aria-label="${brandName} Home">
-        <img src="${logoUrl}" alt="${brandName} Logo" ${logoStyle}>
+        ${logoMarkup}
         <span class="brand-text">
           <span class="brand-name">${brandName}</span>
           ${tagline}

@@ -502,7 +502,83 @@ to review and commit when they're happy.**
 
 ---
 
-## 12. Where to look first when you get a follow-up request
+## 12. Themed 3D logo system
+
+The brand logo can be one of three things, depending on `SITE_CONFIG.logoUrl`:
+
+| `logoUrl` value | Behavior |
+|---|---|
+| (any URL ending `.png` / `.jpg` / `.svg`) | Loaded as a normal `<img src>` |
+| `'Imagelogo.png'` | Default raster logo (legacy, project root) |
+| One of the themed SVG paths in `assets/icons/themed-logos/` | Hard-coded color SVG, scales perfectly |
+| `'auto-3d'` | **Special sentinel.** `renderHeader()` and `applyBranding()` render the inline 3D SVG via `renderAutoLogoSvg()`. Uses `currentColor` + `--accent` CSS variable, so it re-colors itself in real time when the theme changes. |
+
+### 12.1 Available themed logos (one per `FESTIVAL_PRESETS` entry)
+
+```
+assets/icons/themed-logos/
+├── logo-3d-resort.svg         Forest + warm gold (matches resort preset)
+├── logo-3d-default.svg        Navy + gold (classic preset)
+├── logo-3d-diwali.svg         Maroon + gold + diya accents
+├── logo-3d-holi.svg           Pink + yellow + colour splash dots
+├── logo-3d-christmas.svg      Red + green + snowflake accents
+├── logo-3d-eid.svg            Green + gold + crescent moon
+├── logo-3d-independence.svg   Saffron + green + Ashoka chakra hint
+├── logo-3d-summer.svg         Orange + cream + sun rays
+└── logo-3d-auto.svg           Auto-themed (uses currentColor/CSS vars; only fully themes when inlined)
+```
+
+All SVGs are 240×240 viewBox with embossed gradients + drop-shadow filter for the 3D look. They share the same C4 monogram silhouette as the original brand mark; only the gradient stops + small festive accents change.
+
+### 12.2 How preset → logo swap works
+
+Each entry in `FESTIVAL_PRESETS` (`assets/js/site.js`) now carries a `logo` field. When the admin picks a preset in the **Theme & Festival** tab, the admin code calls `applyTheme(preset)`. `applyTheme()` does:
+
+```js
+if (theme.logo && window.SITE_CONFIG) {
+  window.SITE_CONFIG.logoUrl = theme.logo;
+}
+```
+
+…then `rerenderSiteShell()` re-paints the header so the new logo appears immediately. The admin can later upload a custom logo and that takes over.
+
+### 12.3 Adding a new themed logo
+
+1. Copy an existing file in `assets/icons/themed-logos/` (e.g., `logo-3d-resort.svg`) and rename: `logo-3d-MYNAME.svg`.
+2. Edit only the `<linearGradient id="c4_ring">` and `<linearGradient id="c4_letters">` stop colors.
+3. (Optional) Add a small festive accent shape (corner dot, sparkle, etc.) below the `<g filter="url(#c4_emboss)">` block.
+4. Add a matching entry in `FESTIVAL_PRESETS`:
+   ```js
+   navratri: {
+     label: 'Navratri (Yellow + Red)', emoji: '🪕',
+     primary: '#a01a1a', primary_dark: '#6e0e0e',
+     accent: '#ffcc00', accent_dark: '#cca300',
+     background: '#fff8e7',
+     festival_overlay: 'navratri',
+     festival_banner: 'Happy Navratri!',
+     logo: 'assets/icons/themed-logos/logo-3d-navratri.svg'
+   }
+   ```
+5. Validate the SVG: `python3 -c "import xml.etree.ElementTree as ET; ET.parse('assets/icons/themed-logos/logo-3d-navratri.svg')"` (or just open it in a browser).
+
+> ⚠️ **SVG comment characters:** The Cursor write tool sometimes mangles em-dash (`—`) into a control byte and `×` into a stray `0xd7`. Use plain ASCII (`-`, `x`) inside SVG comments.
+
+### 12.4 The `auto-3d` mode in detail
+
+`renderAutoLogoSvg(opts)` returns an inline SVG string where:
+- The ring's middle gradient stops use `currentColor` (top stop white, bottom stop black for the 3D shading effect).
+- The letters' middle stops also use `currentColor`.
+- The `.c4a-auto-logo` CSS class sets `color: var(--accent)`.
+
+So when `applyTheme()` updates `--accent`, the SVG's gradients re-render automatically — no JS re-paint needed. This is the most "magical" option: one logo file, infinite themes.
+
+`renderHeader()` and `applyBranding()` both check `cfg.logoUrl === 'auto-3d'` and emit inline SVG via `renderAutoLogoSvg({ size: cfg.logoHeight || 55 })` instead of an `<img>`.
+
+> Loading `logo-3d-auto.svg` directly via `<img src>` will **not** theme correctly — `<img>` SVGs cannot inherit the page's CSS variables. Use the `'auto-3d'` sentinel only.
+
+---
+
+## 13. Where to look first when you get a follow-up request
 
 | Request type | Open this file first |
 |---|---|
@@ -516,22 +592,27 @@ to review and commit when they're happy.**
 | "Add / restyle an icon" | `assets/js/icons.js` (registry + helpers) |
 | "Tweak 3D look / shadows / colors" | bottom of `assets/css/style.css` ("3D LOOK LAYER") |
 | "Festival theme" | `assets/js/site.js` → `FESTIVAL_PRESETS` + matching `body.festival-*` CSS |
+| "Add / change brand logo" | `assets/icons/themed-logos/*.svg` + `FESTIVAL_PRESETS[*].logo` + `renderAutoLogoSvg()` for the inline auto-themed variant |
 | "PWA / offline" | `sw.js` + `manifest.json` + `setupPwaInstall()` in `site.js` |
 | "SEO / structured data" | top JSON-LD blocks in each HTML + `injectStructuredData()` in `site.js` |
 
 ---
 
-## 13. One-line summary for the next AI
+## 14. One-line summary for the next AI
 
 > A vanilla static site (Call4All — Jaipur service aggregator) with a luxury
 > forest-green + gold theme. Recently upgraded to a 3D look (embossed icon
 > badges, perspective service cards, deep-shadow buttons) and switched all
 > emojis to a Lucide-style SVG icon library (`icons.js`) with an automatic
-> emoji→SVG swap so legacy markup also benefits. Use `c4aIcon('name')` or
-> `data-c4a-icon="name"` for icons; use existing `.feature-box` / `.service-card`
-> / `.btn-accent` etc. classes — they already carry the 3D treatment. CSS
-> variables (`--primary`, `--accent`, …) drive the theme; never hard-code
-> brand colors. Single CSS file, no build, no framework. Admin/Staff write to
+> emoji→SVG swap so legacy markup also benefits. The brand logo also has a
+> 3D system: 8 hand-crafted themed SVGs in `assets/icons/themed-logos/`
+> (one per `FESTIVAL_PRESETS` entry) plus an `'auto-3d'` sentinel that
+> renders an inline SVG using `currentColor` + CSS variables — picking a
+> preset auto-swaps the logo. Use `c4aIcon('name')` or `data-c4a-icon="name"`
+> for icons; use existing `.feature-box` / `.service-card` / `.btn-accent`
+> etc. classes — they already carry the 3D treatment. CSS variables
+> (`--primary`, `--accent`, …) drive the theme; never hard-code brand colors.
+> Single CSS file, no build, no framework. Admin/Staff write to
 > `data/*.{json,csv}` via the GitHub Contents API; the public site reads them
 > via `raw.githubusercontent.com`. Don't add `icons.js` to `admin.html` /
 > `staff.html`. Re-hydrate icons after any dynamic markup injection.

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Call4All - 3D themed logo (Summer: Orange + Cream) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Call4All Logo">
+  <defs>
+    <radialGradient id="c4_bg" cx="38%" cy="32%" r="78%">
+      <stop offset="0%"  stop-color="#ffffff"/>
+      <stop offset="80%" stop-color="#fffaf0"/>
+      <stop offset="100%" stop-color="#ffe9c4"/>
+    </radialGradient>
+    <linearGradient id="c4_ring" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#fff0c0"/>
+      <stop offset="35%"  stop-color="#ffd180"/>
+      <stop offset="70%"  stop-color="#e6b366"/>
+      <stop offset="100%" stop-color="#8a5e1e"/>
+    </linearGradient>
+    <linearGradient id="c4_letters" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#ffb37a"/>
+      <stop offset="35%"  stop-color="#ff7a1f"/>
+      <stop offset="70%"  stop-color="#e65100"/>
+      <stop offset="100%" stop-color="#7a2c00"/>
+    </linearGradient>
+    <filter id="c4_drop" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3.5"/>
+      <feOffset dx="2" dy="5"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.45"/></feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="c4_emboss" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.2"/>
+      <feOffset dx="1.2" dy="1.5"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.6"/></feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#c4_drop)">
+    <circle cx="120" cy="120" r="116" fill="url(#c4_bg)"/>
+    <circle cx="120" cy="120" r="106" fill="none" stroke="url(#c4_ring)" stroke-width="9"/>
+    <circle cx="120" cy="120" r="100.5" fill="none" stroke="#8a5e1e" stroke-width="0.6" opacity="0.35"/>
+    <circle cx="120" cy="120" r="111.5" fill="none" stroke="#ffffff" stroke-width="0.6" opacity="0.7"/>
+  </g>
+  <g filter="url(#c4_emboss)">
+    <text x="120" y="170" font-family="'Playfair Display', Georgia, 'Times New Roman', serif"
+          font-size="160" font-weight="700" text-anchor="middle"
+          fill="url(#c4_letters)" letter-spacing="-6">C4</text>
+  </g>
+  <path d="M 60 50 A 75 75 0 0 1 175 45" stroke="#ffffff" stroke-width="3.5"
+        fill="none" opacity="0.55" stroke-linecap="round"/>
+  <!-- Sun rays (top) -->
+  <g stroke="#ffd180" stroke-width="2" stroke-linecap="round" opacity="0.75">
+    <line x1="120" y1="6" x2="120" y2="14"/>
+    <line x1="170" y1="20" x2="166" y2="27"/>
+    <line x1="70"  y1="20" x2="74"  y2="27"/>
+  </g>
+</svg>
