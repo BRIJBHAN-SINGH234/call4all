@@ -1,22 +1,22 @@
 {
   "version": 3,
-  "updated_at": "2026-05-15T13:23:30.499Z",
+  "updated_at": "2026-05-15T13:23:59.071Z",
   "branding": {
     "site_name": "Call4All",
     "tagline": "One Call. Every Service. Done.",
-    "logo_url": "assets/icons/themed-logos/logo-3d-independence.svg",
+    "logo_url": "assets/icons/themed-logos/logo-3d-default.svg",
     "logo_height": 55
   },
   "theme": {
-    "preset": "independence",
-    "primary": "#138808",
-    "primary_dark": "#0c5a05",
-    "accent": "#ff9933",
-    "accent_dark": "#cc7a29",
+    "preset": "default",
+    "primary": "#1e3c72",
+    "primary_dark": "#142850",
+    "accent": "#ffcc00",
+    "accent_dark": "#e6b800",
     "background": "#ffffff",
-    "festival_overlay": "independence",
-    "festival_banner": "🇮🇳 Jai Hind! Happy Independence Day 🇮🇳",
-    "logo": "assets/icons/themed-logos/logo-3d-independence.svg"
+    "festival_overlay": "none",
+    "festival_banner": "",
+    "logo": "assets/icons/themed-logos/logo-3d-default.svg"
   },
   "contact": {
     "phone": "+917737353588",
