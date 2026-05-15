@@ -31,28 +31,28 @@ window.SITE_CONFIG = {
     branch: 'main'
   },
   services: [
-    { id: 'rental-cars', name: 'Rental Cars', icon: '🚗', desc: 'Premium & budget car rental for events and travel.', page: 'rental-cars.html', image: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=900&q=80&auto=format&fit=crop' },
-    { id: 'rooms-flats', name: 'Rooms & Flats', icon: '🏠', desc: 'Rent rooms, flats and properties easily.', page: 'rooms-flats.html', image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=900&q=80&auto=format&fit=crop' },
-    { id: 'manpower-supply', name: 'Manpower Supply', icon: '👷', desc: 'Skilled & unskilled manpower for any requirement.', page: 'manpower-supply.html', image: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=900&q=80&auto=format&fit=crop' },
-    { id: 'construction', name: 'Construction Labor / Thekedar', icon: '🧱', desc: 'Construction labor, contractors and thekedar for your project.', page: 'construction.html', image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=900&q=80&auto=format&fit=crop' },
-    { id: 'home-tutor', name: 'Home Tutor', icon: '📚', desc: 'Qualified home tutors for all classes and subjects.', page: 'home-tutor.html', image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=900&q=80&auto=format&fit=crop' },
-    { id: 'marriage-services', name: 'Marriage Services', icon: '💍', desc: 'Complete wedding planning, decoration & rental items.', page: 'marriage-services.html', image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=900&q=80&auto=format&fit=crop' },
-    { id: 'flower-bouquet', name: 'Hotel Flower Bouquet', icon: '🌸', desc: 'Luxury flower decoration & bouquet service.', page: 'flower-bouquet.html', image: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=900&q=80&auto=format&fit=crop' },
-    { id: 'car-decoration', name: 'Car Decoration', icon: '🎀', desc: 'Luxury car decoration for weddings & events.', page: 'car-decoration.html', image: 'https://images.unsplash.com/photo-1606013519235-f4f8b3ee5ae5?w=900&q=80&auto=format&fit=crop' },
-    { id: 'other', name: 'Other / Custom Service', icon: '🛎️', desc: 'Need something else? Just tell us, we will arrange it.', page: 'index.html#book', image: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=900&q=80&auto=format&fit=crop' }
+    { id: 'rental-cars',      name: 'Rental Cars',                 icon: '🚗', iconName: 'car',       desc: 'Premium & budget car rental for events and travel.',                 page: 'rental-cars.html',       image: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=900&q=80&auto=format&fit=crop' },
+    { id: 'rooms-flats',      name: 'Rooms & Flats',               icon: '🏠', iconName: 'home',      desc: 'Rent rooms, flats and properties easily.',                            page: 'rooms-flats.html',       image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=900&q=80&auto=format&fit=crop' },
+    { id: 'manpower-supply',  name: 'Manpower Supply',             icon: '👷', iconName: 'hard-hat',  desc: 'Skilled & unskilled manpower for any requirement.',                  page: 'manpower-supply.html',   image: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=900&q=80&auto=format&fit=crop' },
+    { id: 'construction',     name: 'Construction Labor / Thekedar', icon: '🧱', iconName: 'bricks',  desc: 'Construction labor, contractors and thekedar for your project.',     page: 'construction.html',      image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=900&q=80&auto=format&fit=crop' },
+    { id: 'home-tutor',       name: 'Home Tutor',                  icon: '📚', iconName: 'book',      desc: 'Qualified home tutors for all classes and subjects.',                page: 'home-tutor.html',        image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=900&q=80&auto=format&fit=crop' },
+    { id: 'marriage-services',name: 'Marriage Services',           icon: '💍', iconName: 'ring',      desc: 'Complete wedding planning, decoration & rental items.',              page: 'marriage-services.html', image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=900&q=80&auto=format&fit=crop' },
+    { id: 'flower-bouquet',   name: 'Hotel Flower Bouquet',        icon: '🌸', iconName: 'flower',    desc: 'Luxury flower decoration & bouquet service.',                        page: 'flower-bouquet.html',    image: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=900&q=80&auto=format&fit=crop' },
+    { id: 'car-decoration',   name: 'Car Decoration',              icon: '🎀', iconName: 'bow',       desc: 'Luxury car decoration for weddings & events.',                       page: 'car-decoration.html',    image: 'https://images.unsplash.com/photo-1606013519235-f4f8b3ee5ae5?w=900&q=80&auto=format&fit=crop' },
+    { id: 'other',            name: 'Other / Custom Service',      icon: '🛎️', iconName: 'bell',      desc: 'Need something else? Just tell us, we will arrange it.',             page: 'index.html#book',        image: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=900&q=80&auto=format&fit=crop' }
   ],
   slider: {
     enabled: true,
     interval_ms: 5000,
     slides: [
-      { id: 's1', enabled: true, icon: '🚗', title: 'Rental Cars',           subtitle: 'Premium & budget cars for travel and events',        background_url: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1900&q=80&auto=format&fit=crop', link: 'rental-cars.html',       order: 1 },
-      { id: 's2', enabled: true, icon: '🏠', title: 'Rooms & Flats',         subtitle: 'Quick rentals — rooms, flats, PG, properties',       background_url: 'https://images.unsplash.com/photo-1501183638710-841dd1904471?w=1900&q=80&auto=format&fit=crop', link: 'rooms-flats.html',       order: 2 },
-      { id: 's3', enabled: true, icon: '🧱', title: 'Construction Labor',    subtitle: 'Mistri, mazdoor, thekedar — all just one call away',  background_url: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=1900&q=80&auto=format&fit=crop', link: 'construction.html',      order: 3 },
-      { id: 's4', enabled: true, icon: '📚', title: 'Home Tutors',           subtitle: 'Qualified tutors for every class & subject',          background_url: 'https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=1900&q=80&auto=format&fit=crop', link: 'home-tutor.html',        order: 4 },
-      { id: 's5', enabled: true, icon: '👷', title: 'Manpower Supply',       subtitle: 'Skilled & unskilled manpower on demand',              background_url: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1900&q=80&auto=format&fit=crop', link: 'manpower-supply.html',   order: 5 },
-      { id: 's6', enabled: true, icon: '💍', title: 'Marriage Services',     subtitle: 'Decoration, catering, rentals — A to Z',              background_url: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=1900&q=80&auto=format&fit=crop', link: 'marriage-services.html', order: 6 },
-      { id: 's7', enabled: true, icon: '🌸', title: 'Hotel Flower Bouquet',  subtitle: 'Luxury floral arrangements for hotels & events',      background_url: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=1900&q=80&auto=format&fit=crop', link: 'flower-bouquet.html',    order: 7 },
-      { id: 's8', enabled: true, icon: '🎀', title: 'Car Decoration',        subtitle: 'Wedding & event car decoration',                      background_url: 'https://images.unsplash.com/photo-1606013519235-f4f8b3ee5ae5?w=1900&q=80&auto=format&fit=crop', link: 'car-decoration.html',    order: 8 }
+      { id: 's1', enabled: true, icon: '🚗', iconName: 'car',      title: 'Rental Cars',           subtitle: 'Premium & budget cars for travel and events',        background_url: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1900&q=80&auto=format&fit=crop', link: 'rental-cars.html',       order: 1 },
+      { id: 's2', enabled: true, icon: '🏠', iconName: 'home',     title: 'Rooms & Flats',         subtitle: 'Quick rentals — rooms, flats, PG, properties',       background_url: 'https://images.unsplash.com/photo-1501183638710-841dd1904471?w=1900&q=80&auto=format&fit=crop', link: 'rooms-flats.html',       order: 2 },
+      { id: 's3', enabled: true, icon: '🧱', iconName: 'bricks',   title: 'Construction Labor',    subtitle: 'Mistri, mazdoor, thekedar — all just one call away', background_url: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=1900&q=80&auto=format&fit=crop', link: 'construction.html',      order: 3 },
+      { id: 's4', enabled: true, icon: '📚', iconName: 'book',     title: 'Home Tutors',           subtitle: 'Qualified tutors for every class & subject',         background_url: 'https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=1900&q=80&auto=format&fit=crop', link: 'home-tutor.html',        order: 4 },
+      { id: 's5', enabled: true, icon: '👷', iconName: 'hard-hat', title: 'Manpower Supply',       subtitle: 'Skilled & unskilled manpower on demand',             background_url: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1900&q=80&auto=format&fit=crop', link: 'manpower-supply.html',   order: 5 },
+      { id: 's6', enabled: true, icon: '💍', iconName: 'ring',     title: 'Marriage Services',     subtitle: 'Decoration, catering, rentals — A to Z',             background_url: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=1900&q=80&auto=format&fit=crop', link: 'marriage-services.html', order: 6 },
+      { id: 's7', enabled: true, icon: '🌸', iconName: 'flower',   title: 'Hotel Flower Bouquet',  subtitle: 'Luxury floral arrangements for hotels & events',     background_url: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=1900&q=80&auto=format&fit=crop', link: 'flower-bouquet.html',    order: 7 },
+      { id: 's8', enabled: true, icon: '🎀', iconName: 'bow',      title: 'Car Decoration',        subtitle: 'Wedding & event car decoration',                     background_url: 'https://images.unsplash.com/photo-1606013519235-f4f8b3ee5ae5?w=1900&q=80&auto=format&fit=crop', link: 'car-decoration.html',    order: 8 }
     ]
   },
   pages: []
@@ -207,13 +207,15 @@ function renderSlider() {
   _sliderState.slides = slides;
   _sliderState.idx = 0;
 
+  const ico = (name) => (typeof window.c4aIcon === 'function' && name) ? window.c4aIcon(name, { size: 30 }) : '';
   const html = `
     <div class="slider">
       <button class="arrow left" type="button" aria-label="Previous" onclick="moveSlide(-1)">&#10094;</button>
       <div class="slides" id="slides">
         ${slides.map(s => {
           const bg = s.background_url ? `style="background-image:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url('${assetUrl(s.background_url)}');background-size:cover;background-position:center;color:#fff;"` : '';
-          const inner = `${escapeHtml(s.icon || '')} ${escapeHtml(s.title || '')}<div class="slide-sub">${escapeHtml(s.subtitle || '')}</div>`;
+          const iconHtml = s.iconName ? `<span class="slide-icon">${ico(s.iconName)}</span>` : '';
+          const inner = `${iconHtml}<div>${escapeHtml(s.title || '')}</div><div class="slide-sub">${escapeHtml(s.subtitle || '')}</div>`;
           return s.link
             ? `<a class="slide" href="${escapeAttr(s.link)}" ${bg} style="${bg ? '' : ''}text-decoration:none;">${inner}</a>`
             : `<div class="slide" ${bg}>${inner}</div>`;
@@ -372,14 +374,15 @@ async function renderAreasServed() {
     if (a.area) byCity[a.city].push(a.area);
   });
   const cities = Object.keys(byCity).sort();
+  const pinIcon = (typeof window.c4aIcon === 'function') ? window.c4aIcon('pin', { size: 16 }) : '📍';
   const chips = [];
   cities.forEach(city => {
     const subs = byCity[city];
     if (!subs.length) {
-      chips.push(`<a href="#book" class="area-chip" title="Service available in ${escapeAttr(city)}"><span class="area-pin">📍</span><span class="area-city">${city}</span></a>`);
+      chips.push(`<a href="#book" class="area-chip" title="Service available in ${escapeAttr(city)}"><span class="area-pin">${pinIcon}</span><span class="area-city">${city}</span></a>`);
     } else {
       subs.forEach(sub => {
-        chips.push(`<a href="#book" class="area-chip" title="Service in ${escapeAttr(sub)}, ${escapeAttr(city)}"><span class="area-pin">📍</span><span class="area-city">${city}</span> · ${sub}</a>`);
+        chips.push(`<a href="#book" class="area-chip" title="Service in ${escapeAttr(sub)}, ${escapeAttr(city)}"><span class="area-pin">${pinIcon}</span><span class="area-city">${city}</span> · ${sub}</a>`);
       });
     }
   });
@@ -662,6 +665,9 @@ function rerenderSiteShell() {
   }
   // Re-apply branding so phone/email links pick up updated values
   if (typeof applyBranding === 'function') applyBranding();
+  // Re-run icon hydrate + emoji swap on freshly-injected nodes
+  if (typeof window.c4aHydrateIcons === 'function') window.c4aHydrateIcons();
+  if (typeof window.c4aSwapEmojis === 'function') window.c4aSwapEmojis(document.body);
 }
 window.rerenderSiteShell = rerenderSiteShell;
 
@@ -729,6 +735,9 @@ function renderHeader(activePage) {
 
 function renderFooter() {
   const cfg = window.SITE_CONFIG;
+  const ico = (name, size) => (typeof window.c4aIcon === 'function')
+    ? window.c4aIcon(name, { size: size || 16 })
+    : '';
   const serviceLinks = cfg.services
     .filter(s => s.id !== 'other')
     .map(s => `<li><a href="${s.page}">${s.name}</a></li>`)
@@ -736,13 +745,13 @@ function renderFooter() {
   return `
     <footer class="site-footer">
       <div class="footer-content">
-        <div class="footer-section">
+        <div class="footer-section no-icon-list">
           <h3>About ${cfg.businessName}</h3>
           <p>${cfg.aboutText || ''}</p>
         </div>
-        <div class="footer-section">
+        <div class="footer-section no-icon-list">
           <h3>Quick Links</h3>
-          <ul>
+          <ul class="flat">
             <li><a href="index.html">Home</a></li>
             <li><a href="index.html#services">All Services</a></li>
             <li><a href="index.html#gallery">Gallery</a></li>
@@ -751,18 +760,18 @@ function renderFooter() {
             <li><a href="index.html#book">Book a Service</a></li>
           </ul>
         </div>
-        <div class="footer-section">
+        <div class="footer-section no-icon-list">
           <h3>Our Services</h3>
-          <ul>${serviceLinks}</ul>
+          <ul class="flat">${serviceLinks}</ul>
         </div>
         <div class="footer-section">
           <h3>Contact Info</h3>
           <ul>
-            <li>📞 <a href="tel:${cfg.phone}">${cfg.phoneDisplay}</a></li>
-            <li>💬 <a href="https://wa.me/${cfg.whatsappNumber}" target="_blank">WhatsApp Chat</a></li>
-            <li>✉️ <a href="mailto:${cfg.email}">${cfg.email}</a></li>
-            <li>🌐 ${cfg.website}</li>
-            <li>🕒 24/7 Available</li>
+            <li>${ico('phone')}<a href="tel:${cfg.phone}">${cfg.phoneDisplay}</a></li>
+            <li>${ico('whatsapp')}<a href="https://wa.me/${cfg.whatsappNumber}" target="_blank">WhatsApp Chat</a></li>
+            <li>${ico('mail')}<a href="mailto:${cfg.email}">${cfg.email}</a></li>
+            <li>${ico('globe')}<span>${cfg.website}</span></li>
+            <li>${ico('clock')}<span>24/7 Available</span></li>
           </ul>
         </div>
       </div>
@@ -776,11 +785,14 @@ function renderFooter() {
 function renderFloatingButtons() {
   const cfg = window.SITE_CONFIG;
   const waMsg = encodeURIComponent('Hello, I want to enquire about your services.');
+  const ico = (name, size) => (typeof window.c4aIcon === 'function')
+    ? window.c4aIcon(name, { size: size || 26 })
+    : '';
   return `
     <div class="floating-buttons">
-      <button class="float-btn install" id="installAppBtn" aria-label="Install App" title="Install App" style="display:none;background:#ffcc00;color:#1e3c72;border:none;font-size:24px;">📲</button>
-      <a class="float-btn whatsapp" href="https://wa.me/${cfg.whatsappNumber}?text=${waMsg}" target="_blank" aria-label="Chat on WhatsApp" title="Chat on WhatsApp">💬</a>
-      <a class="float-btn call" href="tel:${cfg.phone}" aria-label="Call Now" title="Call Now">📞</a>
+      <button class="float-btn install" id="installAppBtn" aria-label="Install App" title="Install App" style="display:none;">${ico('install')}</button>
+      <a class="float-btn whatsapp" href="https://wa.me/${cfg.whatsappNumber}?text=${waMsg}" target="_blank" aria-label="Chat on WhatsApp" title="Chat on WhatsApp">${ico('whatsapp')}</a>
+      <a class="float-btn call" href="tel:${cfg.phone}" aria-label="Call Now" title="Call Now">${ico('phone')}</a>
     </div>
   `;
 }
@@ -810,9 +822,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
   if (typeof initBookingForm === 'function') initBookingForm();
 
+  // Re-hydrate icons + swap emojis in the freshly-rendered header/footer/floating
+  if (typeof window.c4aHydrateIcons === 'function') window.c4aHydrateIcons();
+  if (typeof window.c4aSwapEmojis === 'function') window.c4aSwapEmojis(document.body);
+
   // Render gallery section if present (homepage / service pages)
   if (typeof renderGallerySection === 'function') {
-    renderGallerySection().catch(err => console.warn('[Gallery] init failed:', err));
+    renderGallerySection()
+      .then(() => {
+        if (typeof window.c4aSwapEmojis === 'function') window.c4aSwapEmojis(document.body);
+      })
+      .catch(err => console.warn('[Gallery] init failed:', err));
   }
 
   setupPwaInstall();

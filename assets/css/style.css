@@ -1734,3 +1734,781 @@ body.festival-independence {
   .section-title { font-size: 22px; }
   .service-card { padding: 22px 18px; }
 }
+
+/* =====================================================================
+   3D LOOK LAYER (icons, cards, buttons, sections, images)
+   Adds depth/embossed feel without heavy 3D libraries — pure CSS
+   gradients, layered shadows, perspective tilts.
+   ===================================================================== */
+
+/* ---------- SVG icon (.c4a-icon) ---------- */
+.c4a-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width:  var(--c4a-icon-size, 24px);
+  height: var(--c4a-icon-size, 24px);
+  flex-shrink: 0;
+  vertical-align: middle;
+  line-height: 0;
+  color: currentColor;
+}
+.c4a-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  stroke: currentColor;
+  fill: none;
+}
+.c4a-icon-inline {
+  width:  var(--c4a-icon-size, 1.05em);
+  height: var(--c4a-icon-size, 1.05em);
+  margin: 0 .15em -0.18em;
+  color: currentColor;
+}
+
+/* ---------- 3D icon badges (gold / dark / glass) ---------- */
+.c4a-icon-3d,
+.c4a-icon-3d-gold,
+.c4a-icon-3d-dark,
+.c4a-icon-3d-glass {
+  --pad: 14px;
+  width:  calc(var(--c4a-icon-size, 28px) + var(--pad) * 2);
+  height: calc(var(--c4a-icon-size, 28px) + var(--pad) * 2);
+  border-radius: 50%;
+  position: relative;
+  isolation: isolate;
+  transform: translateZ(0);
+  transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s ease;
+}
+.c4a-icon-3d > svg,
+.c4a-icon-3d-gold > svg,
+.c4a-icon-3d-dark > svg,
+.c4a-icon-3d-glass > svg {
+  width: var(--c4a-icon-size, 28px);
+  height: var(--c4a-icon-size, 28px);
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 2px 1.5px rgba(0,0,0,0.18));
+  stroke-width: 2;
+}
+
+/* Gold (default 3D) — primary brand badge */
+.c4a-icon-3d,
+.c4a-icon-3d-gold {
+  background:
+    radial-gradient(circle at 32% 28%, #fff7e2 0%, #f0d99a 28%, #c9a36a 65%, #8a6630 100%);
+  color: #4a3416;
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,0.85),
+    inset 0 -3px 5px rgba(74,52,22,0.35),
+    inset 0 0 0 1px rgba(255,255,255,0.25),
+    0 6px 14px rgba(74,52,22,0.30),
+    0 14px 28px rgba(74,52,22,0.22);
+}
+.c4a-icon-3d::after,
+.c4a-icon-3d-gold::after {
+  content: '';
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 32% 22%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 45%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Dark forest 3D badge */
+.c4a-icon-3d-dark {
+  background:
+    radial-gradient(circle at 30% 28%, #4d6c5b 0%, #2c4a3e 35%, #122318 100%);
+  color: #f3ebd9;
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,0.18),
+    inset 0 -3px 6px rgba(0,0,0,0.55),
+    inset 0 0 0 1px rgba(255,255,255,0.06),
+    0 6px 14px rgba(15,30,20,0.45),
+    0 14px 28px rgba(15,30,20,0.30);
+}
+.c4a-icon-3d-dark::after {
+  content: '';
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 32% 22%, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0) 45%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Glass / frosted */
+.c4a-icon-3d-glass {
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.85), rgba(255,255,255,0.45));
+  backdrop-filter: blur(8px);
+  color: var(--accent-dark);
+  box-shadow:
+    inset 0 2px 2px rgba(255,255,255,0.95),
+    inset 0 -2px 4px rgba(20,35,24,0.10),
+    inset 0 0 0 1px rgba(255,255,255,0.65),
+    0 8px 20px rgba(20,35,24,0.12);
+}
+
+/* Hover lift on badged icons inside cards */
+.feature-box:hover .c4a-icon-3d,
+.feature-box:hover .c4a-icon-3d-gold,
+.feature-box:hover .c4a-icon-3d-dark,
+.service-card:hover .c4a-icon-3d-gold,
+.service-card:hover .c4a-icon-3d-glass {
+  transform: translateY(-4px) scale(1.04);
+}
+
+/* ---------- Override emoji-style .feature-icon to use 3D badge ---------- */
+.feature-box .feature-icon {
+  width: 96px;
+  height: 96px;
+  --c4a-icon-size: 36px;
+  background:
+    radial-gradient(circle at 32% 28%, #fff7e2 0%, #f0d99a 28%, #c9a36a 65%, #8a6630 100%);
+  color: #4a3416;
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,0.85),
+    inset 0 -3px 5px rgba(74,52,22,0.35),
+    inset 0 0 0 1px rgba(255,255,255,0.25),
+    0 8px 18px rgba(74,52,22,0.28),
+    0 18px 36px rgba(74,52,22,0.20);
+  position: relative;
+  isolation: isolate;
+  font-size: 38px;
+  transition: transform .35s cubic-bezier(.2,.7,.2,1);
+}
+.feature-box .feature-icon::after {
+  content: '';
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 32% 22%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 45%);
+  pointer-events: none;
+  z-index: 0;
+}
+.feature-box .feature-icon > * { position: relative; z-index: 1; }
+.feature-box:hover .feature-icon { transform: translateY(-4px) scale(1.06); }
+
+/* "How it works" numbered icons should look like dark embossed coins */
+.feature-box .feature-icon[style*="background:var(--primary)"],
+.feature-box .feature-icon.feature-num {
+  background:
+    radial-gradient(circle at 30% 28%, #4d6c5b 0%, #2c4a3e 35%, #122318 100%) !important;
+  color: #fff !important;
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,0.20),
+    inset 0 -3px 6px rgba(0,0,0,0.55),
+    inset 0 0 0 1px rgba(255,255,255,0.06),
+    0 8px 18px rgba(15,30,20,0.45),
+    0 18px 36px rgba(15,30,20,0.30) !important;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 32px;
+}
+
+/* ---------- 3D buttons ---------- */
+.btn {
+  position: relative;
+  border-radius: 8px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  isolation: isolate;
+  overflow: hidden;
+  transform: translateZ(0);
+}
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 60%, rgba(0,0,0,0.10) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+.btn > * { position: relative; z-index: 1; }
+
+.btn-accent {
+  background: linear-gradient(180deg, #d8b67d 0%, #c9a36a 50%, #a17f47 100%);
+  border-color: #a17f47;
+  color: #2c1d09;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 0 -1.5px 0 rgba(0,0,0,0.18),
+    0 4px 0 #6f5226,
+    0 10px 22px rgba(74,52,22,0.35);
+}
+.btn-accent:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 0 -1.5px 0 rgba(0,0,0,0.18),
+    0 6px 0 #6f5226,
+    0 14px 28px rgba(74,52,22,0.40);
+}
+.btn-accent:active {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 0 -1.5px 0 rgba(0,0,0,0.18),
+    0 1px 0 #6f5226,
+    0 4px 10px rgba(74,52,22,0.35);
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, #2f5444 0%, #1f3a2e 55%, #122318 100%);
+  border-color: #122318;
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    inset 0 -1.5px 0 rgba(0,0,0,0.35),
+    0 4px 0 #07120c,
+    0 10px 22px rgba(15,30,20,0.40);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    inset 0 -1.5px 0 rgba(0,0,0,0.35),
+    0 6px 0 #07120c,
+    0 14px 28px rgba(15,30,20,0.45);
+}
+.btn-primary:active {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    inset 0 -1.5px 0 rgba(0,0,0,0.35),
+    0 1px 0 #07120c,
+    0 4px 10px rgba(15,30,20,0.40);
+}
+
+.btn-outline {
+  background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0));
+  backdrop-filter: blur(6px);
+  border-color: rgba(255,255,255,0.85);
+  color: #fff;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.35),
+    0 8px 18px rgba(0,0,0,0.25);
+}
+.btn-outline:hover {
+  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(241,234,219,0.95));
+  color: var(--primary);
+  border-color: #fff;
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.65),
+    0 12px 26px rgba(0,0,0,0.30);
+}
+
+.btn-outline-dark {
+  background: linear-gradient(180deg, #fff, #f5efe2);
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    inset 0 -1.5px 0 rgba(31,58,46,0.10),
+    0 4px 0 rgba(31,58,46,0.18),
+    0 8px 18px rgba(31,58,46,0.10);
+}
+.btn-outline-dark:hover {
+  background: linear-gradient(180deg, #2f5444, #1f3a2e);
+  color: #fff;
+  border-color: #1f3a2e;
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    0 6px 0 #07120c,
+    0 14px 28px rgba(15,30,20,0.35);
+}
+
+/* ---------- Service cards: 3D depth + tilt-on-hover ---------- */
+.service-grid { perspective: 1400px; }
+.service-card {
+  background: linear-gradient(180deg, #ffffff 0%, #faf6ef 100%);
+  border-radius: 18px;
+  border: 1px solid rgba(31,58,46,0.06);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 -1px 0 rgba(31,58,46,0.04) inset,
+    0 4px 8px rgba(20,35,24,0.06),
+    0 18px 30px -10px rgba(20,35,24,0.18),
+    0 30px 60px -20px rgba(20,35,24,0.18);
+  transform-style: preserve-3d;
+  transition:
+    transform .55s cubic-bezier(.2,.7,.2,1),
+    box-shadow .45s ease;
+  will-change: transform;
+}
+.service-card:hover {
+  transform: translateY(-12px) rotateX(4deg) rotateY(-3deg);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 6px 12px rgba(20,35,24,0.08),
+    0 30px 50px -10px rgba(20,35,24,0.28),
+    0 60px 100px -30px rgba(20,35,24,0.30);
+}
+.service-card .service-image {
+  height: 220px;
+  border-radius: 18px 18px 0 0;
+  position: relative;
+  overflow: hidden;
+}
+.service-card .service-image::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at top, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 50%),
+    linear-gradient(160deg, rgba(20,35,24,0) 30%, rgba(20,35,24,0.30) 100%);
+  z-index: 1;
+  pointer-events: none;
+  transition: var(--transition);
+}
+.service-card:hover .service-image::before {
+  background:
+    radial-gradient(ellipse at top, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 55%),
+    linear-gradient(160deg, rgba(20,35,24,0) 25%, rgba(20,35,24,0.45) 100%);
+}
+.service-card .service-icon-overlay {
+  --c4a-icon-size: 30px;
+  width: 64px;
+  height: 64px;
+  background:
+    radial-gradient(circle at 32% 28%, #fff7e2 0%, #f0d99a 28%, #c9a36a 65%, #8a6630 100%);
+  color: #4a3416;
+  font-size: 30px;
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,0.85),
+    inset 0 -3px 5px rgba(74,52,22,0.35),
+    inset 0 0 0 1px rgba(255,255,255,0.25),
+    0 6px 14px rgba(74,52,22,0.35),
+    0 14px 28px rgba(74,52,22,0.25);
+  z-index: 3;
+  transform: translateZ(40px);
+  transition: transform .45s cubic-bezier(.2,.7,.2,1);
+}
+.service-card .service-icon-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 32% 22%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 45%);
+  pointer-events: none;
+}
+.service-card:hover .service-icon-overlay {
+  transform: translateZ(50px) translateY(-4px) scale(1.08);
+}
+
+/* ---------- Feature box 3D ---------- */
+.feature-box {
+  background: linear-gradient(180deg, #ffffff 0%, #faf6ef 100%);
+  border-radius: 18px;
+  border: 1px solid rgba(31,58,46,0.06);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 -1px 0 rgba(31,58,46,0.04) inset,
+    0 4px 8px rgba(20,35,24,0.06),
+    0 16px 28px -8px rgba(20,35,24,0.18),
+    0 30px 56px -22px rgba(20,35,24,0.20);
+  transition: transform .45s cubic-bezier(.2,.7,.2,1), box-shadow .35s ease, border-color .35s ease;
+}
+.feature-box:hover {
+  transform: translateY(-8px);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 8px 16px rgba(20,35,24,0.08),
+    0 24px 40px -10px rgba(20,35,24,0.24),
+    0 50px 90px -30px rgba(20,35,24,0.30);
+  border-bottom-color: var(--accent);
+}
+
+/* ---------- Hero CTA buttons get a deeper 3D shadow ---------- */
+.hero .btn-lg { font-size: 14px; padding: 18px 36px; }
+.hero-cta { gap: 18px; }
+
+/* ---------- Slider 3D arrows + slide depth ---------- */
+.slider {
+  border-radius: 0;
+  box-shadow:
+    inset 0 -2px 30px rgba(0,0,0,0.35),
+    0 30px 60px -20px rgba(15,30,20,0.45);
+}
+.slide {
+  transform-style: preserve-3d;
+}
+.slide::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 55%);
+  pointer-events: none;
+  z-index: 1;
+}
+.arrow {
+  background: linear-gradient(180deg, rgba(255,255,255,0.30), rgba(255,255,255,0.15));
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.35),
+    0 8px 18px rgba(0,0,0,0.30);
+}
+.arrow:hover {
+  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.7));
+  color: var(--primary);
+  transform: translateY(-50%) scale(1.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.85),
+    0 12px 26px rgba(0,0,0,0.35);
+}
+
+/* ---------- About / image frames get 3D treatment ---------- */
+.about-2col-image {
+  border-radius: 22px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.6) inset,
+    0 4px 8px rgba(20,35,24,0.10),
+    0 20px 40px -8px rgba(20,35,24,0.30),
+    0 50px 90px -30px rgba(20,35,24,0.35);
+  transform: perspective(1200px) rotateY(-3deg) rotateX(2deg);
+  transition: transform .8s cubic-bezier(.2,.7,.2,1);
+}
+.about-2col-image:hover {
+  transform: perspective(1200px) rotateY(-1deg) rotateX(1deg) translateY(-6px);
+}
+@media (max-width: 768px) {
+  .about-2col-image { transform: none; }
+  .about-2col-image:hover { transform: none; }
+}
+
+/* ---------- Hero — 3D depth glow + gold rim divider ---------- */
+.hero {
+  box-shadow: inset 0 -40px 60px -30px rgba(0,0,0,0.55);
+}
+.hero h1 {
+  text-shadow:
+    0 1px 0 rgba(0,0,0,0.5),
+    0 6px 22px rgba(0,0,0,0.55);
+}
+.hero-tag-strong {
+  background: linear-gradient(180deg, rgba(201,163,106,0.28), rgba(201,163,106,0.12));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.2),
+    0 6px 14px rgba(0,0,0,0.30);
+}
+
+/* ---------- CTA strip / Booking card depth ---------- */
+.cta-strip {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    inset 0 -1px 0 rgba(0,0,0,0.25),
+    0 30px 60px -20px rgba(15,30,20,0.45);
+}
+.booking-card {
+  border-radius: 22px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 6px 12px rgba(20,35,24,0.08),
+    0 30px 50px -10px rgba(20,35,24,0.30),
+    0 60px 110px -30px rgba(20,35,24,0.32);
+}
+
+/* ---------- Testimonial cards 3D ---------- */
+.testimonial-card {
+  background: linear-gradient(180deg, #ffffff 0%, #faf6ef 100%);
+  border-radius: 18px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 4px 8px rgba(20,35,24,0.06),
+    0 14px 28px -8px rgba(20,35,24,0.18),
+    0 28px 50px -22px rgba(20,35,24,0.18);
+}
+.testimonial-card:hover {
+  transform: translateY(-6px) rotateX(2deg);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 24px 40px -10px rgba(20,35,24,0.24),
+    0 50px 90px -30px rgba(20,35,24,0.30);
+}
+
+/* ---------- Areas chips become little 3D pills ---------- */
+.area-chip {
+  background: linear-gradient(180deg, #ffffff 0%, #f5efe2 100%);
+  border: 1px solid rgba(201,163,106,0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    inset 0 -1.5px 0 rgba(74,52,22,0.10),
+    0 4px 10px rgba(74,52,22,0.10),
+    0 1px 0 rgba(74,52,22,0.20);
+}
+.area-chip:hover {
+  background: linear-gradient(180deg, #d8b67d 0%, #c9a36a 50%, #a17f47 100%);
+  color: #2c1d09;
+  border-color: #a17f47;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 0 -1.5px 0 rgba(0,0,0,0.18),
+    0 6px 0 #6f5226,
+    0 12px 22px rgba(74,52,22,0.35);
+}
+.area-chip .area-pin { display: inline-flex; }
+.area-chip .area-pin .c4a-icon,
+.area-chip .area-pin svg { width: 16px; height: 16px; color: var(--accent-dark); }
+.area-chip:hover .area-pin .c4a-icon,
+.area-chip:hover .area-pin svg { color: #2c1d09; }
+
+/* ---------- FAQ pieces ---------- */
+.faq-item {
+  background: linear-gradient(180deg, #ffffff 0%, #faf6ef 100%);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 4px 8px rgba(20,35,24,0.04),
+    0 14px 24px -10px rgba(20,35,24,0.14);
+}
+.faq-item summary::after {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, #fff7e2 0%, #f0d99a 28%, #c9a36a 65%, #8a6630 100%);
+  color: #4a3416;
+  font-size: 18px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.65),
+    0 4px 10px rgba(74,52,22,0.30);
+}
+
+/* ---------- Floating buttons 3D spheres ---------- */
+.floating-buttons { gap: 14px; }
+.float-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  --c4a-icon-size: 26px;
+  font-size: 26px;
+  border: none;
+  transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s ease;
+}
+.float-btn::before {
+  content: '';
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 32% 22%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 50%);
+  z-index: 1;
+  pointer-events: none;
+}
+.float-btn > * { position: relative; z-index: 2; }
+.float-btn.whatsapp {
+  background:
+    radial-gradient(circle at 32% 28%, #6cf08a 0%, #25d366 35%, #0e9e3f 100%);
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,0.45),
+    inset 0 -3px 6px rgba(0,0,0,0.25),
+    0 6px 14px rgba(14,90,40,0.35),
+    0 16px 28px rgba(14,90,40,0.25);
+  color: #fff;
+}
+.float-btn.call {
+  background:
+    radial-gradient(circle at 32% 28%, #4d6c5b 0%, #2c4a3e 35%, #122318 100%);
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,0.20),
+    inset 0 -3px 6px rgba(0,0,0,0.45),
+    0 6px 14px rgba(15,30,20,0.40),
+    0 16px 28px rgba(15,30,20,0.30);
+  color: #fff;
+}
+.float-btn.install {
+  background:
+    radial-gradient(circle at 32% 28%, #fff7c0 0%, #ffd54f 35%, #c79b1f 100%) !important;
+  color: #4a3416 !important;
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,0.55),
+    inset 0 -3px 6px rgba(0,0,0,0.18),
+    0 6px 14px rgba(199,155,31,0.35),
+    0 16px 28px rgba(199,155,31,0.25);
+}
+.float-btn:hover { transform: translateY(-4px) scale(1.08); }
+.float-btn.call::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(31,58,46,0.55);
+  animation: c4a-pulse 1.6s ease-out infinite;
+  z-index: 0;
+}
+@keyframes c4a-pulse {
+  0%   { transform: scale(1);   opacity: .7; }
+  100% { transform: scale(1.7); opacity: 0;  }
+}
+
+/* ---------- Header logo + nav: subtle 3D refresh ---------- */
+.site-header {
+  background: linear-gradient(180deg, #ffffff 0%, #faf6ef 100%);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.6) inset,
+    0 6px 20px rgba(20,35,24,0.08);
+}
+.site-header .logo img {
+  filter: drop-shadow(0 4px 8px rgba(20,35,24,0.18));
+}
+
+/* ---------- Footer 3D contact icons ---------- */
+.footer-section ul li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255,255,255,0.78);
+  line-height: 2.2;
+  font-size: 14px;
+}
+.footer-section ul li .c4a-icon {
+  --c4a-icon-size: 16px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, #fff7e2 0%, #f0d99a 28%, #c9a36a 65%, #8a6630 100%);
+  color: #4a3416;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.65),
+    inset 0 -1px 2px rgba(74,52,22,0.30),
+    0 3px 6px rgba(0,0,0,0.30);
+  flex-shrink: 0;
+}
+.footer-section ul li .c4a-icon svg { width: 16px; height: 16px; }
+
+/* Quick links / services lists keep their normal layout */
+.footer-section ul.flat li,
+.footer-section.no-icon-list ul li { display: list-item; gap: 0; }
+.footer-section ul li a {
+  padding-left: 0;
+}
+
+/* ---------- Quote mark, gallery cards small lifts ---------- */
+.gallery-card {
+  border-radius: 14px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 4px 8px rgba(20,35,24,0.06),
+    0 14px 24px -10px rgba(20,35,24,0.18);
+}
+.gallery-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 18px 30px -10px rgba(20,35,24,0.28),
+    0 40px 70px -30px rgba(20,35,24,0.30);
+}
+
+/* ---------- Section eyebrow gets a tiny gold rim ---------- */
+.section-eyebrow {
+  position: relative;
+  padding: 4px 14px;
+  border-radius: 999px;
+  display: inline-block;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  background: linear-gradient(180deg, rgba(201,163,106,0.10), rgba(201,163,106,0.02));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.75),
+    inset 0 -1px 0 rgba(74,52,22,0.10),
+    0 1px 2px rgba(74,52,22,0.10);
+}
+
+/* ---------- "Service hero" eyebrow becomes premium pill ---------- */
+.service-hero .hero-eyebrow {
+  background: linear-gradient(180deg, rgba(201,163,106,0.22), rgba(201,163,106,0.10));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.20),
+    0 6px 14px rgba(0,0,0,0.30);
+}
+
+/* ---------- Slider icon badge (used in title row) ---------- */
+.slide .slide-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, #fff7e2 0%, #f0d99a 28%, #c9a36a 65%, #8a6630 100%);
+  color: #4a3416;
+  --c4a-icon-size: 30px;
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,0.85),
+    inset 0 -3px 5px rgba(74,52,22,0.35),
+    0 6px 14px rgba(0,0,0,0.35),
+    0 14px 28px rgba(0,0,0,0.25);
+  margin-bottom: 14px;
+  position: relative;
+}
+.slide .slide-icon::after {
+  content: '';
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 32% 22%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 45%);
+  pointer-events: none;
+}
+
+/* ---------- emoji-swap span: don't wrap or affect line-height ---------- */
+.c4a-emoji-swap {
+  display: inline;
+  line-height: inherit;
+}
+.c4a-emoji-swap .c4a-icon { vertical-align: -0.18em; }
+
+/* ---------- Reduced motion: disable tilts and pulses ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .service-card,
+  .feature-box,
+  .testimonial-card,
+  .gallery-card,
+  .about-2col-image,
+  .float-btn,
+  .arrow,
+  .btn,
+  .area-chip {
+    transition: none !important;
+  }
+  .service-card:hover,
+  .feature-box:hover,
+  .testimonial-card:hover,
+  .about-2col-image:hover,
+  .gallery-card:hover {
+    transform: none !important;
+  }
+  .float-btn.call::after { animation: none !important; }
+}
+
