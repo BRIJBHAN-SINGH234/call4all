@@ -181,7 +181,7 @@ Two modes (configurable in Admin → ⚙️ Settings):
 ### Mode A — WhatsApp only (default, most secure)
 1. Customer fills the form — picks city, area, types address, requirement.
 2. WhatsApp opens with a pre-formatted message (Ref ID + all details).
-3. You receive on **+91 8387930687**.
+3. You receive on **+91 7737353588**.
 4. Open admin panel → **➕ Add Booking** to add it to the CSV.
 
 ### Mode B — Auto-save + WhatsApp
@@ -282,7 +282,7 @@ You haven't added any active areas yet. Admin → 📍 Service Areas → ➕ Add
 
 ## 📞 Support
 
-- Business: **+91 8387930687** / **info@call4all.co.in**
+- Business: **+91 7737353588** / **info@call4all.co.in**
 - Repo issues: https://github.com/BRIJBHAN-SINGH234/call4all/issues
 
 ---

@@ -2086,8 +2086,8 @@ function buildDefaultSiteConfig() {
     },
     theme: { ...window.FESTIVAL_PRESETS.default, preset: 'default' },
     contact: {
-      phone: '+918387930687', phone_display: '+91 8387930687',
-      whatsapp: '918387930687', email: 'info@call4all.co.in',
+      phone: '+917737353588', phone_display: '+91 7737353588',
+      whatsapp: '917737353588', email: 'info@call4all.co.in',
       website: 'www.call4all.co.in', address: 'India'
     },
     footer: { about_text: window.SITE_CONFIG.aboutText || '' },
