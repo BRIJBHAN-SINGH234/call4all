@@ -14,7 +14,7 @@
 
 - **Name:** Call4All — Jaipur's local service aggregator (rental cars, rooms,
   construction labor, tutors, manpower, weddings, flowers, car decoration).
-- **Live URL:** https://www.call4all.co.in
+- **Live URL:** https://call4all.co.in
 - **Tech stack:** **Pure static** HTML + CSS + vanilla JS. **No** build system,
   **no** bundler, **no** framework, **no** TypeScript. Just open `index.html` in
   a browser.

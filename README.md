@@ -2,7 +2,7 @@
 
 A static website + GitHub-backed admin & staff panel for **Call4All**, a service aggregator that connects customers to trusted service providers (rental cars, rooms & flats, construction labor, home tutors, manpower, marriage services, and more).
 
-🌐 Live: https://www.call4all.co.in
+🌐 Live: https://call4all.co.in
 
 ---
 
@@ -87,7 +87,7 @@ call4all/
 
 ### Step 2 — Login to the Admin Panel
 
-1. Open `https://www.call4all.co.in/admin.html`.
+1. Open `https://call4all.co.in/admin.html`.
 2. Enter:
    - **Username/Email:** anything (e.g. `admin@call4all.co.in`)
    - **Password:** any password you like (saved hashed on this browser)
@@ -240,7 +240,7 @@ Then open http://localhost:8000
 This repo is already configured. After every push to `main`:
 
 1. GitHub Pages auto-builds in ~1-2 minutes.
-2. Live at `https://www.call4all.co.in/` (custom domain via `CNAME`).
+2. Live at `https://call4all.co.in/` (custom domain via `CNAME`).
 3. Or `https://brijbhan-singh234.github.io/call4all/`.
 
 ---

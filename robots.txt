@@ -104,4 +104,4 @@ User-agent: MistralAI-User
 Allow: /
 
 # Sitemap (helps both SEO and AI crawlers find all pages)
-Sitemap: https://www.call4all.co.in/sitemap.xml
+Sitemap: https://call4all.co.in/sitemap.xml

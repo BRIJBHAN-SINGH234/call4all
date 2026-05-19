@@ -489,8 +489,8 @@ window.renderAreasServed = renderAreasServed;
 function injectStructuredData() {
   const cfg = window.SITE_CONFIG || {};
   const origin = (location.protocol === 'http:' || location.protocol === 'https:')
-    ? (location.origin || 'https://www.call4all.co.in')
-    : 'https://www.call4all.co.in';
+    ? (location.origin || 'https://call4all.co.in')
+    : 'https://call4all.co.in';
   const areas = Array.isArray(window.SITE_AREAS) ? window.SITE_AREAS : [];
 
   // Build unique city list + sub-area list for areaServed
