@@ -882,7 +882,7 @@ function renderFooter() {
         </div>
       </div>
       <div class="footer-bottom">
-        <p>© ${new Date().getFullYear()} ${cfg.website} | All Rights Reserved &nbsp;|&nbsp; <a href="admin.html">Admin Panel</a> &nbsp;|&nbsp; <a href="staff.html">Staff Portal</a></p>
+        <p>© ${new Date().getFullYear()} ${cfg.website} | All Rights Reserved</p>
       </div>
     </footer>
   `;
@@ -1105,24 +1105,134 @@ function paintGalleryGrid(mount) {
     return;
   }
 
-  const cards = items.map(it => {
+  const cards = items.map((it, idx) => {
     const imgUrl = assetUrl(it.image_path);
+    const title = escapeHtml(it.title || '');
+    const desc = escapeHtml(it.description || '');
+    const cat = escapeHtml(it.category || '');
     return `
       <div class="gallery-card">
-        ${it.category ? `<span class="cat-pill">${escapeHtml(it.category)}</span>` : ''}
-        <a href="${imgUrl}" target="_blank" rel="noopener">
-          <img class="thumb" src="${imgUrl}" alt="${escapeHtml(it.title || it.category || 'Gallery')}" loading="lazy" onerror="this.style.opacity=0.3;this.alt='Image unavailable';">
+        ${cat ? `<span class="cat-pill">${cat}</span>` : ''}
+        <a href="${imgUrl}" class="gallery-thumb-link" data-lightbox-index="${idx}" aria-label="View ${title || cat || 'image'} in lightbox">
+          <img class="thumb" src="${imgUrl}" alt="${title || cat || 'Gallery'}" loading="lazy" onerror="this.style.opacity=0.3;this.alt='Image unavailable';">
         </a>
         <div class="info">
-          <h4>${escapeHtml(it.title || '')}</h4>
-          ${it.description ? `<p>${escapeHtml(it.description)}</p>` : ''}
+          <h4>${title}</h4>
+          ${desc ? `<p>${desc}</p>` : ''}
         </div>
       </div>
     `;
   }).join('');
 
   mount.innerHTML = `<div class="gallery-grid">${cards}</div>`;
+
+  // Wire up lightbox — clicking any thumb opens an in-page modal with the
+  // full image plus title/description (instead of leaving the page).
+  // Keep the visible list in sync with the order we just rendered so
+  // prev/next navigation matches what the user sees.
+  _galleryVisibleItems = items.slice();
+  bindGalleryLightbox(mount);
 }
+
+/* ===== Gallery Lightbox =====
+ * Opens an in-page modal preview when a gallery thumb is clicked.
+ * Closes on backdrop click, the × button, or the Esc key. Arrow keys
+ * (and prev/next buttons) navigate through the currently visible items. */
+let _galleryVisibleItems = [];
+
+function bindGalleryLightbox(scope) {
+  const root = scope || document;
+  const links = root.querySelectorAll('a.gallery-thumb-link');
+  links.forEach(a => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const idx = parseInt(a.getAttribute('data-lightbox-index'), 10) || 0;
+      openGalleryLightbox(idx);
+    });
+  });
+}
+
+function ensureLightboxMarkup() {
+  let lb = document.getElementById('galleryLightbox');
+  if (lb) return lb;
+  lb = document.createElement('div');
+  lb.id = 'galleryLightbox';
+  lb.className = 'gallery-lightbox';
+  lb.setAttribute('role', 'dialog');
+  lb.setAttribute('aria-modal', 'true');
+  lb.setAttribute('aria-label', 'Image preview');
+  lb.innerHTML = `
+    <button class="lightbox-close" aria-label="Close preview" data-lb-close>&times;</button>
+    <button class="lightbox-nav lightbox-prev" aria-label="Previous image" data-lb-prev>&#10094;</button>
+    <button class="lightbox-nav lightbox-next" aria-label="Next image" data-lb-next>&#10095;</button>
+    <figure class="lightbox-figure">
+      <img class="lightbox-image" alt="">
+      <figcaption class="lightbox-caption">
+        <span class="lightbox-cat"></span>
+        <h3 class="lightbox-title"></h3>
+        <p class="lightbox-desc"></p>
+      </figcaption>
+    </figure>
+  `;
+  document.body.appendChild(lb);
+
+  lb.addEventListener('click', (e) => {
+    if (e.target === lb || e.target.matches('[data-lb-close]')) closeGalleryLightbox();
+    if (e.target.matches('[data-lb-prev]')) navigateGalleryLightbox(-1);
+    if (e.target.matches('[data-lb-next]')) navigateGalleryLightbox(1);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!lb.classList.contains('show')) return;
+    if (e.key === 'Escape') closeGalleryLightbox();
+    if (e.key === 'ArrowLeft') navigateGalleryLightbox(-1);
+    if (e.key === 'ArrowRight') navigateGalleryLightbox(1);
+  });
+  return lb;
+}
+
+function openGalleryLightbox(index) {
+  const items = _galleryVisibleItems;
+  if (!items || !items.length) return;
+  const lb = ensureLightboxMarkup();
+  lb.dataset.currentIndex = String(index);
+  const it = items[index];
+  if (!it) return;
+  const imgUrl = assetUrl(it.image_path);
+  lb.querySelector('.lightbox-image').src = imgUrl;
+  lb.querySelector('.lightbox-image').alt = it.title || it.category || 'Gallery image';
+  const catEl = lb.querySelector('.lightbox-cat');
+  catEl.textContent = it.category || '';
+  catEl.style.display = it.category ? 'inline-block' : 'none';
+  lb.querySelector('.lightbox-title').textContent = it.title || '';
+  const descEl = lb.querySelector('.lightbox-desc');
+  descEl.textContent = it.description || '';
+  descEl.style.display = it.description ? 'block' : 'none';
+  // Hide nav buttons when there's only one image
+  const navBtns = lb.querySelectorAll('.lightbox-nav');
+  navBtns.forEach(b => b.style.display = items.length > 1 ? 'flex' : 'none');
+  lb.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeGalleryLightbox() {
+  const lb = document.getElementById('galleryLightbox');
+  if (!lb) return;
+  lb.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function navigateGalleryLightbox(direction) {
+  const lb = document.getElementById('galleryLightbox');
+  if (!lb) return;
+  const items = _galleryVisibleItems;
+  if (!items.length) return;
+  let idx = (parseInt(lb.dataset.currentIndex, 10) || 0) + direction;
+  if (idx < 0) idx = items.length - 1;
+  if (idx >= items.length) idx = 0;
+  openGalleryLightbox(idx);
+}
+window.openGalleryLightbox = openGalleryLightbox;
+window.closeGalleryLightbox = closeGalleryLightbox;
 
 function parseGalleryCsv(text) {
   if (!text) return [];
