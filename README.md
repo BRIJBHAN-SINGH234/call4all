@@ -184,12 +184,19 @@ Two modes (configurable in Admin → ⚙️ Settings):
 3. You receive on **+91 7737353588**.
 4. Open admin panel → **➕ Add Booking** to add it to the CSV.
 
-### Mode B — Auto-save + WhatsApp
-1. Admin → ⚙️ Settings → paste a fine-grained PAT in **Public Form Auto-Save Token**.
-2. Form submissions then automatically write to `bookings.csv` on GitHub.
-3. WhatsApp also opens for confirmation.
+### Mode B — Auto-save + WhatsApp (recommended)
+1. Admin → ⚙️ Settings → paste a fine-grained PAT in **Public Form Auto-Save Token** → Save.
+2. The token is committed to `data/site-config.json` so every visitor's browser receives it on page load.
+3. Each customer submission then writes a row to `data/bookings.csv` via the GitHub Contents API **and** opens WhatsApp.
+4. New bookings show up in the admin Bookings tab within seconds — no manual entry needed.
 
-⚠️ Mode B exposes the token in the public site's localStorage on this browser. Use a separate fine-grained PAT, rotate every 90 days, never enable on a public computer.
+⚠️ **Security trade-off (read carefully):** Because the token sits in a public file, anyone inspecting the site with browser DevTools can read it.
+- ✅ Use a **fine-grained PAT** scoped to **only** this repo with **only** `Contents: Read & Write` permission. Nothing else.
+- ✅ Rotate every 90 days (or sooner if you suspect abuse).
+- ✅ If spam rows appear in `bookings.csv`, click **Clear Public Token** in admin Settings, revoke the PAT on GitHub, generate a new one.
+- ❌ Worst case = junk rows in the CSV (easy to delete). The PAT cannot touch any other repo, your account, or anything else.
+
+For a fully-secure setup (token never exposed), put the GitHub PAT behind a serverless function (Cloudflare Worker / Vercel function) and POST the booking row to that function instead. The current architecture is intentionally simple/static and accepts the trade-off above for free hosting on GitHub Pages.
 
 ---
 

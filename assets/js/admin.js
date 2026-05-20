@@ -1975,14 +1975,28 @@ function bindSettingsEvents() {
   const form = document.getElementById('settingsForm');
   if (!form) return;
   form.addEventListener('submit', handleSaveSettings);
-  // Pre-fill on load + initial pill state
-  document.getElementById('publicToken').value = localStorage.getItem(STORAGE_PUBLIC) || '';
+  // Pre-fill on load + initial pill state. We prefer the token from
+  // site-config.json (shared with every visitor) and fall back to the
+  // legacy localStorage value so older setups still display correctly.
+  const cfgTok = (siteConfigData.json && siteConfigData.json.public_form_token) || '';
+  document.getElementById('publicToken').value = cfgTok || localStorage.getItem(STORAGE_PUBLIC) || '';
   refreshAutoSaveUi();
 
-  document.getElementById('clearPublicBtn').addEventListener('click', () => {
+  document.getElementById('clearPublicBtn').addEventListener('click', async () => {
+    // Clear both: site-config.json (so customers stop auto-saving) AND
+    // localStorage (so this browser is consistent with the public site).
+    try {
+      if (siteConfigData.json) {
+        delete siteConfigData.json.public_form_token;
+        await saveSiteConfig('Clear public_form_token (auto-save OFF)');
+      }
+    } catch (err) {
+      showMsg('settingsMsg', '❌ Could not clear public token from site-config.json: ' + err.message, 'error');
+      return;
+    }
     localStorage.removeItem(STORAGE_PUBLIC);
     document.getElementById('publicToken').value = '';
-    showMsg('settingsMsg', 'Public token cleared. Customer forms will now only arrive on WhatsApp.', 'info');
+    showMsg('settingsMsg', '✅ Public token cleared. Customer forms will now only arrive on WhatsApp.', 'info');
     refreshAutoSaveUi();
   });
   document.getElementById('clearPassBtn').addEventListener('click', () => {
@@ -1996,20 +2010,39 @@ async function handleSaveSettings(e) {
   const form = e.target;
   const publicTok = form.publicToken.value.trim();
   const newPass = form.newAdminPass.value;
-  if (publicTok) localStorage.setItem(STORAGE_PUBLIC, publicTok);
+
+  // Persist the public token to data/site-config.json so EVERY visitor's
+  // browser receives it (the booking form needs it to write bookings.csv
+  // on behalf of the customer). Keep a localStorage copy too so this
+  // admin browser stays in sync even before the site-config CDN refreshes.
+  if (publicTok) {
+    try {
+      if (!siteConfigData.json) siteConfigData.json = buildDefaultSiteConfig();
+      siteConfigData.json.public_form_token = publicTok;
+      await saveSiteConfig('Set public_form_token (auto-save ON)');
+      localStorage.setItem(STORAGE_PUBLIC, publicTok);
+    } catch (err) {
+      showMsg('settingsMsg', '❌ Failed to save token to site-config.json: ' + err.message, 'error');
+      return;
+    }
+  }
+
   if (newPass) {
     const hash = await sha256(newPass);
     localStorage.setItem(STORAGE_PASS_HASH, hash);
     document.getElementById('newAdminPass').value = '';
   }
-  showMsg('settingsMsg', '✅ Settings saved on this browser.', 'success');
+  showMsg('settingsMsg', '✅ Settings saved. Auto-save now active for every visitor.', 'success');
   refreshAutoSaveUi();
 }
 
 /* Toggle the big "Auto-save: ENABLED / DISABLED" pill in Settings AND the
- * warning banner shown above the Bookings list. */
+ * warning banner shown above the Bookings list. We check site-config first
+ * (the authoritative source for what visitors actually see) and fall back
+ * to localStorage for legacy setups. */
 function refreshAutoSaveUi() {
-  const hasToken = !!localStorage.getItem(STORAGE_PUBLIC);
+  const cfgTok = (siteConfigData.json && siteConfigData.json.public_form_token) || '';
+  const hasToken = !!(cfgTok || localStorage.getItem(STORAGE_PUBLIC));
 
   const pill = document.getElementById('autoSaveStatus');
   const label = document.getElementById('autoSaveLabel');
@@ -2048,6 +2081,7 @@ async function loadSiteConfig() {
     populateThemeForm();
     populateBrandingForm();
     populateContactForm();
+    populateSettingsForm();
     renderFestivalPresetGrid();
     refreshSliderUI();
     refreshPagesUI();
@@ -2057,10 +2091,26 @@ async function loadSiteConfig() {
     populateThemeForm();
     populateBrandingForm();
     populateContactForm();
+    populateSettingsForm();
     renderFestivalPresetGrid();
     refreshSliderUI();
     refreshPagesUI();
   }
+}
+
+/* Re-prefill the Settings tab fields after site-config.json has been
+ * fetched. bindSettingsEvents() runs before that, so without this the
+ * Public Token field would stay blank for a fresh login session. */
+function populateSettingsForm() {
+  const tokInput = document.getElementById('publicToken');
+  if (!tokInput) return;
+  const cfgTok = (siteConfigData.json && siteConfigData.json.public_form_token) || '';
+  // Only overwrite if the field is currently blank or holds the older
+  // localStorage-only value — never clobber what the admin is mid-typing.
+  if (!tokInput.value || tokInput.value === (localStorage.getItem(STORAGE_PUBLIC) || '')) {
+    tokInput.value = cfgTok || localStorage.getItem(STORAGE_PUBLIC) || '';
+  }
+  refreshAutoSaveUi();
 }
 
 /* Push the given site config into the running page (window.SITE_CONFIG +

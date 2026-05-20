@@ -1,11 +1,15 @@
 /* ===== Call4All - Booking Form Logic =====
  * Behavior:
  *  1. Build a nice WhatsApp message and open https://wa.me/...
- *  2. If a public-form GitHub token has been configured by admin
- *     (stored in localStorage as "c4a_public_token"), the form will
- *     also append a row to data/bookings.csv via the GitHub Contents API.
- *  3. If no token is configured, only WhatsApp is used (admin will add
- *     the entry manually from the admin panel after receiving the message).
+ *  2. If a public-form GitHub token is configured in data/site-config.json
+ *     (loaded as SITE_CONFIG.publicFormToken on every visitor's browser),
+ *     the form will also append a row to data/bookings.csv via the
+ *     GitHub Contents API. This makes every customer submission show up
+ *     in the admin panel automatically. (Legacy fallback: a token in
+ *     localStorage "c4a_public_token" is still honored so admin's own
+ *     test submissions work even before site-config is wired up.)
+ *  3. If no token is configured anywhere, only WhatsApp is used and the
+ *     admin must add the entry manually from the admin panel.
  */
 
 function renderBookingForm(options) {
@@ -229,7 +233,14 @@ function handleBookingSubmit(e) {
   // Save to CSV in the background. If the auto-save token is configured,
   // the booking is recorded server-side immediately (admin will see it).
   // Without a token, we only send via WhatsApp — admin must add manually.
-  const publicToken = localStorage.getItem('c4a_public_token');
+  // Prefer the shared token from data/site-config.json (delivered to every
+  // visitor's browser via SITE_CONFIG); fall back to localStorage so the
+  // admin's own browser keeps working with the legacy setup if config is
+  // missing the field.
+  const publicToken =
+    (window.SITE_CONFIG && window.SITE_CONFIG.publicFormToken) ||
+    localStorage.getItem('c4a_public_token') ||
+    '';
   let savePromise = null;
   if (publicToken) {
     savePromise = window.CsvAPI.appendRow(row, publicToken, 'data/bookings.csv')

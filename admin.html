@@ -349,9 +349,10 @@
       <!-- Auto-save status banner (shown when public token is missing) -->
       <div id="autoSaveBanner" class="alert-banner" style="display:none;">
         <strong>⚠️ Auto-save OFF —</strong>
-        Customer form submissions currently only arrive on WhatsApp, not the admin panel.
-        Set the <a href="#" onclick="document.querySelector('[data-tab=settings]').click();return false;">⚙️ Settings → Public Auto-Save Token</a>
-        so every new booking shows up here automatically.
+        Customer form submissions currently only arrive on WhatsApp, <strong>not</strong> in this admin panel or
+        <code>bookings.csv</code>. To fix this, set the
+        <a href="#" onclick="document.querySelector('[data-tab=settings]').click();return false;">⚙️ Settings → Public Auto-Save Token</a>
+        — every new booking will then appear here automatically within seconds.
       </div>
 
       <div class="admin-stats">
@@ -966,19 +967,32 @@
             <label>🔓 Public Form Auto-Save Token</label>
             <input type="password" name="publicToken" id="publicToken" placeholder="Paste GitHub PAT here (ghp_xxx... or github_pat_xxx...)">
             <p class="help-text">
-              Setting this GitHub PAT will add every submitted customer form to <code>bookings.csv</code> instantly
-              (status = <strong>Pending</strong>). You won't need to add entries manually. WhatsApp will still open as usual.
+              Setting this GitHub PAT enables <strong>every</strong> customer's booking form to be saved automatically to
+              <code>bookings.csv</code> (status = <strong>Pending</strong>). You won't need to add entries manually.
+              WhatsApp will still open as usual.
+              <br><br>
+              <strong>How it works:</strong> The token is stored in <code>data/site-config.json</code>, which every
+              visitor's browser fetches on page load. The booking form uses it to write to <code>bookings.csv</code>
+              via the GitHub API. This means each customer submission appears here within seconds — no manual entry needed.
               <br><br>
               <strong>Setup:</strong>
               <ol style="margin: 6px 0 0 18px; padding: 0;">
                 <li>Generate a fine-grained PAT: <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">github.com/settings/personal-access-tokens/new</a></li>
-                <li>Repository: <code>BRIJBHAN-SINGH234/call4all</code></li>
-                <li>Permissions → Contents → <strong>Read and write</strong></li>
+                <li>Repository access → <strong>Only select repositories</strong> → <code>BRIJBHAN-SINGH234/call4all</code></li>
+                <li>Permissions → <strong>Contents → Read and write</strong> (nothing else)</li>
                 <li>Expiration: 1 year (suggested)</li>
                 <li>Copy the token, paste it here → Save Settings</li>
               </ol>
-              <strong>⚠️ Security:</strong> This token is stored in your browser's localStorage (in this browser only).
-              It is also exposed to every site visitor (since browser code can read it). Therefore, restrict the PAT to only the <code>Contents: Read &amp; Write</code> permission.
+              <strong>⚠️ Security note:</strong> Because the token sits in <code>site-config.json</code> (a public file),
+              <strong>anyone with browser DevTools can read it</strong>. That's a deliberate trade-off so the form
+              can write without a backend server. To stay safe:
+              <ul style="margin: 6px 0 0 18px; padding: 0;">
+                <li>Keep the PAT scoped to <strong>only</strong> <code>Contents: Read &amp; Write</code> on this single repo.</li>
+                <li>If you ever see spam in <code>bookings.csv</code>, click <strong>Clear Public Token</strong> below,
+                  revoke the PAT on GitHub, and generate a new one.</li>
+                <li>Worst case = bogus rows in the CSV (easily filtered/deleted). The PAT cannot access any other
+                  repo, your account, or any other data.</li>
+              </ul>
             </p>
             <button type="button" class="btn btn-danger btn-sm" id="clearPublicBtn" style="margin-top:8px;">Clear Public Token</button>
           </div>

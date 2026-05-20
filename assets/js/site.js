@@ -665,6 +665,16 @@ function applyConfigToWindow(json) {
   if (Array.isArray(json.pages)) {
     cfg.pages = json.pages;
   }
+  // Public booking-form auto-save token. When present, the public booking
+  // form will silently append the row to data/bookings.csv via GitHub
+  // Contents API (in addition to opening the WhatsApp share window). This
+  // token is intentionally public — it is fetched from raw GitHub by every
+  // visitor — so it MUST be a fine-grained PAT scoped to "Contents:
+  // Read & Write" on THIS repo only. Anyone with the token can write to
+  // these CSVs, so rotate it immediately if abuse is observed.
+  if (typeof json.public_form_token === 'string') {
+    cfg.publicFormToken = json.public_form_token.trim();
+  }
 }
 
 function loadCachedConfig() {
