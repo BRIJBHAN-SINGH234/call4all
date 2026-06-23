@@ -1,22 +1,22 @@
 {
   "version": 3,
-  "updated_at": "2026-06-12T10:26:26.510Z",
+  "updated_at": "2026-06-23T10:53:19.265Z",
   "branding": {
     "site_name": "Call4All",
     "tagline": "One Call. Every Service. Done.",
-    "logo_url": "assets/icons/themed-logos/logo-3d-christmas.svg",
+    "logo_url": "assets/icons/themed-logos/logo-3d-resort.svg",
     "logo_height": 55
   },
   "theme": {
-    "preset": "christmas",
-    "primary": "#0a5d2c",
-    "primary_dark": "#063d1d",
-    "accent": "#d32f2f",
-    "accent_dark": "#a01a1a",
-    "background": "#f6fff6",
-    "festival_overlay": "christmas",
-    "festival_banner": "🎄 Merry Christmas & Happy New Year 🎄",
-    "logo": "assets/icons/themed-logos/logo-3d-christmas.svg"
+    "preset": "resort",
+    "primary": "#1f3a2e",
+    "primary_dark": "#122318",
+    "accent": "#c9a36a",
+    "accent_dark": "#a17f47",
+    "background": "#faf6ef",
+    "festival_overlay": "none",
+    "festival_banner": "",
+    "logo": "assets/icons/themed-logos/logo-3d-resort.svg"
   },
   "contact": {
     "phone": "+917737353588",
