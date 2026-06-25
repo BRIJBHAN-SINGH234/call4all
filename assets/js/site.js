@@ -267,7 +267,7 @@ window.renderAutoLogoSvg = renderAutoLogoSvg;
  * and no waiting for Pages to rebuild). */
 function assetUrl(path) {
   if (!path) return path;
-  if (/^https?:\/\//i.test(path)) return path;
+  if (/^https?:\/\//i.test(path)) return optimizeImageUrl(path);
   if (/^data:/i.test(path)) return path;
   if (path.startsWith('assets/uploads/') || path.startsWith('/assets/uploads/')) {
     const cfg = window.SITE_CONFIG;
@@ -276,10 +276,42 @@ function assetUrl(path) {
   }
   return path;
 }
+
+/** Shrink Unsplash/CDN URLs on mobile to cut payload (major Lighthouse mobile win). */
+function optimizeImageUrl(url, kind) {
+  if (!url || !/^https?:\/\//i.test(url)) return url;
+  if (!/images\.unsplash\.com/i.test(url)) return url;
+  const narrow = window.matchMedia('(max-width: 768px)').matches;
+  const w = kind === 'slide'
+    ? (narrow ? 640 : 960)
+    : kind === 'thumb'
+      ? (narrow ? 320 : 560)
+      : (narrow ? 400 : 800);
+  const q = narrow ? 65 : 75;
+  let out = url;
+  if (/[?&]w=\d+/.test(out)) out = out.replace(/([?&])w=\d+/, `$1w=${w}`);
+  else out += (out.includes('?') ? '&' : '?') + `w=${w}`;
+  if (/[?&]q=\d+/.test(out)) out = out.replace(/([?&])q=\d+/, `$1q=${q}`);
+  else out += `&q=${q}`;
+  if (!/auto=format/.test(out)) out += '&auto=format&fit=crop';
+  return out;
+}
 window.assetUrl = assetUrl;
+window.optimizeImageUrl = optimizeImageUrl;
 
 /* ===== Hero Slider (admin-managed via site-config.json) ===== */
 let _sliderState = { idx: 0, timer: null, slides: [] };
+
+function applySlideBackground(el, url) {
+  if (!el || !url) return;
+  const u = optimizeImageUrl(assetUrl(url), 'slide');
+  el.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url('${u}')`;
+  el.style.backgroundSize = 'cover';
+  el.style.backgroundPosition = 'center';
+  el.style.color = '#fff';
+  el.classList.remove('slide-lazy');
+  el.removeAttribute('data-bg');
+}
 
 function renderSlider() {
   const mount = document.getElementById('sliderMount');
@@ -301,13 +333,18 @@ function renderSlider() {
     <div class="slider">
       <button class="arrow left" type="button" aria-label="Previous" onclick="moveSlide(-1)">&#10094;</button>
       <div class="slides" id="slides">
-        ${slides.map(s => {
-          const bg = s.background_url ? `style="background-image:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url('${assetUrl(s.background_url)}');background-size:cover;background-position:center;color:#fff;"` : '';
+        ${slides.map((s, i) => {
           const iconHtml = s.iconName ? `<span class="slide-icon">${ico(s.iconName)}</span>` : '';
           const inner = `${iconHtml}<div>${escapeHtml(s.title || '')}</div><div class="slide-sub">${escapeHtml(s.subtitle || '')}</div>`;
+          const bgUrl = s.background_url || '';
+          const lazyClass = (i > 0 && bgUrl) ? ' slide-lazy' : '';
+          const dataBg = bgUrl ? ` data-bg="${escapeAttr(bgUrl)}"` : '';
+          let style = i === 0 && bgUrl ? '' : '';
+          if (s.link) style += 'text-decoration:none;';
+          const styleAttr = style ? ` style="${style}"` : '';
           return s.link
-            ? `<a class="slide" href="${escapeAttr(s.link)}" ${bg} style="${bg ? '' : ''}text-decoration:none;">${inner}</a>`
-            : `<div class="slide" ${bg}>${inner}</div>`;
+            ? `<a class="slide${lazyClass}" href="${escapeAttr(s.link)}"${dataBg}${styleAttr}>${inner}</a>`
+            : `<div class="slide${lazyClass}"${dataBg}${styleAttr}>${inner}</div>`;
         }).join('')}
       </div>
       <button class="arrow right" type="button" aria-label="Next" onclick="moveSlide(1)">&#10095;</button>
@@ -315,6 +352,10 @@ function renderSlider() {
     </div>
   `;
   mount.innerHTML = html;
+
+  const firstSlide = mount.querySelector('.slide');
+  const firstBg = slides[0] && slides[0].background_url;
+  if (firstSlide && firstBg) applySlideBackground(firstSlide, firstBg);
 
   if (_sliderState.timer) clearInterval(_sliderState.timer);
   const interval = Math.max(2000, Number(cfg.interval_ms) || 4500);
@@ -331,6 +372,11 @@ function showSlide(n) {
   else _sliderState.idx = n;
   slidesEl.style.transform = `translateX(-${_sliderState.idx * 100}%)`;
   document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === _sliderState.idx));
+  const slideEls = slidesEl.querySelectorAll('.slide');
+  const cur = slideEls[_sliderState.idx];
+  if (cur) applySlideBackground(cur, cur.getAttribute('data-bg'));
+  const next = slideEls[(_sliderState.idx + 1) % total];
+  if (next && next.classList.contains('slide-lazy')) applySlideBackground(next, next.getAttribute('data-bg'));
 }
 function moveSlide(delta) {
   showSlide(_sliderState.idx + delta);
@@ -949,9 +995,11 @@ function renderHomeServiceGrid() {
   const ico = (name) => (typeof window.c4aIcon === 'function' && name)
     ? window.c4aIcon(name, { size: 30 })
     : '';
-  grid.innerHTML = window.SITE_CONFIG.services.map(s => `
+  grid.innerHTML = window.SITE_CONFIG.services.map(s => {
+    const img = optimizeImageUrl(s.image || '', 'service');
+    return `
     <div class="service-card">
-      <div class="service-image" style="background-image:url('${s.image || ''}');">
+      <div class="service-image" style="background-image:url('${img}');">
         <div class="service-icon-overlay">${ico(s.iconName) || s.icon || ''}</div>
       </div>
       <div class="service-body">
@@ -960,7 +1008,8 @@ function renderHomeServiceGrid() {
         <a href="${escapeAttr(s.page)}" class="btn btn-outline-dark btn-sm" style="align-self:center;">Learn More <span data-c4a-icon="arrow-right" data-icon-size="14"></span></a>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
   if (typeof window.c4aHydrateIcons === 'function') window.c4aHydrateIcons(grid);
 }
 
@@ -1003,13 +1052,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Icons already hydrated in paintSiteShellOnce; refresh after async gallery
 
-  // Render gallery section if present (homepage / service pages)
+  // Render gallery when scrolled near (homepage) — saves mobile bandwidth
   if (typeof renderGallerySection === 'function') {
-    renderGallerySection()
-      .then(() => {
-        if (typeof window.c4aSwapEmojis === 'function') window.c4aSwapEmojis(document.body);
-      })
-      .catch(err => console.warn('[Gallery] init failed:', err));
+    scheduleGalleryRender();
   }
 
   setupPwaInstall();
@@ -1106,6 +1151,28 @@ function showIosInstallHintIfNeeded() {
    Optional: data-limit="12" caps the result count. */
 let _galleryAllItems = [];   // cached full set for the dedicated gallery page
 
+function scheduleGalleryRender() {
+  const mount = document.getElementById('galleryMount');
+  if (!mount) return;
+  const run = () => renderGallerySection()
+    .then(() => {
+      if (typeof window.c4aSwapEmojis === 'function') window.c4aSwapEmojis(document.body);
+    })
+    .catch(err => console.warn('[Gallery] init failed:', err));
+
+  const isDedicatedGallery = document.getElementById('galSearchInput') || document.getElementById('galCategorySelect');
+  if (isDedicatedGallery || !('IntersectionObserver' in window)) {
+    run();
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    if (!entries[0].isIntersecting) return;
+    io.disconnect();
+    run();
+  }, { rootMargin: '200px' });
+  io.observe(mount);
+}
+
 async function renderGallerySection() {
   const mount = document.getElementById('galleryMount');
   if (!mount) return;
@@ -1182,7 +1249,7 @@ function paintGalleryGrid(mount) {
   }
 
   const cards = items.map((it, idx) => {
-    const imgUrl = assetUrl(it.image_path);
+    const imgUrl = optimizeImageUrl(assetUrl(it.image_path), 'thumb');
     const title = escapeHtml(it.title || '');
     const desc = escapeHtml(it.description || '');
     const cat = escapeHtml(it.category || '');

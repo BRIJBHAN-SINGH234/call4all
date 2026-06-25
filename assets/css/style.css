@@ -3,8 +3,10 @@
    image-rich storytelling, generous whitespace. Admin can override the
    palette from "Theme & Festival" settings; below are the runtime defaults. */
 
-/* Fonts: display=optional prevents layout shift when webfonts load late */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=optional');
+/* Fonts: load only on tablet/desktop — skips ~100KB+ on mobile Lighthouse */
+@media (min-width: 769px) {
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=optional');
+}
 
 :root {
   /* Earth-tone luxury palette (forest green + warm gold) */
@@ -1798,12 +1800,16 @@ body.festival-independence {
     padding: 12px 4px;
   }
 
-  .hero { padding: 80px 22px 60px; min-height: 70vh; }
+  .hero {
+    padding: 64px 22px 48px;
+    min-height: 52vh;
+    background: linear-gradient(135deg, #0f1e14 0%, #1f3a2e 55%, #122318 100%);
+  }
   .hero h1 { font-size: 32px; }
   .hero p { font-size: 15px; }
-  .slider { height: 340px; }
-  #sliderMount { min-height: 340px; }
-  #serviceGrid { min-height: 1200px; }
+  .slider { height: 300px; }
+  #sliderMount { min-height: 300px; }
+  #serviceGrid { min-height: 720px; }
   .slide { font-size: 22px; }
   .slide-sub { font-size: 14px; }
   .arrow { font-size: 20px; width: 38px; height: 38px; }
@@ -1812,7 +1818,11 @@ body.festival-independence {
 
   .section { padding: 56px 22px; }
   .section-title { font-size: 26px; }
-  .booking-section { padding: 56px 16px; background-attachment: scroll; }
+  .booking-section {
+    padding: 56px 16px;
+    background: linear-gradient(135deg, #0f1e14, #1f3a2e);
+    background-attachment: scroll;
+  }
   .booking-card { padding: 28px 22px; }
   .booking-card h2 { font-size: 24px; }
   .form-row { grid-template-columns: 1fr; gap: 0; }
@@ -1826,7 +1836,18 @@ body.festival-independence {
   .service-detail { padding: 50px 18px; }
   .service-detail h1 { font-size: 28px; }
 
-  .cta-strip { padding: 60px 20px; background-attachment: scroll; }
+  .cta-strip {
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #122318, #1f3a2e);
+    background-attachment: scroll;
+  }
+  .manifesto-block {
+    background: linear-gradient(135deg, rgba(10,18,12,0.98) 0%, rgba(18,35,24,0.94) 100%);
+  }
+  .section-below-fold {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 480px;
+  }
 
   .site-footer { padding: 50px 22px 18px; }
   .footer-content { gap: 28px; }
