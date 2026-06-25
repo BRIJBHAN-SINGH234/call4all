@@ -3,7 +3,8 @@
    image-rich storytelling, generous whitespace. Admin can override the
    palette from "Theme & Festival" settings; below are the runtime defaults. */
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+/* Fonts: display=optional prevents layout shift when webfonts load late */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=optional');
 
 :root {
   /* Earth-tone luxury palette (forest green + warm gold) */
@@ -48,7 +49,20 @@ h1, h2, h3, h4, h5, .brand-name, .section-title, .hero h1 {
 }
 
 a { color: var(--primary); text-decoration: none; transition: var(--transition); }
-img { max-width: 100%; display: block; }
+img { max-width: 100%; display: block; height: auto; }
+
+/* ===== Layout stability (prevents CLS from JS-injected header/slider/gallery) ===== */
+#site-header { min-height: 79px; contain: layout style; }
+#site-footer { min-height: 200px; contain: layout style; }
+#sliderMount {
+  min-height: 480px;
+  background: var(--primary-dark);
+  contain: layout style;
+}
+#serviceGrid { min-height: 680px; }
+#galleryMount { min-height: 280px; contain: layout style; }
+.about-2col-image { aspect-ratio: 4 / 3; min-height: 0; }
+.service-card .service-image { aspect-ratio: 16 / 10; min-height: 0; }
 
 /* ===== Header ===== */
 .site-header {
@@ -1788,6 +1802,8 @@ body.festival-independence {
   .hero h1 { font-size: 32px; }
   .hero p { font-size: 15px; }
   .slider { height: 340px; }
+  #sliderMount { min-height: 340px; }
+  #serviceGrid { min-height: 1200px; }
   .slide { font-size: 22px; }
   .slide-sub { font-size: 14px; }
   .arrow { font-size: 20px; width: 38px; height: 38px; }

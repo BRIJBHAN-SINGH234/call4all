@@ -74,7 +74,7 @@
 <section class="section section-light">
   <div class="about-2col">
     <div class="about-2col-image"
-         style="background-image:url('https://images.unsplash.com/photo-1556761175-b413da4baf72?w=1200&q=80&auto=format&fit=crop');"></div>
+         style="background-image:url('https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&q=75&auto=format&fit=crop');"></div>
     <div class="about-2col-text">
       <span class="section-eyebrow">About <span data-brand-name></span></span>
       <h2>Your Single Point <span class="accent">For Every Need.</span></h2>
@@ -622,42 +622,17 @@
 }
 </script>
 
-<script src="assets/js/icons.js"></script>
-<script src="assets/js/site.js"></script>
-<script src="assets/js/booking.js"></script>
-<script>
+<script src="assets/js/icons.js" defer></script>
+<script src="assets/js/site.js" defer></script>
+<script src="assets/js/booking.js" defer></script>
+<script defer>
 document.addEventListener('DOMContentLoaded', () => {
-  if (typeof window.renderSlider === 'function') window.renderSlider();
   if (typeof window.renderAreasServed === 'function') window.renderAreasServed();
   if (typeof window.injectStructuredData === 'function') window.injectStructuredData();
-
-  const grid = document.getElementById('serviceGrid');
-  if (grid) {
-    const ico = (name) => (typeof window.c4aIcon === 'function' && name)
-      ? window.c4aIcon(name, { size: 30 })
-      : '';
-    grid.innerHTML = window.SITE_CONFIG.services.map(s => `
-      <div class="service-card">
-        <div class="service-image" style="background-image:url('${s.image || ''}');">
-          <div class="service-icon-overlay">${ico(s.iconName) || s.icon || ''}</div>
-        </div>
-        <div class="service-body">
-          <h3>${s.name}</h3>
-          <p>${s.desc}</p>
-          <a href="${s.page}" class="btn btn-outline-dark btn-sm" style="align-self:center;">Learn More <span data-c4a-icon="arrow-right" data-icon-size="14"></span></a>
-        </div>
-      </div>
-    `).join('');
-    if (typeof window.c4aHydrateIcons === 'function') window.c4aHydrateIcons(grid);
-  }
 
   const slot = document.getElementById('bookingFormSlot');
   if (slot) slot.innerHTML = renderBookingForm();
   if (typeof initBookingForm === 'function') initBookingForm();
-
-  // Final hydrate pass after everything is mounted
-  if (typeof window.c4aHydrateIcons === 'function') window.c4aHydrateIcons();
-  if (typeof window.c4aSwapEmojis === 'function') window.c4aSwapEmojis(document.body);
 });
 </script>
 

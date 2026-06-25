@@ -396,6 +396,11 @@ window.renderDynamicPage = renderDynamicPage;
 function escapeAttr(s) {
   return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
+function escapeHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, m => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[m]);
+}
 
 /* ===== Areas We Serve (loads from data/areas.csv) =====
  * Renders a list of active service areas as clickable chips, and feeds
@@ -733,7 +738,7 @@ async function fetchAndApplySiteConfig() {
           applyConfigToWindow(cached);
           applyTheme(window.SITE_CONFIG.theme);
           applyBranding();
-          rerenderSiteShell();
+          rerenderSiteShellIfNeeded();
           return;
         }
       }
@@ -742,11 +747,31 @@ async function fetchAndApplySiteConfig() {
     applyConfigToWindow(json);
     applyTheme(window.SITE_CONFIG.theme);
     applyBranding();
-    rerenderSiteShell();
+    rerenderSiteShellIfNeeded();
     try { localStorage.setItem(SITE_CONFIG_CACHE_KEY, JSON.stringify(json)); } catch (e) {}
   } catch (e) {
     console.warn('[Site] site-config load failed:', e.message);
   }
+}
+
+function configShellSignature() {
+  const cfg = window.SITE_CONFIG || {};
+  return JSON.stringify({
+    businessName: cfg.businessName,
+    phone: cfg.phone,
+    logoUrl: cfg.logoUrl,
+    themePreset: cfg.theme && cfg.theme.preset,
+    slideCount: (cfg.slider && cfg.slider.slides) ? cfg.slider.slides.length : 0,
+    festivalBanner: cfg.theme && cfg.theme.festival_banner
+  });
+}
+let _lastShellSig = '';
+
+function rerenderSiteShellIfNeeded() {
+  const sig = configShellSignature();
+  if (sig === _lastShellSig) return;
+  _lastShellSig = sig;
+  rerenderSiteShell();
 }
 
 function rerenderSiteShell() {
@@ -918,29 +943,65 @@ function toggleMenu() {
   if (nav) nav.classList.toggle('open');
 }
 
-/* ===== Auto-render on DOMContentLoaded ===== */
-document.addEventListener('DOMContentLoaded', function () {
-  // Apply theme/branding from cached config first (instant)
+function renderHomeServiceGrid() {
+  const grid = document.getElementById('serviceGrid');
+  if (!grid || grid.children.length) return;
+  const ico = (name) => (typeof window.c4aIcon === 'function' && name)
+    ? window.c4aIcon(name, { size: 30 })
+    : '';
+  grid.innerHTML = window.SITE_CONFIG.services.map(s => `
+    <div class="service-card">
+      <div class="service-image" style="background-image:url('${s.image || ''}');">
+        <div class="service-icon-overlay">${ico(s.iconName) || s.icon || ''}</div>
+      </div>
+      <div class="service-body">
+        <h3>${escapeHtml(s.name)}</h3>
+        <p>${escapeHtml(s.desc)}</p>
+        <a href="${escapeAttr(s.page)}" class="btn btn-outline-dark btn-sm" style="align-self:center;">Learn More <span data-c4a-icon="arrow-right" data-icon-size="14"></span></a>
+      </div>
+    </div>
+  `).join('');
+  if (typeof window.c4aHydrateIcons === 'function') window.c4aHydrateIcons(grid);
+}
+
+function paintSiteShellOnce() {
+  if (window._c4aShellPainted) return;
+  window._c4aShellPainted = true;
+
   applyTheme(window.SITE_CONFIG.theme);
   applyBranding();
-  insertFestivalBannerIfNeeded();
 
-  const activePage = document.body.getAttribute('data-page') || '';
-
+  const activePage = document.body ? (document.body.getAttribute('data-page') || '') : '';
   const headerSlot = document.getElementById('site-header');
-  if (headerSlot) headerSlot.outerHTML = renderHeader(activePage);
-
+  if (headerSlot && !headerSlot.querySelector('header')) {
+    headerSlot.outerHTML = renderHeader(activePage);
+  }
   const footerSlot = document.getElementById('site-footer');
-  if (footerSlot) footerSlot.outerHTML = renderFooter();
-
+  if (footerSlot && !footerSlot.querySelector('footer')) {
+    footerSlot.outerHTML = renderFooter();
+  }
   const floatSlot = document.getElementById('site-floating');
-  if (floatSlot) floatSlot.outerHTML = renderFloatingButtons();
+  if (floatSlot && !floatSlot.querySelector('.floating-buttons')) {
+    floatSlot.outerHTML = renderFloatingButtons();
+  }
+
+  insertFestivalBannerIfNeeded();
+  if (typeof renderSlider === 'function') renderSlider();
+  renderHomeServiceGrid();
+
+  _lastShellSig = configShellSignature();
+
+  if (typeof window.c4aHydrateIcons === 'function') window.c4aHydrateIcons(document.body);
+  if (typeof window.c4aSwapEmojis === 'function') window.c4aSwapEmojis(document.body);
+}
+
+/* ===== Auto-render on DOMContentLoaded ===== */
+document.addEventListener('DOMContentLoaded', function () {
+  paintSiteShellOnce();
 
   if (typeof initBookingForm === 'function') initBookingForm();
 
-  // Re-hydrate icons + swap emojis in the freshly-rendered header/footer/floating
-  if (typeof window.c4aHydrateIcons === 'function') window.c4aHydrateIcons();
-  if (typeof window.c4aSwapEmojis === 'function') window.c4aSwapEmojis(document.body);
+  // Icons already hydrated in paintSiteShellOnce; refresh after async gallery
 
   // Render gallery section if present (homepage / service pages)
   if (typeof renderGallerySection === 'function') {
@@ -956,6 +1017,11 @@ document.addEventListener('DOMContentLoaded', function () {
   // Fetch latest config in background and re-render shell
   fetchAndApplySiteConfig();
 });
+
+// Paint shell as early as possible (script is at end of <body>) to cut CLS
+if (document.body) {
+  paintSiteShellOnce();
+}
 
 /* ===== PWA: Service Worker + Install Prompt ===== */
 let _deferredInstallPrompt = null;
@@ -1275,10 +1341,4 @@ function parseCsvLine(line) {
   }
   result.push(cur);
   return result;
-}
-
-function escapeHtml(str) {
-  return String(str || '').replace(/[&<>"']/g, m => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  })[m]);
 }

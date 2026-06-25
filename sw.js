@@ -8,7 +8,7 @@
  *   - GitHub API calls:  network-only (sensitive, never cache)
  */
 
-const CACHE_VERSION = 'v10-2026-05-13-pwa-icon-sync';
+const CACHE_VERSION = 'v11-2026-05-20-perf';
 const STATIC_CACHE = 'c4a-static-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'c4a-runtime-' + CACHE_VERSION;
 
@@ -83,10 +83,9 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // JS / CSS files — network-first so deploy updates show on normal reload
-  // (without requiring a hard refresh / SW cache version bump every time)
+  // JS / CSS — stale-while-revalidate: fast repeat visits + cache lifetime score
   if (/\.(js|css|mjs)(\?|$)/.test(url.pathname)) {
-    event.respondWith(networkFirst(req));
+    event.respondWith(staleWhileRevalidate(req));
     return;
   }
 
@@ -107,6 +106,16 @@ async function cacheFirst(req) {
   } catch (err) {
     return cached || new Response('Offline', { status: 503 });
   }
+}
+
+async function staleWhileRevalidate(req) {
+  const cache = await caches.open(RUNTIME_CACHE);
+  const cached = await cache.match(req);
+  const networkPromise = fetch(req).then(res => {
+    if (res.ok) cache.put(req, res.clone());
+    return res;
+  }).catch(() => null);
+  return cached || networkPromise || new Response('Offline', { status: 503 });
 }
 
 async function networkFirst(req) {
