@@ -1,0 +1,33 @@
+{
+  "baseUrl": "https://call4all.co.in",
+  "excludeHtml": [
+    "admin.html",
+    "staff.html",
+    "logo-preview.html",
+    "googleb71665e6b1f52ee2.html",
+    "page.html"
+  ],
+  "extraPaths": [
+    { "path": "llms.txt", "priority": 0.5, "changefreq": "weekly" },
+    { "path": "llms-full.txt", "priority": 0.5, "changefreq": "weekly" }
+  ],
+  "dynamicPageDefaults": {
+    "priority": 0.75,
+    "changefreq": "weekly"
+  },
+  "rules": [
+    { "pattern": "^kukas\\.html$", "priority": 0.95, "changefreq": "weekly" },
+    { "pattern": "car-rental-kukas-jaipur|room-rent-kukas-jaipur|flat-rent-kukas-jaipur", "priority": 0.92, "changefreq": "weekly" },
+    { "pattern": "car-rental-kukas\\.html$|wedding-services-kukas\\.html$", "priority": 0.95, "changefreq": "weekly" },
+    { "pattern": "-kukas", "priority": 0.9, "changefreq": "weekly" },
+    { "pattern": "^gallery\\.html$|^contact\\.html$", "priority": 0.8, "changefreq": "weekly" },
+    { "pattern": "^about\\.html$", "priority": 0.7, "changefreq": "monthly" },
+    {
+      "pattern": "rental-cars|rooms-flats|construction|home-tutor|manpower-supply|marriage-services|flower-bouquet|car-decoration",
+      "priority": 0.9,
+      "changefreq": "weekly"
+    }
+  ],
+  "home": { "priority": 1.0, "changefreq": "daily" },
+  "default": { "priority": 0.8, "changefreq": "weekly" }
+}

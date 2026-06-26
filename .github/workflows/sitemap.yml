@@ -1,0 +1,33 @@
+name: Auto-generate sitemap
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**.html'
+      - 'data/site-config.json'
+      - 'data/sitemap-config.json'
+      - 'scripts/generate-sitemap.mjs'
+      - '.github/workflows/sitemap.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  sitemap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate sitemap.xml
+        run: node scripts/generate-sitemap.mjs
+
+      - name: Commit sitemap if changed
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore: auto-update sitemap.xml'
+          file_pattern: sitemap.xml

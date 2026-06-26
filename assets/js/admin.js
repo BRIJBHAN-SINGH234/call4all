@@ -2003,6 +2003,65 @@ function bindSettingsEvents() {
     localStorage.removeItem(STORAGE_PASS_HASH);
     showMsg('settingsMsg', 'Admin password cleared.', 'info');
   });
+
+  const regenBtn = document.getElementById('regenSitemapBtn');
+  if (regenBtn) {
+    regenBtn.addEventListener('click', () => regenerateSitemap({ silent: false }));
+  }
+}
+
+/* ===== SITEMAP AUTO-GENERATION ===== */
+async function listRootHtmlFiles(token) {
+  const gh = window.SITE_CONFIG && window.SITE_CONFIG.github;
+  if (!gh) throw new Error('GitHub repo settings missing in site-config.');
+  const res = await fetch(
+    `https://api.github.com/repos/${gh.owner}/${gh.repo}/contents/?ref=${encodeURIComponent(gh.branch || 'main')}&t=${Date.now()}`,
+    {
+      headers: {
+        Accept: 'application/vnd.github+json',
+        Authorization: `Bearer ${token}`
+      },
+      cache: 'no-store'
+    }
+  );
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || `Could not list repo files (${res.status})`);
+  }
+  const data = await res.json();
+  if (!Array.isArray(data)) return [];
+  return data
+    .filter((f) => f.type === 'file' && /\.html$/i.test(f.name))
+    .map((f) => f.name);
+}
+
+async function regenerateSitemap({ silent } = {}) {
+  if (!window.C4aSitemapGen) throw new Error('Sitemap generator script not loaded.');
+  const token = getToken();
+  if (!token) throw new Error('GitHub token required. Log in again.');
+
+  const btn = document.getElementById('regenSitemapBtn');
+  const status = document.getElementById('sitemapStatus');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Generating...'; }
+
+  try {
+    const [config, htmlFiles] = await Promise.all([
+      window.C4aSitemapGen.loadConfig(),
+      listRootHtmlFiles(token)
+    ]);
+    const pages = ensurePagesArray().filter((p) => p.enabled !== false && p.slug);
+    const xml = window.C4aSitemapGen.generate(config, htmlFiles, pages);
+    const sha = await window.CsvAPI.getFileSha('sitemap.xml', token);
+    await window.CsvAPI.putFile('sitemap.xml', xml, sha, token, 'Auto-generate sitemap.xml (admin)');
+
+    const count = window.C4aSitemapGen.buildEntries(config, htmlFiles, pages).length;
+    const msg = `✅ Sitemap updated — ${count} URLs. Submit https://call4all.co.in/sitemap.xml in Google Search Console if needed.`;
+    if (status) status.textContent = msg;
+    if (!silent) showMsg('settingsMsg', msg, 'success');
+    return count;
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '🔄 Regenerate Sitemap Now'; }
+  }
 }
 
 async function handleSaveSettings(e) {
@@ -3316,9 +3375,14 @@ async function handleSavePage(e) {
 
   try {
     await saveSiteConfig(`Pages: ${isNew ? 'create' : 'update'} "${page.title}"`);
+    try {
+      await regenerateSitemap({ silent: true });
+    } catch (sitemapErr) {
+      console.warn('[sitemap] auto-regen after page save:', sitemapErr.message);
+    }
     closePageModal();
     refreshPagesUI();
-    alert(`✅ Page saved. View it at:\npage.html?slug=${page.slug}\n\nNote: Public visitors may take ~5 minutes (CDN cache).`);
+    alert(`✅ Page saved. View it at:\npage.html?slug=${page.slug}\n\nSitemap.xml was updated automatically.\nPublic visitors may take ~5 minutes (CDN cache).`);
   } catch (err) {
     alert('Save failed: ' + err.message);
     submitBtn.disabled = false; submitBtn.textContent = '💾 Save Page';
@@ -3332,6 +3396,11 @@ async function deletePage(id) {
   siteConfigData.json.pages = ensurePagesArray().filter(p => p.id !== id);
   try {
     await saveSiteConfig(`Pages: delete "${page.title}"`);
+    try {
+      await regenerateSitemap({ silent: true });
+    } catch (sitemapErr) {
+      console.warn('[sitemap] auto-regen after page delete:', sitemapErr.message);
+    }
     refreshPagesUI();
   } catch (err) {
     alert('Delete failed: ' + err.message);

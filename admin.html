@@ -960,6 +960,16 @@
       </div>
 
       <div class="admin-card-section">
+        <h3>🗺️ Sitemap (SEO)</h3>
+        <p class="subtitle">
+          <code>sitemap.xml</code> is built automatically from all public HTML pages + custom admin pages.
+          GitHub Actions updates it on every push; you can also regenerate manually below.
+        </p>
+        <p class="help-text" id="sitemapStatus">Last check: —</p>
+        <button type="button" class="btn btn-primary" id="regenSitemapBtn">🔄 Regenerate Sitemap Now</button>
+      </div>
+
+      <div class="admin-card-section">
         <h3>⚙️ System Settings</h3>
         <p class="subtitle">Browser-only settings (token + admin password).</p>
         <form id="settingsForm">
@@ -1255,6 +1265,7 @@
 
 <script src="assets/js/site.js"></script>
 <script src="assets/js/booking.js"></script>
+<script src="assets/js/sitemap-gen.js"></script>
 <script src="assets/js/admin.js"></script>
 <script>
 (function () {
