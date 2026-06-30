@@ -308,8 +308,9 @@
 /* --- SECTION 6: Le Mugs long-scroll table (4200px journey) --- */
 .lm-section6 {
   position: relative;
-  height: 4200px;
+  height: 4350px;
   width: 100%;
+  --s6-top-offset: 150px;
   background-color: #194853;
   background-image:
     radial-gradient(circle at 20% 30%, rgba(255,255,255,0.03) 0%, transparent 50%),
@@ -329,7 +330,7 @@
 }
 .lm-s6-title {
   position: absolute;
-  top: 60px;
+  top: calc(60px + var(--s6-top-offset));
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
@@ -364,7 +365,10 @@
 }
 .lm-s6-stage {
   position: absolute;
-  inset: 0;
+  top: var(--s6-top-offset);
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 15;
 }
 .lm-s6-cat {
@@ -690,12 +694,13 @@
   .lm-contact-block { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
   .home-creative .site-header { padding: 14px 20px; }
   .lm-story { min-height: 70vh; padding: 60px 24px; }
-  .lm-section6 { height: 3200px; }
+  .lm-section6 { height: 3350px; }
   .lm-s6-stage {
+    top: var(--s6-top-offset);
     transform: scale(0.45);
     transform-origin: top center;
   }
-  .lm-s6-title { width: 200px; top: 40px; }
+  .lm-s6-title { width: 200px; top: calc(40px + var(--s6-top-offset)); }
   .lm-s6-title h2 { font-size: 28px; }
   .lm-s6-title h1, .lm-s6-title-last { font-size: 48px !important; }
   .lm-s6-roundbtn { width: 90px; height: 90px; margin: -45px 0 0 -45px; }
