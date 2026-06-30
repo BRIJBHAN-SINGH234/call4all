@@ -5,7 +5,8 @@
     "staff.html",
     "logo-preview.html",
     "googleb71665e6b1f52ee2.html",
-    "page.html"
+    "page.html",
+    "home-classic.html"
   ],
   "extraPaths": [
     { "path": "llms.txt", "priority": 0.5, "changefreq": "weekly" },
