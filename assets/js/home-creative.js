@@ -54,6 +54,8 @@
     el.dataset.p0 = p0;
     el.dataset.p1 = p1;
   }
+
+  function escapeAttr(s) {
     return String(s || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
@@ -66,21 +68,37 @@
     const pctEl = document.getElementById('lmPreloaderPct');
     if (!el || !pctEl) return;
 
+    const finish = () => {
+      el.classList.add('done');
+      document.body.classList.add('loaded');
+      sessionStorage.setItem('c4a_preloader_done', '1');
+    };
+
     const skip = sessionStorage.getItem('c4a_preloader_done') === '1'
       || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (skip) {
-      el.classList.add('done');
-      document.body.classList.add('loaded');
+      finish();
       return;
     }
 
     let pct = 0;
+    let done = false;
+    const safeDone = () => {
+      if (done) return;
+      done = true;
+      pctEl.textContent = '100%';
+      setTimeout(finish, 350);
+    };
+
+    /* Always dismiss — never block the page */
+    setTimeout(safeDone, 3200);
+    window.addEventListener('load', safeDone, { once: true });
+
     const tick = () => {
+      if (done) return;
       pct += Math.random() * 12 + 4;
       if (pct >= 100) {
-        pctEl.textContent = '100%';
-        sessionStorage.setItem('c4a_preloader_done', '1');
-        setTimeout(() => { el.classList.add('done'); document.body.classList.add('loaded'); }, 400);
+        safeDone();
         return;
       }
       pctEl.textContent = Math.floor(pct) + '%';
