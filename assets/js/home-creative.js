@@ -2,35 +2,55 @@
 (function () {
   'use strict';
 
-  const S6_HEIGHT = 3800;
+  const S6_VIEW_H = 3544;
+  const S6_REVEAL_BAND = 0.07;
+  const S6_MOBILE_MQ = '(max-width: 900px)';
 
-  /* Scattered table layout — mirrors Le Mugs vertical journey */
-  const S6_SCENE = [
-    { type: 'deco', top: 20, left: 'calc(50% + 160px)', html: '<div class="lm-s6-deco-card"><strong>Call4All</strong><small>Service Menu</small></div>', from: { x: 24, y: -16, r: 8 } },
-    { type: 'deco', top: 8, left: 'calc(50% - 400px)', icon: 'phone', size: 52, from: { x: -14, y: 0, r: -10 } },
+  const S6_SCENE_DESKTOP = [
+    { type: 'deco', top: 20, left: 'calc(50% + 140px)', html: '<div class="lm-s6-deco-card"><strong>Call4All</strong><small>Service Menu</small></div>', from: { x: 24, y: -16, r: 8 } },
+    { type: 'deco', top: 8, left: 'calc(50% - 360px)', icon: 'phone', size: 52, from: { x: -14, y: 0, r: -10 } },
     { type: 'cat', label: 'Rental & Travel', top: 250, left: 'calc(50% - 115px)' },
-    { type: 'service', sid: 'rental-cars', top: 310, left: 'calc(50% - 440px)', size: 320, wide: true, from: { x: -28, y: 0, r: -12 } },
-    { type: 'deco', top: 400, left: 'calc(50% + 300px)', icon: 'car', size: 44, from: { x: 10, y: -6, r: 6 } },
-    { type: 'service', sid: 'car-decoration', top: 490, left: 'calc(50% + 55px)', size: 255, from: { x: 22, y: -10, r: 14 } },
-    { type: 'cat', label: 'Home & Property', top: 730, left: 'calc(50% - 130px)' },
-    { type: 'service', sid: 'rooms-flats', top: 800, left: 'calc(50% - 180px)', size: 360, wide: true, from: { x: 18, y: 14, r: 9 } },
-    { type: 'deco', top: 770, left: 'calc(50% - 430px)', icon: 'home', size: 42, from: { x: -8, y: 4, r: -5 } },
-    { type: 'cat', label: 'Work & Labor', top: 1130, left: 'calc(50% - 95px)' },
-    { type: 'service', sid: 'construction', top: 1200, left: 'calc(50% - 435px)', size: 285, wide: true, from: { x: -24, y: -12, r: -11 } },
-    { type: 'service', sid: 'manpower-supply', top: 1360, left: 'calc(50% + 75px)', size: 295, wide: true, from: { x: 26, y: 0, r: 12 } },
-    { type: 'cat', label: 'Education', top: 1690, left: 'calc(50% - 72px)' },
-    { type: 'service', sid: 'home-tutor', top: 1760, left: 'calc(50% - 130px)', size: 265, from: { x: -12, y: 18, r: -8 } },
-    { type: 'cat', label: 'Events & Celebrations', top: 2090, left: 'calc(50% - 168px)' },
-    { type: 'service', sid: 'marriage-services', top: 2160, left: 'calc(50% - 455px)', size: 335, wide: true, from: { x: -30, y: 0, r: -11 } },
-    { type: 'service', sid: 'flower-bouquet', top: 2350, left: 'calc(50% + 48px)', size: 260, from: { x: 20, y: 10, r: 13 } },
-    { type: 'deco', top: 2290, left: 'calc(50% + 310px)', icon: 'flower', size: 40, from: { x: 8, y: 0, r: 5 } },
-    { type: 'cat', label: 'Anything Else?', top: 2690, left: 'calc(50% - 108px)' },
-    { type: 'service', sid: 'other', top: 2760, left: 'calc(50% - 125px)', size: 255, from: { x: 0, y: 22, r: -6 } },
-    { type: 'deco', top: 2910, left: 'calc(50% + 270px)', icon: 'check-shield', size: 58, from: { x: 14, y: 0, r: 9 } }
+    { type: 'service', sid: 'rental-cars', top: 310, left: '5%', size: 300, wide: true, from: { x: -28, y: 0, r: -12 } },
+    { type: 'service', sid: 'car-decoration', top: 310, right: '5%', size: 240, from: { x: 22, y: 0, r: 12 } },
+    { type: 'cat', label: 'Home & Property', top: 680, left: 'calc(50% - 130px)' },
+    { type: 'service', sid: 'rooms-flats', top: 750, left: 'calc(50% - 180px)', size: 340, wide: true, from: { x: 18, y: 14, r: 9 } },
+    { type: 'cat', label: 'Work & Labor', top: 1060, left: 'calc(50% - 95px)' },
+    { type: 'service', sid: 'construction', top: 1130, left: '5%', size: 270, wide: true, from: { x: -24, y: -12, r: -11 } },
+    { type: 'service', sid: 'manpower-supply', top: 1130, right: '5%', size: 270, wide: true, from: { x: 26, y: 0, r: 12 } },
+    { type: 'cat', label: 'Education', top: 1440, left: 'calc(50% - 72px)' },
+    { type: 'service', sid: 'home-tutor', top: 1510, left: 'calc(50% - 132px)', size: 265, from: { x: -12, y: 18, r: -8 } },
+    { type: 'cat', label: 'Events & Celebrations', top: 1800, left: 'calc(50% - 168px)' },
+    { type: 'service', sid: 'marriage-services', top: 1870, left: '5%', size: 310, wide: true, from: { x: -30, y: 0, r: -11 } },
+    { type: 'service', sid: 'flower-bouquet', top: 1870, right: '5%', size: 240, from: { x: 20, y: 10, r: 13 } },
+    { type: 'cat', label: 'Anything Else?', top: 2180, left: 'calc(50% - 108px)' },
+    { type: 'service', sid: 'other', top: 2250, left: 'calc(50% - 127px)', size: 255, from: { x: 0, y: 22, r: -6 } }
   ];
 
-  const S6_VIEW_H = 3544;
-  const S6_REVEAL_BAND = 0.055;
+  const S6_SCENE_MOBILE = [
+    { type: 'cat', label: 'Rental & Travel', top: 0, center: true },
+    { type: 'service', sid: 'rental-cars', top: 48, left: '3%', size: 158, wide: true, from: { x: -12, y: 0, r: -8 } },
+    { type: 'service', sid: 'car-decoration', top: 48, right: '3%', size: 148, from: { x: 12, y: 0, r: 8 } },
+    { type: 'cat', label: 'Home & Property', top: 250, center: true },
+    { type: 'service', sid: 'rooms-flats', top: 300, center: true, size: 200, wide: true, from: { x: 0, y: 12, r: 6 } },
+    { type: 'cat', label: 'Work & Labor', top: 520, center: true },
+    { type: 'service', sid: 'construction', top: 568, left: '3%', size: 148, wide: true, from: { x: -12, y: 0, r: -8 } },
+    { type: 'service', sid: 'manpower-supply', top: 568, right: '3%', size: 148, wide: true, from: { x: 12, y: 0, r: 8 } },
+    { type: 'cat', label: 'Education', top: 760, center: true },
+    { type: 'service', sid: 'home-tutor', top: 808, center: true, size: 170, from: { x: 0, y: 10, r: -5 } },
+    { type: 'cat', label: 'Events & Celebrations', top: 990, center: true },
+    { type: 'service', sid: 'marriage-services', top: 1038, left: '3%', size: 155, wide: true, from: { x: -12, y: 0, r: -7 } },
+    { type: 'service', sid: 'flower-bouquet', top: 1038, right: '3%', size: 145, from: { x: 12, y: 0, r: 7 } },
+    { type: 'cat', label: 'Anything Else?', top: 1220, center: true },
+    { type: 'service', sid: 'other', top: 1268, center: true, size: 165, from: { x: 0, y: 10, r: -4 } }
+  ];
+
+  function isMobileLayout() {
+    return window.matchMedia(S6_MOBILE_MQ).matches;
+  }
+
+  function getScene() {
+    return isMobileLayout() ? S6_SCENE_MOBILE : S6_SCENE_DESKTOP;
+  }
 
   function topToProgress(top, stageHeight) {
     const p = top / stageHeight;
@@ -114,21 +134,42 @@
 
   function applyNodePosition(el, node) {
     el.style.top = node.top + 'px';
-    el.style.left = node.left || '';
+    el.style.left = '';
     el.style.right = '';
     delete el.dataset.center;
 
     if (node.center) {
       el.style.left = '50%';
       el.dataset.center = '1';
+    } else if (node.right) {
+      el.style.right = node.right;
+      el.style.left = 'auto';
+    } else if (node.left) {
+      el.style.left = node.left;
     }
+  }
+
+  function nodeOpacity(node, progress, scrollEased) {
+    if (progress >= parseFloat(node.dataset.p1 || 1)) return 1;
+
+    const rect = node.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const inView = rect.top < vh * 0.9 && rect.bottom > vh * 0.1;
+    if (inView) {
+      const enter = easeOut(Math.max(0, Math.min(1, (vh * 0.7 - rect.top) / (rect.height + 50))));
+      return Math.max(scrollEased, enter);
+    }
+    return scrollEased;
   }
 
   function buildSection6Scene() {
     const stage = document.getElementById('lmSection6Stage');
-    if (!stage || stage.children.length) return;
+    if (!stage) return;
 
-    S6_SCENE.forEach((node) => {
+    stage.innerHTML = '';
+    const scene = getScene();
+
+    scene.forEach((node) => {
       const el = document.createElement('div');
       applyNodePosition(el, node);
       el.dataset.top = node.top;
@@ -162,7 +203,8 @@
                 <span>Discover</span>
               </a>
             </div>
-          </div>`;
+          </div>
+          <p class="lm-s6-item-caption">${escapeAttr(svc.name)}</p>`;
       } else {
         return;
       }
@@ -175,6 +217,26 @@
     }
 
     retimeSection6Nodes();
+    resizeSection6Height();
+  }
+
+  function resizeSection6Height() {
+    const section = document.querySelector('.lm-section6');
+    const stage = document.getElementById('lmSection6Stage');
+    if (!section || !stage) return;
+
+    let maxBottom = 0;
+    stage.querySelectorAll('[data-top]').forEach((el) => {
+      const top = parseFloat(el.dataset.top) || 0;
+      maxBottom = Math.max(maxBottom, top + el.offsetHeight);
+    });
+
+    const stageH = maxBottom + 80;
+    stage.style.height = stageH + 'px';
+
+    const stageTop = stage.offsetTop || 280;
+    const sectionH = stageTop + stageH + (isMobileLayout() ? 100 : 160);
+    section.style.setProperty('--s6-height', sectionH + 'px');
   }
 
   function retimeSection6Nodes() {
@@ -215,18 +277,17 @@
     return `translate(${tx}px, ${ty}px) rotate(${rot}deg)`;
   }
 
+  let s6ScrollBound = false;
+  let s6WasMobile = null;
+
   function initSection6ScrollScrub() {
     const section = document.querySelector('.lm-section6');
     const stage = document.getElementById('lmSection6Stage');
-    const nodes = section ? section.querySelectorAll('.lm-s6-cat, .lm-s6-deco, .lm-s6-item') : [];
     const traceMeta = initTracePaths();
-    if (!section || !stage || !nodes.length) return;
-
-    section.style.setProperty('--s6-height', S6_HEIGHT + 'px');
-
-    let ticking = false;
+    if (!section || !stage) return;
 
     const update = () => {
+      const nodes = section.querySelectorAll('.lm-s6-cat, .lm-s6-deco, .lm-s6-item');
       const progress = getStageProgress(section, stage);
 
       nodes.forEach((node) => {
@@ -238,12 +299,12 @@
 
         let local = (p1 - p0) > 0 ? (progress - p0) / (p1 - p0) : 0;
         local = Math.max(0, Math.min(1, local));
-        const eased = easeOut(local);
-
-        const opacity = eased;
-        const tx = fx * (1 - eased);
-        const ty = fy * (1 - eased);
-        const rot = fr * (1 - eased);
+        const scrollEased = easeOut(local);
+        const opacity = nodeOpacity(node, progress, scrollEased);
+        const anim = progress >= p1 ? 1 : scrollEased;
+        const tx = fx * (1 - anim);
+        const ty = fy * (1 - anim);
+        const rot = fr * (1 - anim);
 
         node.style.opacity = String(opacity);
         node.style.transform = nodeTransform(node, tx, ty, rot);
@@ -258,22 +319,31 @@
         local = Math.max(0, Math.min(1, local));
         el.style.strokeDashoffset = String(len * (1 - easeOut(local)));
       });
-
-      ticking = false;
     };
 
-    const onScroll = () => {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(update);
-      }
-    };
+    if (!s6ScrollBound) {
+      s6ScrollBound = true;
+      let ticking = false;
+      const onScroll = () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(() => { update(); ticking = false; });
+        }
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', () => {
+        const mobile = isMobileLayout();
+        if (s6WasMobile !== null && s6WasMobile !== mobile) {
+          buildSection6Scene();
+        }
+        s6WasMobile = mobile;
+        resizeSection6Height();
+        retimeSection6Nodes();
+        onScroll();
+      }, { passive: true });
+      s6WasMobile = isMobileLayout();
+    }
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', () => {
-      retimeSection6Nodes();
-      onScroll();
-    }, { passive: true });
     update();
   }
 
