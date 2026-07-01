@@ -6,30 +6,54 @@
 
   /* Scattered table layout — mirrors Le Mugs vertical journey */
   const S6_SCENE = [
-    { type: 'deco', top: 20, left: 'calc(50% + 160px)', html: '<div class="lm-s6-deco-card"><strong>Call4All</strong><small>Service Menu</small></div>', p0: 0, p1: 0.06, from: { x: 24, y: -16, r: 8 } },
-    { type: 'deco', top: 8, left: 'calc(50% - 400px)', icon: 'phone', size: 52, p0: 0, p1: 0.05, from: { x: -14, y: 0, r: -10 } },
-    { type: 'cat', label: 'Rental & Travel', top: 250, left: 'calc(50% - 115px)', p0: 0.04, p1: 0.10 },
-    { type: 'service', sid: 'rental-cars', top: 310, left: 'calc(50% - 440px)', size: 320, wide: true, p0: 0.06, p1: 0.14, from: { x: -28, y: 0, r: -12 } },
-    { type: 'deco', top: 400, left: 'calc(50% + 300px)', icon: 'car', size: 44, p0: 0.09, p1: 0.13, from: { x: 10, y: -6, r: 6 } },
-    { type: 'service', sid: 'car-decoration', top: 490, left: 'calc(50% + 55px)', size: 255, p0: 0.10, p1: 0.17, from: { x: 22, y: -10, r: 14 } },
-    { type: 'cat', label: 'Home & Property', top: 730, left: 'calc(50% - 130px)', p0: 0.16, p1: 0.21 },
-    { type: 'service', sid: 'rooms-flats', top: 800, left: 'calc(50% - 180px)', size: 360, wide: true, p0: 0.18, p1: 0.25, from: { x: 18, y: 14, r: 9 } },
-    { type: 'deco', top: 770, left: 'calc(50% - 430px)', icon: 'home', size: 42, p0: 0.17, p1: 0.22, from: { x: -8, y: 4, r: -5 } },
-    { type: 'cat', label: 'Work & Labor', top: 1130, left: 'calc(50% - 95px)', p0: 0.26, p1: 0.31 },
-    { type: 'service', sid: 'construction', top: 1200, left: 'calc(50% - 435px)', size: 285, wide: true, p0: 0.28, p1: 0.35, from: { x: -24, y: -12, r: -11 } },
-    { type: 'service', sid: 'manpower-supply', top: 1360, left: 'calc(50% + 75px)', size: 295, wide: true, p0: 0.32, p1: 0.39, from: { x: 26, y: 0, r: 12 } },
-    { type: 'cat', label: 'Education', top: 1690, left: 'calc(50% - 72px)', p0: 0.40, p1: 0.45 },
-    { type: 'service', sid: 'home-tutor', top: 1760, left: 'calc(50% - 130px)', size: 265, p0: 0.42, p1: 0.49, from: { x: -12, y: 18, r: -8 } },
-    { type: 'cat', label: 'Events & Celebrations', top: 2090, left: 'calc(50% - 168px)', p0: 0.50, p1: 0.55 },
-    { type: 'service', sid: 'marriage-services', top: 2160, left: 'calc(50% - 455px)', size: 335, wide: true, p0: 0.52, p1: 0.59, from: { x: -30, y: 0, r: -11 } },
-    { type: 'service', sid: 'flower-bouquet', top: 2350, left: 'calc(50% + 48px)', size: 260, p0: 0.56, p1: 0.63, from: { x: 20, y: 10, r: 13 } },
-    { type: 'deco', top: 2290, left: 'calc(50% + 310px)', icon: 'flower', size: 40, p0: 0.55, p1: 0.60, from: { x: 8, y: 0, r: 5 } },
-    { type: 'cat', label: 'Anything Else?', top: 2690, left: 'calc(50% - 108px)', p0: 0.64, p1: 0.69 },
-    { type: 'service', sid: 'other', top: 2760, left: 'calc(50% - 125px)', size: 255, p0: 0.66, p1: 0.73, from: { x: 0, y: 22, r: -6 } },
-    { type: 'deco', top: 2910, left: 'calc(50% + 270px)', icon: 'check-shield', size: 58, p0: 0.70, p1: 0.76, from: { x: 14, y: 0, r: 9 } }
+    { type: 'deco', top: 20, left: 'calc(50% + 160px)', html: '<div class="lm-s6-deco-card"><strong>Call4All</strong><small>Service Menu</small></div>', from: { x: 24, y: -16, r: 8 } },
+    { type: 'deco', top: 8, left: 'calc(50% - 400px)', icon: 'phone', size: 52, from: { x: -14, y: 0, r: -10 } },
+    { type: 'cat', label: 'Rental & Travel', top: 250, left: 'calc(50% - 115px)' },
+    { type: 'service', sid: 'rental-cars', top: 310, left: 'calc(50% - 440px)', size: 320, wide: true, from: { x: -28, y: 0, r: -12 } },
+    { type: 'deco', top: 400, left: 'calc(50% + 300px)', icon: 'car', size: 44, from: { x: 10, y: -6, r: 6 } },
+    { type: 'service', sid: 'car-decoration', top: 490, left: 'calc(50% + 55px)', size: 255, from: { x: 22, y: -10, r: 14 } },
+    { type: 'cat', label: 'Home & Property', top: 730, left: 'calc(50% - 130px)' },
+    { type: 'service', sid: 'rooms-flats', top: 800, left: 'calc(50% - 180px)', size: 360, wide: true, from: { x: 18, y: 14, r: 9 } },
+    { type: 'deco', top: 770, left: 'calc(50% - 430px)', icon: 'home', size: 42, from: { x: -8, y: 4, r: -5 } },
+    { type: 'cat', label: 'Work & Labor', top: 1130, left: 'calc(50% - 95px)' },
+    { type: 'service', sid: 'construction', top: 1200, left: 'calc(50% - 435px)', size: 285, wide: true, from: { x: -24, y: -12, r: -11 } },
+    { type: 'service', sid: 'manpower-supply', top: 1360, left: 'calc(50% + 75px)', size: 295, wide: true, from: { x: 26, y: 0, r: 12 } },
+    { type: 'cat', label: 'Education', top: 1690, left: 'calc(50% - 72px)' },
+    { type: 'service', sid: 'home-tutor', top: 1760, left: 'calc(50% - 130px)', size: 265, from: { x: -12, y: 18, r: -8 } },
+    { type: 'cat', label: 'Events & Celebrations', top: 2090, left: 'calc(50% - 168px)' },
+    { type: 'service', sid: 'marriage-services', top: 2160, left: 'calc(50% - 455px)', size: 335, wide: true, from: { x: -30, y: 0, r: -11 } },
+    { type: 'service', sid: 'flower-bouquet', top: 2350, left: 'calc(50% + 48px)', size: 260, from: { x: 20, y: 10, r: 13 } },
+    { type: 'deco', top: 2290, left: 'calc(50% + 310px)', icon: 'flower', size: 40, from: { x: 8, y: 0, r: 5 } },
+    { type: 'cat', label: 'Anything Else?', top: 2690, left: 'calc(50% - 108px)' },
+    { type: 'service', sid: 'other', top: 2760, left: 'calc(50% - 125px)', size: 255, from: { x: 0, y: 22, r: -6 } },
+    { type: 'deco', top: 2910, left: 'calc(50% + 270px)', icon: 'check-shield', size: 58, from: { x: 14, y: 0, r: 9 } }
   ];
 
-  function escapeAttr(s) {
+  const S6_VIEW_H = 3544;
+  const S6_REVEAL_BAND = 0.055;
+
+  function topToProgress(top, stageHeight) {
+    const p = top / stageHeight;
+    return {
+      p0: Math.max(0, p - 0.015),
+      p1: Math.min(1, p + S6_REVEAL_BAND)
+    };
+  }
+
+  function getStageProgress(section, stage) {
+    if (!section || !stage) return 0;
+    const triggerY = window.innerHeight * 0.42;
+    const stageRect = stage.getBoundingClientRect();
+    const scrolled = triggerY - stageRect.top;
+    const range = stageRect.height + window.innerHeight * 0.25;
+    return Math.max(0, Math.min(1, scrolled / range));
+  }
+
+  function applyRevealTiming(el, top, stageHeight) {
+    const { p0, p1 } = topToProgress(top, stageHeight);
+    el.dataset.p0 = p0;
+    el.dataset.p1 = p1;
+  }
     return String(s || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
@@ -89,8 +113,7 @@
     S6_SCENE.forEach((node) => {
       const el = document.createElement('div');
       applyNodePosition(el, node);
-      el.dataset.p0 = node.p0;
-      el.dataset.p1 = node.p1;
+      el.dataset.top = node.top;
       el.dataset.fx = (node.from && node.from.x) || 0;
       el.dataset.fy = (node.from && node.from.y) || 0;
       el.dataset.fr = (node.from && node.from.r) || 0;
@@ -132,6 +155,17 @@
     if (typeof window.c4aHydrateIcons === 'function') {
       window.c4aHydrateIcons(stage);
     }
+
+    retimeSection6Nodes();
+  }
+
+  function retimeSection6Nodes() {
+    const stage = document.getElementById('lmSection6Stage');
+    if (!stage) return;
+    const h = stage.offsetHeight || 3200;
+    stage.querySelectorAll('[data-top]').forEach((el) => {
+      applyRevealTiming(el, parseFloat(el.dataset.top), h);
+    });
   }
 
   function initTracePaths() {
@@ -141,16 +175,16 @@
     const paths = section.querySelectorAll('.lm-s6-trace-path');
     const meta = [];
 
-    paths.forEach((path, i) => {
+    paths.forEach((path) => {
       const len = path.getTotalLength();
       path.style.strokeDasharray = String(len);
       path.style.strokeDashoffset = String(len);
-      meta.push({
-        el: path,
-        len,
-        p0: i * 0.12,
-        p1: Math.min(1, (i + 1) * 0.14 + 0.02)
-      });
+
+      const box = path.getBBox();
+      const p0 = Math.max(0, (box.y - 30) / S6_VIEW_H);
+      const p1 = Math.min(1, (box.y + box.height + 30) / S6_VIEW_H);
+
+      meta.push({ el: path, len, p0, p1 });
     });
 
     return meta;
@@ -165,20 +199,17 @@
 
   function initSection6ScrollScrub() {
     const section = document.querySelector('.lm-section6');
+    const stage = document.getElementById('lmSection6Stage');
     const nodes = section ? section.querySelectorAll('.lm-s6-cat, .lm-s6-deco, .lm-s6-item') : [];
     const traceMeta = initTracePaths();
-    if (!section || !nodes.length) return;
+    if (!section || !stage || !nodes.length) return;
 
     section.style.setProperty('--s6-height', S6_HEIGHT + 'px');
 
     let ticking = false;
 
     const update = () => {
-      const rect = section.getBoundingClientRect();
-      const scrollable = section.offsetHeight - window.innerHeight;
-      if (scrollable <= 0) return;
-
-      const progress = Math.max(0, Math.min(1, -rect.top / scrollable));
+      const progress = getStageProgress(section, stage);
 
       nodes.forEach((node) => {
         const p0 = parseFloat(node.dataset.p0 || 0);
@@ -187,27 +218,25 @@
         const fy = parseFloat(node.dataset.fy || 0);
         const fr = parseFloat(node.dataset.fr || 0);
 
-        let local = (p1 - p0) > 0 ? (progress - p0) / (p1 - p0) : 1;
+        let local = (p1 - p0) > 0 ? (progress - p0) / (p1 - p0) : 0;
         local = Math.max(0, Math.min(1, local));
         const eased = easeOut(local);
 
-        if (progress >= p1) node.dataset.revealed = '1';
-
-        const opacity = node.dataset.revealed === '1' ? 1 : eased;
-        const tx = progress >= p1 ? 0 : fx * (1 - eased);
-        const ty = progress >= p1 ? 0 : fy * (1 - eased);
-        const rot = progress >= p1 ? 0 : fr * (1 - eased);
+        const opacity = eased;
+        const tx = fx * (1 - eased);
+        const ty = fy * (1 - eased);
+        const rot = fr * (1 - eased);
 
         node.style.opacity = String(opacity);
         node.style.transform = nodeTransform(node, tx, ty, rot);
 
-        if (node.classList.contains('lm-s6-cat') && opacity > 0.5) {
-          node.classList.add('lm-s6-visible');
+        if (node.classList.contains('lm-s6-cat')) {
+          node.classList.toggle('lm-s6-visible', opacity > 0.65);
         }
       });
 
       traceMeta.forEach(({ el, len, p0, p1 }) => {
-        let local = (p1 - p0) > 0 ? (progress - p0) / (p1 - p0) : 1;
+        let local = (p1 - p0) > 0 ? (progress - p0) / (p1 - p0) : 0;
         local = Math.max(0, Math.min(1, local));
         el.style.strokeDashoffset = String(len * (1 - easeOut(local)));
       });
@@ -223,7 +252,10 @@
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
+    window.addEventListener('resize', () => {
+      retimeSection6Nodes();
+      onScroll();
+    }, { passive: true });
     update();
   }
 
