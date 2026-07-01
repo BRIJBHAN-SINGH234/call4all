@@ -26,22 +26,34 @@
     { type: 'service', sid: 'other', top: 2250, left: 'calc(50% - 127px)', size: 255, from: { x: 0, y: 22, r: -6 } }
   ];
 
-  const S6_SCENE_MOBILE = [
-    { type: 'cat', label: 'Rental & Travel', top: 0, center: true },
-    { type: 'service', sid: 'rental-cars', top: 48, left: '3%', size: 158, wide: true, from: { x: -12, y: 0, r: -8 } },
-    { type: 'service', sid: 'car-decoration', top: 48, right: '3%', size: 148, from: { x: 12, y: 0, r: 8 } },
-    { type: 'cat', label: 'Home & Property', top: 250, center: true },
-    { type: 'service', sid: 'rooms-flats', top: 300, center: true, size: 200, wide: true, from: { x: 0, y: 12, r: 6 } },
-    { type: 'cat', label: 'Work & Labor', top: 520, center: true },
-    { type: 'service', sid: 'construction', top: 568, left: '3%', size: 148, wide: true, from: { x: -12, y: 0, r: -8 } },
-    { type: 'service', sid: 'manpower-supply', top: 568, right: '3%', size: 148, wide: true, from: { x: 12, y: 0, r: 8 } },
-    { type: 'cat', label: 'Education', top: 760, center: true },
-    { type: 'service', sid: 'home-tutor', top: 808, center: true, size: 170, from: { x: 0, y: 10, r: -5 } },
-    { type: 'cat', label: 'Events & Celebrations', top: 990, center: true },
-    { type: 'service', sid: 'marriage-services', top: 1038, left: '3%', size: 155, wide: true, from: { x: -12, y: 0, r: -7 } },
-    { type: 'service', sid: 'flower-bouquet', top: 1038, right: '3%', size: 145, from: { x: 12, y: 0, r: 7 } },
-    { type: 'cat', label: 'Anything Else?', top: 1220, center: true },
-    { type: 'service', sid: 'other', top: 1268, center: true, size: 165, from: { x: 0, y: 10, r: -4 } }
+  const S6_SCENE_MOBILE_ROWS = [
+    { type: 'cat', label: 'Rental & Travel' },
+    { type: 'row', services: [
+      { sid: 'rental-cars', left: '4%', size: 148, wide: true, from: { x: -8, y: 0, r: -6 } },
+      { sid: 'car-decoration', right: '4%', size: 138, from: { x: 8, y: 0, r: 6 } }
+    ]},
+    { type: 'cat', label: 'Home & Property' },
+    { type: 'row', services: [
+      { sid: 'rooms-flats', center: true, size: 188, wide: true, from: { x: 0, y: 10, r: 5 } }
+    ]},
+    { type: 'cat', label: 'Work & Labor' },
+    { type: 'row', services: [
+      { sid: 'construction', left: '4%', size: 138, wide: true, from: { x: -8, y: 0, r: -6 } },
+      { sid: 'manpower-supply', right: '4%', size: 138, wide: true, from: { x: 8, y: 0, r: 6 } }
+    ]},
+    { type: 'cat', label: 'Education' },
+    { type: 'row', services: [
+      { sid: 'home-tutor', center: true, size: 168, from: { x: 0, y: 8, r: -4 } }
+    ]},
+    { type: 'cat', label: 'Events & Celebrations' },
+    { type: 'row', services: [
+      { sid: 'marriage-services', left: '4%', size: 142, wide: true, from: { x: -8, y: 0, r: -5 } },
+      { sid: 'flower-bouquet', right: '4%', size: 132, from: { x: 8, y: 0, r: 5 } }
+    ]},
+    { type: 'cat', label: 'Anything Else?' },
+    { type: 'row', services: [
+      { sid: 'other', center: true, size: 162, from: { x: 0, y: 8, r: -3 } }
+    ]}
   ];
 
   function isMobileLayout() {
@@ -49,7 +61,73 @@
   }
 
   function getScene() {
-    return isMobileLayout() ? S6_SCENE_MOBILE : S6_SCENE_DESKTOP;
+    return S6_SCENE_DESKTOP;
+  }
+
+  function createSceneNode(node, rowIndex) {
+    const el = document.createElement('div');
+    el.dataset.row = String(rowIndex);
+    applyNodePosition(el, node);
+    el.dataset.fx = (node.from && node.from.x) || 0;
+    el.dataset.fy = (node.from && node.from.y) || 0;
+    el.dataset.fr = (node.from && node.from.r) || 0;
+
+    if (node.type === 'cat') {
+      el.className = 'lm-s6-cat';
+      el.textContent = node.label;
+      if (isMobileLayout()) el.dataset.center = '1';
+    } else if (node.type === 'deco') {
+      el.className = 'lm-s6-deco';
+      if (node.html) {
+        el.innerHTML = node.html;
+      } else if (node.icon) {
+        el.className += ' lm-s6-deco-icon';
+        el.innerHTML = `<span data-c4a-icon="${node.icon}" data-icon-size="${node.size || 48}"></span>`;
+      }
+    } else if (node.type === 'service') {
+      const svc = getService(node.sid);
+      if (!svc) return null;
+      const size = node.size || 240;
+      const img = svc.image || '';
+      el.className = 'lm-s6-item' + (node.wide ? ' lm-s6-wide' : '');
+      el.style.width = size + 'px';
+      el.innerHTML = `
+        <div class="lm-s6-item-inner" style="width:${size}px;height:${size}px">
+          <img src="${escapeAttr(img)}" alt="${escapeAttr(svc.name)}" loading="lazy" decoding="async" width="${size}" height="${size}">
+          <div class="lm-s6-rollover">
+            <a href="${escapeAttr(svc.page)}" class="lm-s6-roundbtn" aria-label="Discover ${escapeAttr(svc.name)}">
+              <span>Discover</span>
+            </a>
+          </div>
+        </div>
+        <p class="lm-s6-item-caption">${escapeAttr(svc.name)}</p>`;
+    } else {
+      return null;
+    }
+    return el;
+  }
+
+  function reflowMobileStage() {
+    const stage = document.getElementById('lmSection6Stage');
+    if (!stage) return;
+
+    const rowGap = 20;
+    const sectionGap = 32;
+    let y = 0;
+    let rowIndex = 0;
+
+    while (stage.querySelector(`[data-row="${rowIndex}"]`)) {
+      const rowEls = [...stage.querySelectorAll(`[data-row="${rowIndex}"]`)];
+      let rowH = 0;
+      rowEls.forEach((el) => {
+        el.style.top = y + 'px';
+        el.dataset.top = y;
+        rowH = Math.max(rowH, el.offsetHeight);
+      });
+      const isCatRow = rowEls.some((el) => el.classList.contains('lm-s6-cat'));
+      y += rowH + (isCatRow ? rowGap : sectionGap);
+      rowIndex += 1;
+    }
   }
 
   function topToProgress(top, stageHeight) {
@@ -151,6 +229,7 @@
 
   function nodeOpacity(node, progress, scrollEased) {
     if (progress >= parseFloat(node.dataset.p1 || 1)) return 1;
+    if (isMobileLayout()) return scrollEased;
 
     const rect = node.getBoundingClientRect();
     const vh = window.innerHeight;
@@ -164,53 +243,40 @@
 
   function buildSection6Scene() {
     const stage = document.getElementById('lmSection6Stage');
+    const section = document.querySelector('.lm-section6');
     if (!stage) return;
 
     stage.innerHTML = '';
-    const scene = getScene();
+    stage.classList.toggle('lm-s6-stage--mobile', isMobileLayout());
+    if (section) section.classList.toggle('lm-section6--mobile', isMobileLayout());
 
-    scene.forEach((node) => {
-      const el = document.createElement('div');
-      applyNodePosition(el, node);
-      el.dataset.top = node.top;
-      el.dataset.fx = (node.from && node.from.x) || 0;
-      el.dataset.fy = (node.from && node.from.y) || 0;
-      el.dataset.fr = (node.from && node.from.r) || 0;
+    let rowIndex = 0;
 
-      if (node.type === 'cat') {
-        el.className = 'lm-s6-cat';
-        el.textContent = node.label;
-      } else if (node.type === 'deco') {
-        el.className = 'lm-s6-deco';
-        if (node.html) {
-          el.innerHTML = node.html;
-        } else if (node.icon) {
-          el.className += ' lm-s6-deco-icon';
-          el.innerHTML = `<span data-c4a-icon="${node.icon}" data-icon-size="${node.size || 48}"></span>`;
+    if (isMobileLayout()) {
+      S6_SCENE_MOBILE_ROWS.forEach((block) => {
+        if (block.type === 'cat') {
+          const el = createSceneNode({ type: 'cat', label: block.label, center: true }, rowIndex);
+          if (el) stage.appendChild(el);
+          rowIndex += 1;
+        } else if (block.type === 'row') {
+          block.services.forEach((svc) => {
+            const el = createSceneNode({ type: 'service', ...svc }, rowIndex);
+            if (el) stage.appendChild(el);
+          });
+          rowIndex += 1;
         }
-      } else if (node.type === 'service') {
-        const svc = getService(node.sid);
-        if (!svc) return;
-        const size = node.size || 240;
-        const img = svc.image || '';
-        el.className = 'lm-s6-item' + (node.wide ? ' lm-s6-wide' : '');
-        el.style.width = size + 'px';
-        el.innerHTML = `
-          <div class="lm-s6-item-inner" style="width:${size}px;height:${size}px">
-            <img src="${escapeAttr(img)}" alt="${escapeAttr(svc.name)}" loading="lazy" decoding="async" width="${size}" height="${size}">
-            <div class="lm-s6-rollover">
-              <a href="${escapeAttr(svc.page)}" class="lm-s6-roundbtn" aria-label="Discover ${escapeAttr(svc.name)}">
-                <span>Discover</span>
-              </a>
-            </div>
-          </div>
-          <p class="lm-s6-item-caption">${escapeAttr(svc.name)}</p>`;
-      } else {
-        return;
-      }
-
-      stage.appendChild(el);
-    });
+      });
+      reflowMobileStage();
+    } else {
+      getScene().forEach((node) => {
+        const el = createSceneNode(node, rowIndex);
+        if (!el) return;
+        el.dataset.top = node.top;
+        el.style.top = node.top + 'px';
+        stage.appendChild(el);
+        rowIndex += 1;
+      });
+    }
 
     if (typeof window.c4aHydrateIcons === 'function') {
       window.c4aHydrateIcons(stage);
@@ -335,6 +401,10 @@
         const mobile = isMobileLayout();
         if (s6WasMobile !== null && s6WasMobile !== mobile) {
           buildSection6Scene();
+        } else if (mobile) {
+          reflowMobileStage();
+          resizeSection6Height();
+          retimeSection6Nodes();
         }
         s6WasMobile = mobile;
         resizeSection6Height();
