@@ -2,30 +2,31 @@
 (function () {
   'use strict';
 
-  const S6_STAGE_TOP_FALLBACK = 360;
+  const S6_HEIGHT = 3800;
 
-  function getS6StageTop() {
-    const stage = document.getElementById('lmSection6Stage');
-    return stage ? stage.offsetTop : S6_STAGE_TOP_FALLBACK;
-  }
-
-  /* Tighter layout — pairs side-by-side, fits in ~2600px scroll */
+  /* Scattered table layout — mirrors Le Mugs vertical journey */
   const S6_SCENE = [
-    { type: 'cat', label: 'Rental & Travel', top: 0, p0: 0.02, p1: 0.10 },
-    { type: 'service', sid: 'rental-cars', top: 48, left: '6%', size: 240, p0: 0.04, p1: 0.14, from: { x: -18, y: 0, r: -10 } },
-    { type: 'service', sid: 'car-decoration', top: 48, right: '6%', size: 220, p0: 0.04, p1: 0.14, from: { x: 18, y: 0, r: 10 } },
-    { type: 'cat', label: 'Home & Property', top: 340, p0: 0.12, p1: 0.20 },
-    { type: 'service', sid: 'rooms-flats', top: 390, center: true, size: 260, p0: 0.14, p1: 0.24, from: { x: 0, y: 16, r: 8 } },
-    { type: 'cat', label: 'Work & Labor', top: 680, p0: 0.22, p1: 0.30 },
-    { type: 'service', sid: 'construction', top: 728, left: '6%', size: 220, p0: 0.24, p1: 0.34, from: { x: -16, y: 0, r: -10 } },
-    { type: 'service', sid: 'manpower-supply', top: 728, right: '6%', size: 220, p0: 0.24, p1: 0.34, from: { x: 16, y: 0, r: 10 } },
-    { type: 'cat', label: 'Education', top: 980, p0: 0.32, p1: 0.40 },
-    { type: 'service', sid: 'home-tutor', top: 1028, center: true, size: 220, p0: 0.34, p1: 0.44, from: { x: 0, y: 14, r: -6 } },
-    { type: 'cat', label: 'Events & Celebrations', top: 1280, p0: 0.42, p1: 0.50 },
-    { type: 'service', sid: 'marriage-services', top: 1328, left: '6%', size: 230, p0: 0.44, p1: 0.54, from: { x: -18, y: 0, r: -8 } },
-    { type: 'service', sid: 'flower-bouquet', top: 1328, right: '6%', size: 210, p0: 0.44, p1: 0.54, from: { x: 18, y: 0, r: 8 } },
-    { type: 'cat', label: 'Anything Else?', top: 1580, p0: 0.52, p1: 0.60 },
-    { type: 'service', sid: 'other', top: 1628, center: true, size: 210, p0: 0.54, p1: 0.64, from: { x: 0, y: 12, r: -5 } }
+    { type: 'deco', top: 20, left: 'calc(50% + 160px)', html: '<div class="lm-s6-deco-card"><strong>Call4All</strong><small>Service Menu</small></div>', p0: 0, p1: 0.06, from: { x: 24, y: -16, r: 8 } },
+    { type: 'deco', top: 8, left: 'calc(50% - 400px)', icon: 'phone', size: 52, p0: 0, p1: 0.05, from: { x: -14, y: 0, r: -10 } },
+    { type: 'cat', label: 'Rental & Travel', top: 250, left: 'calc(50% - 115px)', p0: 0.04, p1: 0.10 },
+    { type: 'service', sid: 'rental-cars', top: 310, left: 'calc(50% - 440px)', size: 320, wide: true, p0: 0.06, p1: 0.14, from: { x: -28, y: 0, r: -12 } },
+    { type: 'deco', top: 400, left: 'calc(50% + 300px)', icon: 'car', size: 44, p0: 0.09, p1: 0.13, from: { x: 10, y: -6, r: 6 } },
+    { type: 'service', sid: 'car-decoration', top: 490, left: 'calc(50% + 55px)', size: 255, p0: 0.10, p1: 0.17, from: { x: 22, y: -10, r: 14 } },
+    { type: 'cat', label: 'Home & Property', top: 730, left: 'calc(50% - 130px)', p0: 0.16, p1: 0.21 },
+    { type: 'service', sid: 'rooms-flats', top: 800, left: 'calc(50% - 180px)', size: 360, wide: true, p0: 0.18, p1: 0.25, from: { x: 18, y: 14, r: 9 } },
+    { type: 'deco', top: 770, left: 'calc(50% - 430px)', icon: 'home', size: 42, p0: 0.17, p1: 0.22, from: { x: -8, y: 4, r: -5 } },
+    { type: 'cat', label: 'Work & Labor', top: 1130, left: 'calc(50% - 95px)', p0: 0.26, p1: 0.31 },
+    { type: 'service', sid: 'construction', top: 1200, left: 'calc(50% - 435px)', size: 285, wide: true, p0: 0.28, p1: 0.35, from: { x: -24, y: -12, r: -11 } },
+    { type: 'service', sid: 'manpower-supply', top: 1360, left: 'calc(50% + 75px)', size: 295, wide: true, p0: 0.32, p1: 0.39, from: { x: 26, y: 0, r: 12 } },
+    { type: 'cat', label: 'Education', top: 1690, left: 'calc(50% - 72px)', p0: 0.40, p1: 0.45 },
+    { type: 'service', sid: 'home-tutor', top: 1760, left: 'calc(50% - 130px)', size: 265, p0: 0.42, p1: 0.49, from: { x: -12, y: 18, r: -8 } },
+    { type: 'cat', label: 'Events & Celebrations', top: 2090, left: 'calc(50% - 168px)', p0: 0.50, p1: 0.55 },
+    { type: 'service', sid: 'marriage-services', top: 2160, left: 'calc(50% - 455px)', size: 335, wide: true, p0: 0.52, p1: 0.59, from: { x: -30, y: 0, r: -11 } },
+    { type: 'service', sid: 'flower-bouquet', top: 2350, left: 'calc(50% + 48px)', size: 260, p0: 0.56, p1: 0.63, from: { x: 20, y: 10, r: 13 } },
+    { type: 'deco', top: 2290, left: 'calc(50% + 310px)', icon: 'flower', size: 40, p0: 0.55, p1: 0.60, from: { x: 8, y: 0, r: 5 } },
+    { type: 'cat', label: 'Anything Else?', top: 2690, left: 'calc(50% - 108px)', p0: 0.64, p1: 0.69 },
+    { type: 'service', sid: 'other', top: 2760, left: 'calc(50% - 125px)', size: 255, p0: 0.66, p1: 0.73, from: { x: 0, y: 22, r: -6 } },
+    { type: 'deco', top: 2910, left: 'calc(50% + 270px)', icon: 'check-shield', size: 58, p0: 0.70, p1: 0.76, from: { x: 14, y: 0, r: 9 } }
   ];
 
   function escapeAttr(s) {
@@ -71,18 +72,13 @@
 
   function applyNodePosition(el, node) {
     el.style.top = node.top + 'px';
-    el.style.left = '';
+    el.style.left = node.left || '';
     el.style.right = '';
     delete el.dataset.center;
 
     if (node.center) {
       el.style.left = '50%';
       el.dataset.center = '1';
-    } else if (node.left) {
-      el.style.left = node.left;
-    } else if (node.right) {
-      el.style.right = node.right;
-      el.style.left = 'auto';
     }
   }
 
@@ -102,12 +98,20 @@
       if (node.type === 'cat') {
         el.className = 'lm-s6-cat';
         el.textContent = node.label;
+      } else if (node.type === 'deco') {
+        el.className = 'lm-s6-deco';
+        if (node.html) {
+          el.innerHTML = node.html;
+        } else if (node.icon) {
+          el.className += ' lm-s6-deco-icon';
+          el.innerHTML = `<span data-c4a-icon="${node.icon}" data-icon-size="${node.size || 48}"></span>`;
+        }
       } else if (node.type === 'service') {
         const svc = getService(node.sid);
         if (!svc) return;
-        const size = node.size || 220;
+        const size = node.size || 240;
         const img = svc.image || '';
-        el.className = 'lm-s6-item';
+        el.className = 'lm-s6-item' + (node.wide ? ' lm-s6-wide' : '');
         el.style.width = size + 'px';
         el.innerHTML = `
           <div class="lm-s6-item-inner" style="width:${size}px;height:${size}px">
@@ -125,27 +129,35 @@
       stage.appendChild(el);
     });
 
-    resizeSection6Height();
+    if (typeof window.c4aHydrateIcons === 'function') {
+      window.c4aHydrateIcons(stage);
+    }
   }
 
-  function resizeSection6Height() {
+  function initTracePaths() {
     const section = document.querySelector('.lm-section6');
-    const stage = document.getElementById('lmSection6Stage');
-    if (!section || !stage) return;
+    if (!section) return [];
 
-    let maxBottom = 0;
-    stage.querySelectorAll('.lm-s6-item, .lm-s6-cat').forEach((el) => {
-      const top = parseFloat(el.style.top) || 0;
-      const h = el.offsetHeight || 240;
-      maxBottom = Math.max(maxBottom, top + h);
+    const paths = section.querySelectorAll('.lm-s6-trace-path');
+    const meta = [];
+
+    paths.forEach((path, i) => {
+      const len = path.getTotalLength();
+      path.style.strokeDasharray = String(len);
+      path.style.strokeDashoffset = String(len);
+      meta.push({
+        el: path,
+        len,
+        p0: i * 0.12,
+        p1: Math.min(1, (i + 1) * 0.14 + 0.02)
+      });
     });
 
-    const total = getS6StageTop() + maxBottom + 160;
-    section.style.setProperty('--s6-height', total + 'px');
+    return meta;
   }
 
   function nodeTransform(el, tx, ty, rot) {
-    if (el.dataset.center === '1' || el.classList.contains('lm-s6-cat')) {
+    if (el.dataset.center === '1') {
       return `translate(calc(-50% + ${tx}px), ${ty}px) rotate(${rot}deg)`;
     }
     return `translate(${tx}px, ${ty}px) rotate(${rot}deg)`;
@@ -153,8 +165,11 @@
 
   function initSection6ScrollScrub() {
     const section = document.querySelector('.lm-section6');
-    const nodes = section ? section.querySelectorAll('.lm-s6-cat, .lm-s6-item') : [];
+    const nodes = section ? section.querySelectorAll('.lm-s6-cat, .lm-s6-deco, .lm-s6-item') : [];
+    const traceMeta = initTracePaths();
     if (!section || !nodes.length) return;
+
+    section.style.setProperty('--s6-height', S6_HEIGHT + 'px');
 
     let ticking = false;
 
@@ -176,9 +191,7 @@
         local = Math.max(0, Math.min(1, local));
         const eased = easeOut(local);
 
-        if (progress >= p1) {
-          node.dataset.revealed = '1';
-        }
+        if (progress >= p1) node.dataset.revealed = '1';
 
         const opacity = node.dataset.revealed === '1' ? 1 : eased;
         const tx = progress >= p1 ? 0 : fx * (1 - eased);
@@ -193,6 +206,12 @@
         }
       });
 
+      traceMeta.forEach(({ el, len, p0, p1 }) => {
+        let local = (p1 - p0) > 0 ? (progress - p0) / (p1 - p0) : 1;
+        local = Math.max(0, Math.min(1, local));
+        el.style.strokeDashoffset = String(len * (1 - easeOut(local)));
+      });
+
       ticking = false;
     };
 
@@ -204,10 +223,7 @@
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', () => {
-      resizeSection6Height();
-      onScroll();
-    }, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
     update();
   }
 
@@ -229,7 +245,7 @@
           boot();
           io.disconnect();
         }
-      }, { rootMargin: '400px 0px' });
+      }, { rootMargin: '500px 0px' });
       io.observe(section);
     } else {
       boot();
