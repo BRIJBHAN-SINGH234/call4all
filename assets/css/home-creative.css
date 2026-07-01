@@ -729,6 +729,32 @@
   .lm-contact-block { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
   .home-creative .site-header { padding: 14px 20px; }
   .lm-story { min-height: 70vh; padding: 60px 24px; }
+  .lm-section6--mobile {
+    height: auto !important;
+    min-height: 0;
+    padding-top: var(--s6-header-clear);
+    padding-bottom: 40px;
+    --s6-top-offset: 0px;
+    --s6-header-clear: 80px;
+  }
+  .lm-section6--mobile .lm-atable {
+    position: relative;
+    inset: auto;
+    height: auto;
+    min-height: 0;
+  }
+  .lm-section6--mobile .lm-s6-title {
+    position: relative;
+    top: auto;
+    margin: 16px auto 8px;
+    transform: translateX(-50%);
+  }
+  .lm-section6--mobile .lm-s6-stage {
+    position: relative;
+    top: auto;
+    min-height: 0;
+    margin-top: 0;
+  }
   .lm-section6 { --s6-top-offset: 120px; }
   .lm-section6--mobile .lm-s6-trace { display: none; }
   .lm-atable {

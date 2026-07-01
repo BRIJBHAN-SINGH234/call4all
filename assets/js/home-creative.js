@@ -211,7 +211,7 @@
   }
 
   function applyNodePosition(el, node) {
-    el.style.top = node.top + 'px';
+    el.style.top = (node.top != null ? node.top : 0) + 'px';
     el.style.left = '';
     el.style.right = '';
     delete el.dataset.center;
@@ -225,6 +225,13 @@
     } else if (node.left) {
       el.style.left = node.left;
     }
+  }
+
+  function mobileNodeOpacity(node) {
+    const rect = node.getBoundingClientRect();
+    const vh = window.innerHeight;
+    if (rect.bottom < 8 || rect.top > vh - 8) return 0;
+    return easeOut(Math.max(0, Math.min(1, (vh * 0.82 - rect.top) / 90)));
   }
 
   function nodeOpacity(node, progress, scrollEased) {
@@ -297,12 +304,17 @@
       maxBottom = Math.max(maxBottom, top + el.offsetHeight);
     });
 
-    const stageH = maxBottom + 80;
+    const stageH = maxBottom + (isMobileLayout() ? 24 : 80);
     stage.style.height = stageH + 'px';
 
+    if (isMobileLayout()) {
+      section.style.height = 'auto';
+      section.style.removeProperty('--s6-height');
+      return;
+    }
+
     const stageTop = stage.offsetTop || 280;
-    const sectionH = stageTop + stageH + (isMobileLayout() ? 100 : 160);
-    section.style.setProperty('--s6-height', sectionH + 'px');
+    section.style.setProperty('--s6-height', (stageTop + stageH + 160) + 'px');
   }
 
   function retimeSection6Nodes() {
@@ -354,6 +366,19 @@
 
     const update = () => {
       const nodes = section.querySelectorAll('.lm-s6-cat, .lm-s6-deco, .lm-s6-item');
+
+      if (isMobileLayout()) {
+        nodes.forEach((node) => {
+          const opacity = mobileNodeOpacity(node);
+          node.style.opacity = String(opacity);
+          node.style.transform = nodeTransform(node, 0, 0, 0);
+          if (node.classList.contains('lm-s6-cat')) {
+            node.classList.toggle('lm-s6-visible', opacity > 0.5);
+          }
+        });
+        return;
+      }
+
       const progress = getStageProgress(section, stage);
 
       nodes.forEach((node) => {
@@ -381,6 +406,7 @@
       });
 
       traceMeta.forEach(({ el, len, p0, p1 }) => {
+        if (isMobileLayout()) return;
         let local = (p1 - p0) > 0 ? (progress - p0) / (p1 - p0) : 0;
         local = Math.max(0, Math.min(1, local));
         el.style.strokeDashoffset = String(len * (1 - easeOut(local)));
