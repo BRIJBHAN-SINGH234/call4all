@@ -1,22 +1,22 @@
 {
   "version": 3,
-  "updated_at": "2026-06-24T06:01:41.809Z",
+  "updated_at": "2026-07-09T09:10:30.050Z",
   "branding": {
     "site_name": "Call4All",
     "tagline": "One Call. Every Service. Done.",
-    "logo_url": "auto-3d",
+    "logo_url": "assets/icons/themed-logos/logo-3d-default.svg",
     "logo_height": 55
   },
   "theme": {
-    "preset": "auto",
-    "primary": "#1f3a2e",
-    "primary_dark": "#122318",
-    "accent": "#c9a36a",
-    "accent_dark": "#a17f47",
-    "background": "#faf6ef",
+    "preset": "default",
+    "primary": "#1e3c72",
+    "primary_dark": "#142850",
+    "accent": "#ffcc00",
+    "accent_dark": "#e6b800",
+    "background": "#ffffff",
     "festival_overlay": "none",
     "festival_banner": "",
-    "logo": "auto-3d"
+    "logo": "assets/icons/themed-logos/logo-3d-default.svg"
   },
   "contact": {
     "phone": "+917737353588",
