@@ -115,7 +115,7 @@
     <priority>0.90</priority>
   </url>
   <url>
-    <loc>https://call4all.co.in/property.html</loc>
+    <loc>https://call4all.co.in/property.html?id=prop-1784380998443</loc>
     <lastmod>2026-07-18</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.90</priority>
@@ -149,12 +149,6 @@
     <lastmod>2026-07-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
-  </url>
-  <url>
-    <loc>https://call4all.co.in/property.html?id=prop-1784380998443</loc>
-    <lastmod>2026-07-18</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.90</priority>
   </url>
   <url>
     <loc>https://call4all.co.in/page.html?slug=book-farm-house</loc>
