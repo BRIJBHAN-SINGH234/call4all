@@ -1,2 +1,2 @@
-id,timestamp,title,latitude,longitude,price,width_ft,height_ft,image_path,description,status,added_by,approval_status,pending_json,reviewed_by,reviewed_at
-prop-1784372861829,2026-07-18T11:07:41.829Z,Lease/Rent,27.04165,75.895014,500000,20,30,assets/uploads/property-1784372860670-Screenshot_from_2026-05-30_17-34-36.png,tets,Active,admin,Approved,,admin,2026-07-18T11:07:41.829Z
+id,timestamp,property_type,title,latitude,longitude,price,width_ft,height_ft,image_path,description,status,added_by,approval_status,pending_json,reviewed_by,reviewed_at
+prop-1784372861829,2026-07-18T11:07:41.829Z,Lease/Rent,Lease/Rent,27.04165,75.895014,500000,20,30,assets/uploads/property-1784372860670-Screenshot_from_2026-05-30_17-34-36.png,tets,Active,admin,Approved,,admin,2026-07-18T11:07:41.829Z

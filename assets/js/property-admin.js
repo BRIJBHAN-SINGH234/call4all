@@ -1,7 +1,7 @@
 (function(){
   const PATH='data/properties.csv';
-  const HEADERS=['id','timestamp','title','latitude','longitude','price','width_ft','height_ft','image_path','description','status','added_by','approval_status','pending_json','reviewed_by','reviewed_at'];
-  const DATA_FIELDS=['title','latitude','longitude','price','width_ft','height_ft','image_path','description'];
+  const HEADERS=['id','timestamp','property_type','title','latitude','longitude','price','width_ft','height_ft','image_path','description','status','added_by','approval_status','pending_json','reviewed_by','reviewed_at'];
+  const DATA_FIELDS=['property_type','title','latitude','longitude','price','width_ft','height_ft','image_path','description'];
   const isAdmin=sessionStorage.getItem('c4a_admin_session')==='1'&&!!localStorage.getItem('c4a_admin_token');
   const isStaff=sessionStorage.getItem('c4a_staff_session')==='1'&&!!localStorage.getItem('c4a_staff_token');
   const role=isAdmin?'admin':(isStaff?'staff':'');

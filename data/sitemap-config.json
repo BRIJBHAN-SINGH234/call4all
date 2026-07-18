@@ -17,6 +17,8 @@
     "changefreq": "weekly"
   },
   "rules": [
+    { "pattern": "^properties\\.html$", "priority": 0.98, "changefreq": "daily" },
+    { "pattern": "^property\\.html$", "priority": 0.90, "changefreq": "daily" },
     { "pattern": "^kukas\\.html$", "priority": 0.95, "changefreq": "weekly" },
     { "pattern": "car-rental-kukas-jaipur|room-rent-kukas-jaipur|flat-rent-kukas-jaipur", "priority": 0.92, "changefreq": "weekly" },
     { "pattern": "car-rental-kukas\\.html$|wedding-services-kukas\\.html$", "priority": 0.95, "changefreq": "weekly" },

@@ -877,6 +877,7 @@ function renderHeader(activePage) {
   const links = [
     { href: 'index.html', label: 'Home', key: 'home' },
     { href: 'index.html#services', label: 'Services', key: 'services' },
+    { href: 'properties.html', label: 'Properties', key: 'properties' },
     { href: 'gallery.html', label: 'Gallery', key: 'gallery' },
     { href: 'about.html', label: 'About Us', key: 'about' },
     { href: 'contact.html', label: 'Contact Us', key: 'contact' }
@@ -941,6 +942,7 @@ function renderFooter() {
           <ul class="flat">
             <li><a href="index.html">Home</a></li>
             <li><a href="index.html#services">All Services</a></li>
+            <li><a href="properties.html">Property Sale &amp; Rent</a></li>
             <li><a href="index.html#gallery">Gallery</a></li>
             <li><a href="about.html">About Us</a></li>
             <li><a href="contact.html">Contact Us</a></li>
