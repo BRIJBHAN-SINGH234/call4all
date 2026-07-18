@@ -1,5 +1,5 @@
 (function(){
-  const KUKAS=[27.0306,75.8966],RADIUS=10000;
+  const KUKAS=[27.041750,75.895101],RADIUS=10000;
   const safe=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const money=v=>v?new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(Number(v)):'Price on request';
   const image=p=>p||'assets/icons/icon-512.png';

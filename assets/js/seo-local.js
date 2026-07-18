@@ -16,9 +16,9 @@
     phone: '+917737353588',
     phoneDisplay: '+91 7737353588',
     email: 'call4all.info@gmail.com',
-    lat: 27.0167,
-    lng: 75.9000,
-    mapQuery: 'Kukas,Jaipur,Rajasthan+302028',
+    lat: 27.041750,
+    lng: 75.895101,
+    mapQuery: '27.041750,75.895101',
     landmarks: [
       'Arya College of Engineering & IT, Kukas',
       'The Leela Palace Jaipur (near Kukas)',
