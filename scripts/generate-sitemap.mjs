@@ -32,7 +32,7 @@ function isNoindexHtml(content) {
   return /<meta[^>]+name=["']robots["'][^>]+content=["'][^"']*noindex/i.test(content);
 }
 
-function buildEntries(config, htmlFiles, dynamicPages) {
+function buildEntries(config, htmlFiles, dynamicPages, properties) {
   const base = (config.baseUrl || 'https://call4all.co.in').replace(/\/$/, '');
   const exclude = new Set(config.excludeHtml || []);
   const today = new Date().toISOString().slice(0, 10);
@@ -77,6 +77,12 @@ function buildEntries(config, htmlFiles, dynamicPages) {
     add(base + '/page.html?slug=' + encodeURIComponent(p.slug), lm, dynDefaults);
   }
 
+  for (const p of properties || []) {
+    if (!p.id || String(p.status).toLowerCase() !== 'active' || String(p.approval_status).toLowerCase() !== 'approved') continue;
+    const lm = (p.reviewed_at || p.timestamp || '').slice(0, 10) || today;
+    add(base + '/property.html?id=' + encodeURIComponent(p.id), lm, { priority: 0.9, changefreq: 'daily' });
+  }
+
   entries.sort((a, b) => b.priority - a.priority || a.loc.localeCompare(b.loc));
   return entries;
 }
@@ -103,6 +109,21 @@ function loadJson(relPath) {
   return JSON.parse(fs.readFileSync(path.join(ROOT, relPath), 'utf8'));
 }
 
+function parseCsv(text) {
+  const rows = []; let row = [], cell = '', quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (quoted && ch === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+    else if (ch === '"') quoted = !quoted;
+    else if (ch === ',' && !quoted) { row.push(cell); cell = ''; }
+    else if ((ch === '\n' || ch === '\r') && !quoted) { if (ch === '\r' && text[i + 1] === '\n') i++; row.push(cell); if (row.some(Boolean)) rows.push(row); row = []; cell = ''; }
+    else cell += ch;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  const headers = rows.shift() || [];
+  return rows.map(values => Object.fromEntries(headers.map((h, i) => [h, values[i] || ''])));
+}
+
 function listRootHtmlFiles() {
   return fs.readdirSync(ROOT).filter((f) => f.endsWith('.html'));
 }
@@ -116,7 +137,9 @@ function main() {
 
   const htmlFiles = listRootHtmlFiles();
   const pages = (siteConfig.pages || []).filter((p) => p.enabled !== false && p.slug);
-  const entries = buildEntries(config, htmlFiles, pages);
+  let properties = [];
+  try { properties = parseCsv(fs.readFileSync(path.join(ROOT, 'data/properties.csv'), 'utf8')); } catch (_) { /* optional */ }
+  const entries = buildEntries(config, htmlFiles, pages, properties);
   const xml = toXml(entries);
   const outPath = path.join(ROOT, 'sitemap.xml');
 

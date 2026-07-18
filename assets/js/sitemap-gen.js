@@ -22,7 +22,7 @@
     return config.default || { priority: 0.8, changefreq: 'weekly' };
   }
 
-  function buildEntries(config, htmlFiles, dynamicPages) {
+  function buildEntries(config, htmlFiles, dynamicPages, properties) {
     const base = (config.baseUrl || 'https://call4all.co.in').replace(/\/$/, '');
     const exclude = new Set(config.excludeHtml || []);
     const today = new Date().toISOString().slice(0, 10);
@@ -66,6 +66,12 @@
       );
     });
 
+    (properties || []).forEach((p) => {
+      if (!p.id || String(p.status).toLowerCase() !== 'active' || String(p.approval_status).toLowerCase() !== 'approved') return;
+      const lm = (p.reviewed_at || p.timestamp || '').slice(0, 10) || today;
+      add(base + '/property.html?id=' + encodeURIComponent(p.id), lm, { priority: 0.9, changefreq: 'daily' });
+    });
+
     entries.sort((a, b) => b.priority - a.priority || a.loc.localeCompare(b.loc));
     return entries;
   }
@@ -88,8 +94,8 @@
     );
   }
 
-  function generate(config, htmlFiles, dynamicPages) {
-    return toXml(buildEntries(config, htmlFiles, dynamicPages));
+  function generate(config, htmlFiles, dynamicPages, properties) {
+    return toXml(buildEntries(config, htmlFiles, dynamicPages, properties));
   }
 
   async function loadConfig() {

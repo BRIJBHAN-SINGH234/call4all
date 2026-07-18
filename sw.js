@@ -8,7 +8,7 @@
  *   - GitHub API calls:  network-only (sensitive, never cache)
  */
 
-const CACHE_VERSION = 'v22-2026-06-30-no-s6';
+const CACHE_VERSION = 'v23-2026-07-18-sitemap';
 const STATIC_CACHE = 'c4a-static-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'c4a-runtime-' + CACHE_VERSION;
 
@@ -63,6 +63,10 @@ self.addEventListener('fetch', event => {
 
   // Only handle GET requests
   if (req.method !== 'GET') return;
+
+  // SEO files must always come directly from hosting. In particular, never
+  // replace sitemap.xml with the HTML offline fallback on a navigation error.
+  if (url.pathname === '/sitemap.xml' || url.pathname === '/robots.txt') return;
 
   // Never cache the GitHub API or admin/staff pages (sensitive)
   if (url.host === 'api.github.com') return;
