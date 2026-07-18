@@ -1,3 +1,4 @@
 id,timestamp,property_type,title,latitude,longitude,price,width_ft,height_ft,image_path,description,status,added_by,approval_status,pending_json,reviewed_by,reviewed_at
 prop-1784380998443,2026-07-18T13:23:18.443Z,,Pradhan Farm,27.042534,75.898765,230000,319,250,assets/uploads/property-1784380996335-WhatsApp_Image_2026-07-18_at_6.52.01_PM.jpg,,Active,admin,Approved,,admin,2026-07-18T13:38:36.099Z
 prop-1784385645859,2026-07-18T14:40:45.859Z,Lease/Rent,1BH Full Furnished,27.041821,75.899310,11000,20,20,assets/uploads/property-1784385643531-268d9f4e-d5b8-4298-9418-d205d906ac36.jpg,"WI-FI, AC, Inverter, Geyser, RO",Active,admin,Approved,,admin,2026-07-18T14:40:45.859Z
+prop-1784386730867,2026-07-18T14:58:50.867Z,Sale,Running property,27.042337,75.886921,80000000,125,325,assets/uploads/property-1784386724992-Gemini_Generated_Image_gt2yoigt2yoigt2y.png,Running property,Active,admin,Approved,,admin,2026-07-18T14:58:50.867Z
