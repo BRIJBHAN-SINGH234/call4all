@@ -394,7 +394,8 @@ window.CsvAPI = (function () {
     'data/sources.csv': ['id', 'timestamp', 'category', 'name', 'city', 'area', 'address', 'contact_person', 'contact_phone', 'price', 'availability', 'notes', 'added_by'],
     'data/staff.csv': ['id', 'email', 'password_hash', 'name', 'phone', 'role', 'status', 'created_at', 'created_by'],
     'data/areas.csv': ['id', 'city', 'area', 'status', 'created_at'],
-    'data/gallery.csv': ['id', 'timestamp', 'category', 'title', 'description', 'image_path', 'featured', 'sort_order', 'status', 'added_by']
+    'data/gallery.csv': ['id', 'timestamp', 'category', 'title', 'description', 'image_path', 'featured', 'sort_order', 'status', 'added_by'],
+    'data/properties.csv': ['id', 'timestamp', 'title', 'latitude', 'longitude', 'price', 'width_ft', 'height_ft', 'image_path', 'description', 'status', 'added_by']
   };
 
   async function getFile(path, token) {
@@ -682,6 +683,7 @@ window.CsvAPI = (function () {
       staff: 'data/staff.csv',
       areas: 'data/areas.csv',
       gallery: 'data/gallery.csv',
+      properties: 'data/properties.csv',
       siteConfig: 'data/site-config.json'
     },
     DEFAULT_HEADERS,
