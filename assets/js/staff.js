@@ -176,7 +176,8 @@ function initStaffLogin() {
  * STEP 2 — Access Key Entry
  * =========================================================================== */
 function initTokenStep() {
-  document.getElementById('tokenWelcomeName').textContent = localStorage.getItem(SS_NAME) || 'Staff';
+  const welcomeName = document.getElementById('tokenWelcomeName');
+  if (welcomeName) welcomeName.textContent = localStorage.getItem(SS_NAME) || 'Staff';
   document.getElementById('logoutFromTokenBtn').addEventListener('click', staffLogout);
 
   const form = document.getElementById('tokenForm');

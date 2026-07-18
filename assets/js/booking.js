@@ -395,7 +395,7 @@ window.CsvAPI = (function () {
     'data/staff.csv': ['id', 'email', 'password_hash', 'name', 'phone', 'role', 'status', 'created_at', 'created_by'],
     'data/areas.csv': ['id', 'city', 'area', 'status', 'created_at'],
     'data/gallery.csv': ['id', 'timestamp', 'category', 'title', 'description', 'image_path', 'featured', 'sort_order', 'status', 'added_by'],
-    'data/properties.csv': ['id', 'timestamp', 'title', 'latitude', 'longitude', 'price', 'width_ft', 'height_ft', 'image_path', 'description', 'status', 'added_by']
+    'data/properties.csv': ['id', 'timestamp', 'title', 'latitude', 'longitude', 'price', 'width_ft', 'height_ft', 'image_path', 'description', 'status', 'added_by', 'approval_status', 'pending_json', 'reviewed_by', 'reviewed_at']
   };
 
   async function getFile(path, token) {

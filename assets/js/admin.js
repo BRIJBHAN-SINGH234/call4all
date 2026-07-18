@@ -786,7 +786,7 @@ function initLogin() {
       const verify = await fetch('https://api.github.com/user', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (!verify.ok) throw new Error('Invalid GitHub token. Check the token and try again.');
+      if (!verify.ok) throw new Error('Invalid access key. Check the key and try again.');
 
       const storedPassHash = localStorage.getItem(STORAGE_PASS_HASH);
       if (storedPassHash) {

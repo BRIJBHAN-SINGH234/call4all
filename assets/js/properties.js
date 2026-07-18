@@ -4,7 +4,7 @@
   const money=v=>v?new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(Number(v)): 'Price on request';
   const img=p=>p||'assets/icons/icon-512.png';
   async function load(){
-    try{return (await window.CsvAPI.loadAllPublic('data/properties.csv')).items.filter(p=>String(p.status).toLowerCase()!=='inactive');}
+    try{return (await window.CsvAPI.loadAllPublic('data/properties.csv')).items.filter(p=>String(p.status).toLowerCase()==='active'&&String(p.approval_status).toLowerCase()==='approved');}
     catch(e){console.warn(e);return []}
   }
   function detailUrl(p){return 'property.html?id='+encodeURIComponent(p.id)}
