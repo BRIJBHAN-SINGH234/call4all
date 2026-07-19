@@ -4,3 +4,201 @@ mpt-1784444464796,Electrician,Active,2026-07-19T07:01:04.796Z,admin
 mpt-1784444473569,Penter,Active,2026-07-19T07:01:13.569Z,admin
 mpt-1784444489356,F$B Service,Active,2026-07-19T07:01:29.356Z,admin
 mpt-1784444523223,House Keeping,Active,2026-07-19T07:02:03.223Z,admin
+mpt-001,Project Manager,Active,2026-07-19T00:00:00.000Z,admin
+mpt-002,Site Engineer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-003,Civil Engineer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-004,Mechanical Engineer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-005,Electrical Engineer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-006,Safety Officer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-007,Safety Supervisor,Active,2026-07-19T00:00:00.000Z,admin
+mpt-008,QA/QC Engineer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-009,Surveyor,Active,2026-07-19T00:00:00.000Z,admin
+mpt-010,Architect,Active,2026-07-19T00:00:00.000Z,admin
+mpt-011,Draftsman,Active,2026-07-19T00:00:00.000Z,admin
+mpt-012,Planning Engineer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-013,Quantity Surveyor,Active,2026-07-19T00:00:00.000Z,admin
+mpt-014,Foreman,Active,2026-07-19T00:00:00.000Z,admin
+mpt-015,Site Supervisor,Active,2026-07-19T00:00:00.000Z,admin
+mpt-016,Mason,Active,2026-07-19T00:00:00.000Z,admin
+mpt-017,Carpenter,Active,2026-07-19T00:00:00.000Z,admin
+mpt-018,Steel Fixer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-019,Bar Bender,Active,2026-07-19T00:00:00.000Z,admin
+mpt-020,Scaffolder,Active,2026-07-19T00:00:00.000Z,admin
+mpt-021,Welder,Active,2026-07-19T00:00:00.000Z,admin
+mpt-022,Fabricator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-023,Fitter,Active,2026-07-19T00:00:00.000Z,admin
+mpt-024,Pipe Fitter,Active,2026-07-19T00:00:00.000Z,admin
+mpt-027,Helper,Active,2026-07-19T00:00:00.000Z,admin
+mpt-028,General Labour,Active,2026-07-19T00:00:00.000Z,admin
+mpt-029,Painter,Active,2026-07-19T00:00:00.000Z,admin
+mpt-030,Spray Painter,Active,2026-07-19T00:00:00.000Z,admin
+mpt-031,Tile Mason,Active,2026-07-19T00:00:00.000Z,admin
+mpt-032,Marble Mason,Active,2026-07-19T00:00:00.000Z,admin
+mpt-033,POP Worker,Active,2026-07-19T00:00:00.000Z,admin
+mpt-034,Gypsum Installer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-035,Glass Installer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-036,Aluminium Fabricator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-037,HVAC Technician,Active,2026-07-19T00:00:00.000Z,admin
+mpt-038,AC Technician,Active,2026-07-19T00:00:00.000Z,admin
+mpt-039,Chiller Technician,Active,2026-07-19T00:00:00.000Z,admin
+mpt-040,Ductman,Active,2026-07-19T00:00:00.000Z,admin
+mpt-041,Insulator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-042,Instrument Technician,Active,2026-07-19T00:00:00.000Z,admin
+mpt-043,Automation Technician,Active,2026-07-19T00:00:00.000Z,admin
+mpt-044,Cable Jointer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-045,Lineman,Active,2026-07-19T00:00:00.000Z,admin
+mpt-046,Generator Operator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-047,Boiler Operator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-048,Crane Operator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-049,Excavator Operator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-050,JCB Operator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-051,Bulldozer Operator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-052,Grader Operator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-053,Loader Operator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-054,Forklift Operator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-055,Tower Crane Operator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-056,Heavy Driver,Active,2026-07-19T00:00:00.000Z,admin
+mpt-057,Light Driver,Active,2026-07-19T00:00:00.000Z,admin
+mpt-058,Bus Driver,Active,2026-07-19T00:00:00.000Z,admin
+mpt-059,Truck Driver,Active,2026-07-19T00:00:00.000Z,admin
+mpt-060,Dumper Driver,Active,2026-07-19T00:00:00.000Z,admin
+mpt-061,Trailer Driver,Active,2026-07-19T00:00:00.000Z,admin
+mpt-062,Machine Operator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-063,CNC Operator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-064,Lathe Operator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-065,Milling Operator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-066,Press Machine Operator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-067,Packing Operator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-068,Production Operator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-069,Production Supervisor,Active,2026-07-19T00:00:00.000Z,admin
+mpt-070,Factory Worker,Active,2026-07-19T00:00:00.000Z,admin
+mpt-071,Warehouse Supervisor,Active,2026-07-19T00:00:00.000Z,admin
+mpt-072,Store Keeper,Active,2026-07-19T00:00:00.000Z,admin
+mpt-073,Store Assistant,Active,2026-07-19T00:00:00.000Z,admin
+mpt-074,Inventory Controller,Active,2026-07-19T00:00:00.000Z,admin
+mpt-075,Material Controller,Active,2026-07-19T00:00:00.000Z,admin
+mpt-076,Logistics Coordinator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-077,Dispatcher,Active,2026-07-19T00:00:00.000Z,admin
+mpt-078,Supply Chain Executive,Active,2026-07-19T00:00:00.000Z,admin
+mpt-079,Procurement Officer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-080,Purchase Executive,Active,2026-07-19T00:00:00.000Z,admin
+mpt-081,Buyer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-082,Vendor Coordinator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-083,Office Boy,Active,2026-07-19T00:00:00.000Z,admin
+mpt-084,Office Assistant,Active,2026-07-19T00:00:00.000Z,admin
+mpt-085,Receptionist,Active,2026-07-19T00:00:00.000Z,admin
+mpt-086,Front Office Executive,Active,2026-07-19T00:00:00.000Z,admin
+mpt-087,Data Entry Operator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-088,Computer Operator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-089,Admin Executive,Active,2026-07-19T00:00:00.000Z,admin
+mpt-090,HR Executive,Active,2026-07-19T00:00:00.000Z,admin
+mpt-091,HR Manager,Active,2026-07-19T00:00:00.000Z,admin
+mpt-092,Recruiter,Active,2026-07-19T00:00:00.000Z,admin
+mpt-093,Payroll Executive,Active,2026-07-19T00:00:00.000Z,admin
+mpt-094,Accountant,Active,2026-07-19T00:00:00.000Z,admin
+mpt-095,Senior Accountant,Active,2026-07-19T00:00:00.000Z,admin
+mpt-096,Finance Manager,Active,2026-07-19T00:00:00.000Z,admin
+mpt-097,Cashier,Active,2026-07-19T00:00:00.000Z,admin
+mpt-098,Auditor,Active,2026-07-19T00:00:00.000Z,admin
+mpt-099,Tax Consultant,Active,2026-07-19T00:00:00.000Z,admin
+mpt-100,Cost Accountant,Active,2026-07-19T00:00:00.000Z,admin
+mpt-101,Sales Executive,Active,2026-07-19T00:00:00.000Z,admin
+mpt-102,Sales Manager,Active,2026-07-19T00:00:00.000Z,admin
+mpt-103,Marketing Executive,Active,2026-07-19T00:00:00.000Z,admin
+mpt-104,Digital Marketing Executive,Active,2026-07-19T00:00:00.000Z,admin
+mpt-105,SEO Executive,Active,2026-07-19T00:00:00.000Z,admin
+mpt-106,Social Media Manager,Active,2026-07-19T00:00:00.000Z,admin
+mpt-107,Graphic Designer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-108,Video Editor,Active,2026-07-19T00:00:00.000Z,admin
+mpt-109,Content Writer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-110,Copywriter,Active,2026-07-19T00:00:00.000Z,admin
+mpt-111,Photographer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-112,Customer Care Executive,Active,2026-07-19T00:00:00.000Z,admin
+mpt-113,Call Center Agent,Active,2026-07-19T00:00:00.000Z,admin
+mpt-114,Telecaller,Active,2026-07-19T00:00:00.000Z,admin
+mpt-115,Business Development Executive,Active,2026-07-19T00:00:00.000Z,admin
+mpt-116,Relationship Manager,Active,2026-07-19T00:00:00.000Z,admin
+mpt-117,CRM Executive,Active,2026-07-19T00:00:00.000Z,admin
+mpt-118,IT Support Engineer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-119,Network Engineer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-120,System Administrator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-121,Software Developer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-122,Web Developer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-123,Mobile App Developer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-124,Database Administrator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-125,Cyber Security Analyst,Active,2026-07-19T00:00:00.000Z,admin
+mpt-126,Cloud Engineer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-127,DevOps Engineer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-128,AI Engineer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-129,Data Analyst,Active,2026-07-19T00:00:00.000Z,admin
+mpt-130,Data Scientist,Active,2026-07-19T00:00:00.000Z,admin
+mpt-131,Machine Learning Engineer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-132,Printer Technician,Active,2026-07-19T00:00:00.000Z,admin
+mpt-133,CCTV Technician,Active,2026-07-19T00:00:00.000Z,admin
+mpt-134,Fire Alarm Technician,Active,2026-07-19T00:00:00.000Z,admin
+mpt-135,Access Control Technician,Active,2026-07-19T00:00:00.000Z,admin
+mpt-136,Security Guard,Active,2026-07-19T00:00:00.000Z,admin
+mpt-137,Security Supervisor,Active,2026-07-19T00:00:00.000Z,admin
+mpt-138,Security Officer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-139,Housekeeping Supervisor,Active,2026-07-19T00:00:00.000Z,admin
+mpt-140,Housekeeper,Active,2026-07-19T00:00:00.000Z,admin
+mpt-141,Cleaner,Active,2026-07-19T00:00:00.000Z,admin
+mpt-142,Janitor,Active,2026-07-19T00:00:00.000Z,admin
+mpt-143,Gardener,Active,2026-07-19T00:00:00.000Z,admin
+mpt-144,Pest Control Technician,Active,2026-07-19T00:00:00.000Z,admin
+mpt-145,Laundry Worker,Active,2026-07-19T00:00:00.000Z,admin
+mpt-146,Cook,Active,2026-07-19T00:00:00.000Z,admin
+mpt-147,Chef,Active,2026-07-19T00:00:00.000Z,admin
+mpt-148,Sous Chef,Active,2026-07-19T00:00:00.000Z,admin
+mpt-149,Kitchen Helper,Active,2026-07-19T00:00:00.000Z,admin
+mpt-150,Waiter,Active,2026-07-19T00:00:00.000Z,admin
+mpt-151,Steward,Active,2026-07-19T00:00:00.000Z,admin
+mpt-152,Bartender,Active,2026-07-19T00:00:00.000Z,admin
+mpt-153,Barista,Active,2026-07-19T00:00:00.000Z,admin
+mpt-154,Baker,Active,2026-07-19T00:00:00.000Z,admin
+mpt-155,Butcher,Active,2026-07-19T00:00:00.000Z,admin
+mpt-156,Cash Counter Staff,Active,2026-07-19T00:00:00.000Z,admin
+mpt-157,Hotel Receptionist,Active,2026-07-19T00:00:00.000Z,admin
+mpt-158,Room Attendant,Active,2026-07-19T00:00:00.000Z,admin
+mpt-159,Bell Boy,Active,2026-07-19T00:00:00.000Z,admin
+mpt-160,Concierge,Active,2026-07-19T00:00:00.000Z,admin
+mpt-161,Lifeguard,Active,2026-07-19T00:00:00.000Z,admin
+mpt-162,Gym Trainer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-163,Fitness Instructor,Active,2026-07-19T00:00:00.000Z,admin
+mpt-164,Yoga Trainer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-165,Nurse,Active,2026-07-19T00:00:00.000Z,admin
+mpt-166,Staff Nurse,Active,2026-07-19T00:00:00.000Z,admin
+mpt-167,Pharmacist,Active,2026-07-19T00:00:00.000Z,admin
+mpt-168,Lab Technician,Active,2026-07-19T00:00:00.000Z,admin
+mpt-169,Radiology Technician,Active,2026-07-19T00:00:00.000Z,admin
+mpt-170,Physiotherapist,Active,2026-07-19T00:00:00.000Z,admin
+mpt-171,Doctor,Active,2026-07-19T00:00:00.000Z,admin
+mpt-172,Dentist,Active,2026-07-19T00:00:00.000Z,admin
+mpt-173,Ambulance Driver,Active,2026-07-19T00:00:00.000Z,admin
+mpt-174,Caregiver,Active,2026-07-19T00:00:00.000Z,admin
+mpt-175,Ward Boy,Active,2026-07-19T00:00:00.000Z,admin
+mpt-176,Teacher,Active,2026-07-19T00:00:00.000Z,admin
+mpt-177,Lecturer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-178,Professor,Active,2026-07-19T00:00:00.000Z,admin
+mpt-179,Trainer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-180,Librarian,Active,2026-07-19T00:00:00.000Z,admin
+mpt-181,Research Assistant,Active,2026-07-19T00:00:00.000Z,admin
+mpt-182,Legal Advisor,Active,2026-07-19T00:00:00.000Z,admin
+mpt-183,Advocate,Active,2026-07-19T00:00:00.000Z,admin
+mpt-184,Company Secretary,Active,2026-07-19T00:00:00.000Z,admin
+mpt-185,Compliance Officer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-186,Public Relations Officer,Active,2026-07-19T00:00:00.000Z,admin
+mpt-187,Event Coordinator,Active,2026-07-19T00:00:00.000Z,admin
+mpt-188,Travel Consultant,Active,2026-07-19T00:00:00.000Z,admin
+mpt-189,Tour Guide,Active,2026-07-19T00:00:00.000Z,admin
+mpt-190,Delivery Executive,Active,2026-07-19T00:00:00.000Z,admin
+mpt-191,Courier Boy,Active,2026-07-19T00:00:00.000Z,admin
+mpt-192,E-commerce Executive,Active,2026-07-19T00:00:00.000Z,admin
+mpt-193,Merchandiser,Active,2026-07-19T00:00:00.000Z,admin
+mpt-194,Retail Sales Associate,Active,2026-07-19T00:00:00.000Z,admin
+mpt-195,Cash Collection Executive,Active,2026-07-19T00:00:00.000Z,admin
+mpt-196,Field Executive,Active,2026-07-19T00:00:00.000Z,admin
+mpt-197,Field Technician,Active,2026-07-19T00:00:00.000Z,admin
+mpt-198,Maintenance Technician,Active,2026-07-19T00:00:00.000Z,admin
+mpt-199,Utility Worker,Active,2026-07-19T00:00:00.000Z,admin
+mpt-200,Multi-Skilled Technician,Active,2026-07-19T00:00:00.000Z,admin
