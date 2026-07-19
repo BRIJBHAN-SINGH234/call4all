@@ -1,0 +1,41 @@
+id,group,name,status,created_at,created_by
+crt-001,Duration,Hourly Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-002,Duration,Half-Day Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-003,Duration,Full-Day Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-004,Duration,Weekly Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-005,Duration,Monthly Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-006,Duration,Long-Term Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-007,Duration,Annual Lease,Active,2026-07-19T00:00:00.000Z,admin
+crt-008,Usage,Self-Drive Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-009,Usage,Chauffeur-Driven Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-010,Usage,One-Way Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-011,Usage,Round-Trip Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-012,Usage,Airport Pickup,Active,2026-07-19T00:00:00.000Z,admin
+crt-013,Usage,Airport Drop,Active,2026-07-19T00:00:00.000Z,admin
+crt-014,Usage,Outstation Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-015,Usage,Local City Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-016,Usage,Intercity Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-017,Vehicle Category,Hatchback Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-018,Vehicle Category,Sedan Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-019,Vehicle Category,SUV Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-020,Vehicle Category,MUV Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-021,Vehicle Category,Luxury Car Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-022,Vehicle Category,Premium Car Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-023,Vehicle Category,Sports Car Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-024,Vehicle Category,Convertible Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-025,Vehicle Category,Electric Car Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-026,Vehicle Category,Hybrid Car Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-027,Vehicle Category,Van Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-028,Vehicle Category,Minivan Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-029,Vehicle Category,Tempo Traveller Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-030,Vehicle Category,Limousine Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-031,Purpose,Corporate Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-032,Purpose,Business Travel Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-033,Purpose,Wedding Car Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-034,Purpose,Event Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-035,Purpose,VIP Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-036,Purpose,Tourism Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-037,Purpose,Holiday Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-038,Purpose,Pilgrimage Rental,Active,2026-07-19T00:00:00.000Z,admin
+crt-039,Purpose,Employee Transportation,Active,2026-07-19T00:00:00.000Z,admin
+crt-040,Purpose,School/College Transport,Active,2026-07-19T00:00:00.000Z,admin

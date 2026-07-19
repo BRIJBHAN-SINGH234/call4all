@@ -397,7 +397,9 @@ window.CsvAPI = (function () {
     'data/gallery.csv': ['id', 'timestamp', 'category', 'title', 'description', 'image_path', 'featured', 'sort_order', 'status', 'added_by'],
     'data/properties.csv': ['id', 'timestamp', 'property_type', 'title', 'contact_phone', 'latitude', 'longitude', 'price', 'width_ft', 'height_ft', 'image_path', 'description', 'status', 'added_by', 'approval_status', 'pending_json', 'reviewed_by', 'reviewed_at'],
     'data/manpower.csv': ['id', 'timestamp', 'name', 'contact_phone', 'types', 'city', 'area', 'address', 'experience', 'availability', 'notes', 'added_by'],
-    'data/manpower-types.csv': ['id', 'name', 'status', 'created_at', 'created_by']
+    'data/manpower-types.csv': ['id', 'name', 'status', 'created_at', 'created_by'],
+    'data/rental-cars.csv': ['id', 'timestamp', 'brand', 'model', 'image_path', 'service_types', 'price', 'city', 'seats', 'fuel', 'transmission', 'description', 'status', 'added_by'],
+    'data/car-rental-types.csv': ['id', 'group', 'name', 'status', 'created_at', 'created_by']
   };
 
   async function getFile(path, token) {
@@ -686,6 +688,8 @@ window.CsvAPI = (function () {
       areas: 'data/areas.csv',
       gallery: 'data/gallery.csv',
       properties: 'data/properties.csv',
+      rentalCars: 'data/rental-cars.csv',
+      carRentalTypes: 'data/car-rental-types.csv',
       siteConfig: 'data/site-config.json'
     },
     DEFAULT_HEADERS,

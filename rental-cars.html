@@ -6,6 +6,7 @@
 <title>Car Rental in Kukas Jaipur | Self Drive &amp; Taxi Service | Call4All</title>
 <meta name="description" content="Car rental in Kukas Jaipur — self drive, taxi with driver, wedding cars, airport pick-drop and outstation trips. Sedan, SUV, luxury cars near Arya College &amp; Leela Palace area. Call +91 7737353588.">
 <meta name="keywords" content="rental cars Jaipur, car rental Jaipur, car rent in Kukas, car rental Kukas, taxi in Kukas, Kukas car rental, wedding car Jaipur, wedding car Kukas, outstation taxi Jaipur, outstation taxi Kukas, SUV rental Jaipur, sedan rental Jaipur, luxury car hire Jaipur, airport taxi Kukas, Innova rental Jaipur Kukas, tempo traveller Jaipur Kukas">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 <meta name="geo.region" content="IN-RJ">
 <meta name="geo.placename" content="Jaipur, Kukas">
 <meta name="geo.position" content="27.041750;75.895101">
@@ -28,6 +29,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://images.unsplash.com">
 <link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/rental-cars.css">
 </head>
 <body data-page="services">
 
@@ -79,6 +81,28 @@
   <h2>Booking Process</h2>
   <p>Simply fill out the form or call <a href="tel:" data-call-link><span data-brand-phone></span></a>. We'll send you the best rates and car options for Jaipur or Kukas.</p>
 </div>
+
+<section class="section car-catalog-section" id="available-cars" aria-labelledby="availableCarsTitle">
+  <span class="section-eyebrow">Live Fleet</span>
+  <h2 class="section-title" id="availableCarsTitle">Available Cars for Rent in <span class="accent">Jaipur &amp; Kukas</span></h2>
+  <div class="title-divider"></div>
+  <p class="section-subtitle">Filter available vehicles by brand or rental need—hourly, daily, self-drive, chauffeur, airport, outstation, wedding, corporate, SUV, sedan, luxury and more.</p>
+  <div class="car-filters" aria-label="Rental car filters">
+    <input id="carPublicSearch" type="search" placeholder="Search brand or model" aria-label="Search car brand or model">
+    <select id="carPublicBrand" aria-label="Filter by car brand"><option value="">All brands</option></select>
+    <select id="carPublicType" aria-label="Filter by rental service"><option value="">All rental services</option></select>
+    <button class="btn btn-outline" id="carFilterReset" type="button">Reset</button>
+  </div>
+  <p class="car-result-count" id="carResultCount" aria-live="polite"></p>
+  <div class="public-car-grid" id="publicCarGrid"><div class="car-loading">Available rental cars loading…</div></div>
+  <noscript><p>Available car inventory dekhne aur booking ke liye Call4All ko +91 7737353588 par call ya WhatsApp karein.</p></noscript>
+</section>
+
+<section class="service-detail car-seo-copy" aria-labelledby="rentalOptionsTitle">
+  <h2 id="rentalOptionsTitle">Car Rental Options for Every Duration, Vehicle and Purpose</h2>
+  <p>Call4All par hourly, half-day, full-day, weekly, monthly, long-term aur annual lease cars mil sakti hain. Self-drive, chauffeur-driven, one-way, round-trip, airport pickup/drop, local Jaipur, intercity aur outstation rental options available hain.</p>
+  <p>Choose from hatchback, sedan, SUV, MUV, luxury, premium, sports, convertible, electric, hybrid, van, minivan, tempo traveller and limousine rentals. Corporate travel, weddings, VIP movement, tourism, pilgrimage, employee transport and school or college transport ke liye direct vehicle enquiry bhejein.</p>
+</section>
 
 <section class="section section-light">
   <span class="section-eyebrow">Gallery</span>
@@ -208,6 +232,7 @@
 <script src="assets/js/site.js"></script>
 <script src="assets/js/seo-local.js"></script>
 <script src="assets/js/booking.js"></script>
+<script src="assets/js/rental-cars-catalog.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const slot = document.getElementById('bookingFormSlot');

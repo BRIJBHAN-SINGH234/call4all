@@ -1,0 +1,12 @@
+.car-catalog-section{background:var(--bg-light);padding:64px max(20px,5vw)}
+.car-filters{max-width:1180px;margin:24px auto 10px;display:grid;grid-template-columns:2fr 1fr 1.5fr auto;gap:10px}
+.car-filters input,.car-filters select{width:100%;padding:12px;border:1px solid #ccd5d0;border-radius:9px;background:#fff;font:inherit}
+.car-filters .btn{border-color:var(--primary);color:var(--primary)}
+.car-result-count{max-width:1180px;margin:0 auto 12px;color:var(--text-light);font-size:14px}
+.public-car-grid{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:22px;align-items:stretch}
+.public-car-card{background:#fff;border-radius:14px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;border:1px solid rgba(31,58,46,.08)}
+.public-car-card img{width:100%;aspect-ratio:16/10;object-fit:cover;background:#e8ecea}
+.public-car-body{padding:18px;display:flex;flex-direction:column;gap:9px;flex:1}.public-car-body h3{font-size:22px;margin:0}.public-car-price{color:var(--accent-dark);font-weight:700}.public-car-meta{font-size:13px;color:var(--text-light)}
+.public-car-tags{display:flex;flex-wrap:wrap;gap:5px}.public-car-tag{background:#eef4f1;color:var(--primary);border-radius:15px;padding:3px 8px;font-size:11px}.public-car-description{font-size:14px;color:#555;flex:1}.public-car-enquiry{display:block;text-align:center;background:#25d366;color:#fff!important;padding:11px;border-radius:8px;font-weight:700;margin-top:5px}.public-car-enquiry:hover{background:#168f42}
+.car-loading,.car-empty{grid-column:1/-1;text-align:center;padding:40px;background:#fff;border-radius:12px;color:var(--text-light)}.car-seo-copy{padding-top:45px;padding-bottom:45px}
+@media(max-width:800px){.car-filters{grid-template-columns:1fr 1fr}.car-filters input{grid-column:1/-1}}@media(max-width:520px){.car-filters{grid-template-columns:1fr}.car-filters input{grid-column:auto}}
