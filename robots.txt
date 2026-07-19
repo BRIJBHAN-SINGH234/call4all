@@ -1,107 +1,29 @@
-# ============================================
-#  Call4All robots.txt
-#  Welcomes search engines AND AI crawlers so
-#  Call4All can appear in both Google results
-#  and AI chatbot answers (ChatGPT, Claude,
-#  Perplexity, Gemini, Copilot, etc).
-# ============================================
+# Call4All crawler policy
+# Public service pages and the resources required to render them are crawlable.
+# Admin, staff, previews and private operational data are blocked.
 
-# Default — allow all bots
 User-agent: *
 Allow: /
+
+# Public data required by indexable JavaScript-rendered pages
+Allow: /data/site-config.json
+Allow: /data/gallery.csv
+Allow: /data/properties.csv
+Allow: /data/rental-cars.csv
+
+# Private data and authenticated management pages
 Disallow: /data/
 Disallow: /admin.html
 Disallow: /staff.html
+Disallow: /property-admin.html
+Disallow: /manpower-admin.html
+Disallow: /car-rental-admin.html
+Disallow: /logo-preview.html
+Disallow: /home-classic.html
 Disallow: /assets/js/admin.js
 Disallow: /assets/js/staff.js
+Disallow: /assets/js/property-admin.js
+Disallow: /assets/js/manpower-admin.js
+Disallow: /assets/js/car-rental-admin.js
 
-# -------- AI / LLM Crawlers (explicitly allowed) --------
-
-# OpenAI ChatGPT (search-time browsing + training)
-User-agent: GPTBot
-Allow: /
-Disallow: /data/
-Disallow: /admin.html
-Disallow: /staff.html
-
-User-agent: ChatGPT-User
-Allow: /
-
-User-agent: OAI-SearchBot
-Allow: /
-
-# Anthropic Claude
-User-agent: ClaudeBot
-Allow: /
-Disallow: /data/
-Disallow: /admin.html
-Disallow: /staff.html
-
-User-agent: Claude-Web
-Allow: /
-
-User-agent: anthropic-ai
-Allow: /
-
-# Google Gemini / Bard / Vertex AI (separate from Googlebot)
-User-agent: Google-Extended
-Allow: /
-Disallow: /data/
-Disallow: /admin.html
-Disallow: /staff.html
-
-# Microsoft Copilot / Bing AI
-User-agent: bingbot
-Allow: /
-
-# Perplexity AI
-User-agent: PerplexityBot
-Allow: /
-Disallow: /data/
-Disallow: /admin.html
-Disallow: /staff.html
-
-# Apple Intelligence / Apple AI
-User-agent: Applebot-Extended
-Allow: /
-Disallow: /data/
-Disallow: /admin.html
-Disallow: /staff.html
-
-# ByteDance (TikTok / Doubao AI)
-User-agent: Bytespider
-Allow: /
-Disallow: /data/
-
-# Common Crawl (used as training data by many LLMs)
-User-agent: CCBot
-Allow: /
-Disallow: /data/
-Disallow: /admin.html
-Disallow: /staff.html
-
-# You.com
-User-agent: YouBot
-Allow: /
-
-# Cohere
-User-agent: cohere-ai
-Allow: /
-
-# Diffbot
-User-agent: Diffbot
-Allow: /
-
-# Meta AI
-User-agent: FacebookBot
-Allow: /
-
-User-agent: Meta-ExternalAgent
-Allow: /
-
-# Mistral AI
-User-agent: MistralAI-User
-Allow: /
-
-# Sitemap (helps both SEO and AI crawlers find all pages)
 Sitemap: https://call4all.co.in/sitemap.xml

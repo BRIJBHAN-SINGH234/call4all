@@ -404,6 +404,7 @@ async function renderDynamicPage(slug) {
     const page = pages.find(p => p.slug === slug && p.enabled !== false);
     if (!page) {
       document.title = 'Page not found - ' + (cfg.businessName || 'Call4All');
+      document.querySelector('meta[name="robots"]')?.setAttribute('content', 'noindex,follow');
       root.innerHTML = `
         <div class="page-not-found">
           <div class="icon">📄</div>
@@ -417,6 +418,15 @@ async function renderDynamicPage(slug) {
     document.title = `${page.title} - ${cfg.businessName || 'Call4All'}`;
     const metaEl = document.getElementById('metaDescription');
     if (metaEl && page.meta_description) metaEl.setAttribute('content', page.meta_description);
+    document.querySelector('meta[name="robots"]')?.setAttribute('content', 'index,follow,max-image-preview:large');
+    const canonicalUrl = `https://call4all.co.in/page.html?slug=${encodeURIComponent(page.slug)}`;
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      document.head.appendChild(canonical);
+    }
+    canonical.href = canonicalUrl;
     document.body.setAttribute('data-page', 'page-' + page.slug);
 
     root.innerHTML = `<div class="dynamic-page-wrap">${page.html_content || ''}</div>`;
