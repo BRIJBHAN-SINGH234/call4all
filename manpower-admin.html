@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Manpower Manager | Call4All</title><meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="assets/css/style.css"><link rel="stylesheet" href="assets/css/properties.css">
+<style>
+.mp-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.mp-toolbar input,.mp-toolbar select{min-width:180px;flex:1}.mp-types{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;padding:12px;border:1px solid #dfe5e2;border-radius:8px;max-height:190px;overflow:auto}.mp-check{display:flex;gap:8px;align-items:center;font-size:14px}.mp-check input{width:auto}.mp-item{padding:14px 0;border-bottom:1px solid #e5e9e7;display:grid;grid-template-columns:1fr auto;gap:12px}.mp-item h3{margin:0 0 5px}.mp-item p{margin:4px 0;color:#5c6862}.type-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px;border-bottom:1px solid #eee}.type-pill{display:inline-block;background:#e9f2ff;color:#173f73;border-radius:14px;padding:3px 9px;margin:2px;font-size:12px}@media(max-width:700px){.pa-grid{grid-template-columns:1fr}.mp-item{grid-template-columns:1fr}.mp-toolbar>*{width:100%}}
+</style></head>
+<body style="background:#f3f6f4">
+<header class="pa-top"><div><strong id="pageHeading">👷 Manpower Manager</strong><div style="font-size:12px;opacity:.75">Private admin/staff records</div></div><div><a class="btn btn-outline btn-sm" id="backLink" href="admin.html" style="color:#fff;border-color:#fff">Dashboard</a></div></header>
+<main class="pa-wrap"><div class="pa-grid">
+<section class="pa-card"><h2 id="formTitle">Add Manpower</h2><p style="color:#66736d">Ek person ke multiple manpower types select kiye ja sakte hain.</p>
+<form class="pa-form" id="manpowerForm"><input type="hidden" name="id">
+<label>Name *</label><input name="name" required maxlength="100" placeholder="Full name / provider name">
+<label>Contact number *</label><input name="contact_phone" required type="tel" inputmode="tel" maxlength="15" pattern="[0-9+() -]{7,15}" placeholder="9876543210">
+<label>Manpower type * <small>(one or more)</small></label><div class="mp-types" id="typeChoices"><span>Loading types…</span></div>
+<div class="pa-row"><div><label>City</label><input name="city" maxlength="80"></div><div><label>Area</label><input name="area" maxlength="100"></div></div>
+<label>Address</label><textarea name="address" rows="2"></textarea>
+<div class="pa-row"><div><label>Experience</label><input name="experience" placeholder="e.g. 5 years"></div><div><label>Availability</label><select name="availability"><option>Available</option><option>Busy</option><option>Inactive</option></select></div></div>
+<label>Notes</label><textarea name="notes" rows="3"></textarea><div id="saveStatus"></div>
+<div class="pa-actions"><button class="pa-btn gold" type="submit">Save Manpower</button><button class="pa-btn" id="cancelEdit" type="button" hidden>Cancel</button></div></form></section>
+<section class="pa-card"><h2>Saved Manpower</h2><div class="mp-toolbar"><input id="searchInput" type="search" placeholder="Search name, phone, type, city…"><select id="typeFilter"><option value="">All types</option></select></div><div id="manpowerList"><p>Loading…</p></div></section>
+</div>
+<section class="pa-card" id="typeManager" style="margin-top:18px" hidden><h2>Manpower Types (Admin Only)</h2><form class="mp-toolbar" id="typeForm"><input type="hidden" name="id"><input name="name" required maxlength="60" placeholder="e.g. Electrician, Helper, Driver"><select name="status"><option>Active</option><option>Inactive</option></select><button class="pa-btn gold" type="submit">Save Type</button><button class="pa-btn" id="cancelTypeEdit" type="button" hidden>Cancel</button></form><div id="typeList"></div></section>
+</main><script src="assets/js/site.js"></script><script src="assets/js/booking.js"></script><script src="assets/js/manpower-admin.js"></script></body></html>
