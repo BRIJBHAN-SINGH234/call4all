@@ -5,11 +5,40 @@
 User-agent: *
 Allow: /
 
+# OpenAI search and user-request crawlers. Explicit rules make the intent clear
+# even though the wildcard rule above already permits public content.
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /data/
+Disallow: /admin.html
+Disallow: /staff.html
+Disallow: /property-admin.html
+Disallow: /manpower-admin.html
+Disallow: /car-rental-admin.html
+Disallow: /second-hand-admin.html
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /data/
+Disallow: /admin.html
+Disallow: /staff.html
+
+# Training access is intentionally allowed for public pages only.
+User-agent: GPTBot
+Allow: /
+Disallow: /data/
+Disallow: /admin.html
+Disallow: /staff.html
+Disallow: /property-admin.html
+Disallow: /manpower-admin.html
+Disallow: /car-rental-admin.html
+
 # Public data required by indexable JavaScript-rendered pages
 Allow: /data/site-config.json
 Allow: /data/gallery.csv
 Allow: /data/properties.csv
 Allow: /data/rental-cars.csv
+Allow: /data/second-hand-items.csv
 
 # Private data and authenticated management pages
 Disallow: /data/
@@ -18,6 +47,7 @@ Disallow: /staff.html
 Disallow: /property-admin.html
 Disallow: /manpower-admin.html
 Disallow: /car-rental-admin.html
+Disallow: /second-hand-admin.html
 Disallow: /logo-preview.html
 Disallow: /home-classic.html
 Disallow: /assets/js/admin.js
@@ -25,5 +55,6 @@ Disallow: /assets/js/staff.js
 Disallow: /assets/js/property-admin.js
 Disallow: /assets/js/manpower-admin.js
 Disallow: /assets/js/car-rental-admin.js
+Disallow: /assets/js/second-hand-admin.js
 
 Sitemap: https://call4all.co.in/sitemap.xml

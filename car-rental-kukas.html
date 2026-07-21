@@ -42,6 +42,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://images.unsplash.com">
 <link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/rental-cars.css">
 </head>
 <body data-page="services">
 
@@ -60,7 +61,7 @@
 
 <!-- ===== INTRO (rich Kukas body text — primary SEO content) ===== -->
 <div class="service-detail">
-  <p class="lead">Need a <strong>car on rent in Kukas, Jaipur</strong>? Call4All is the trusted local service aggregator for Kukas residents, hotels and resorts. Whether it's a wedding in a Kukas resort, an outstation trip to Delhi-Agra-Ajmer, an airport transfer, or daily local travel — we connect you to a verified driver and the right vehicle within an hour. Also see our <a href="car-rental-kukas-jaipur.html"><strong>Car Rental Kukas Jaipur</strong></a> landing page for keyword-focused pricing and FAQs.</p>
+  <p class="lead">Need a <strong>car on rent in Kukas, Jaipur</strong>? Call4All is the trusted local service aggregator for Kukas residents, hotels and resorts. Whether it's a wedding in a Kukas resort, an outstation trip to Delhi-Agra-Ajmer, an airport transfer, or daily local travel — we connect you to a verified driver and the right vehicle within an hour.</p>
 
   <h2>Why Call4All for Car Rental in Kukas?</h2>
   <p>Kukas is a fast-growing belt on the Delhi–Jaipur NH-48 highway, dotted with luxury resorts, wedding venues, marble factories and residential colonies. Demand for reliable taxis and rental cars in Kukas is huge — and Call4All has built a network of <strong>verified drivers based in and around Kukas</strong> so you never have to wait long.</p>
@@ -97,7 +98,7 @@
   </ul>
 
   <h2>Wedding Cars in Kukas Resorts</h2>
-  <p>Kukas is one of Jaipur's most popular destination-wedding zones with luxury resorts. Call4All supplies <strong>decorated wedding cars in Kukas</strong> — dulha car, dulhan car, baraat car — with fresh-flower decoration and colour-coordinated styling. Luxury options (BMW, Audi, Mercedes, Fortuner, Innova Crysta) are available even on short notice. See our <a href="car-decoration.html">car decoration service</a> for theme &amp; flower options.</p>
+  <p>Kukas is one of Jaipur's most popular destination-wedding zones with luxury resorts. Call4All supplies <strong>decorated wedding cars in Kukas</strong> — dulha car, dulhan car, baraat car — with fresh-flower decoration and colour-coordinated styling. Luxury options (BMW, Audi, Mercedes, Fortuner, Innova Crysta) are available even on short notice. See our <a href="car-decoration-kukas.html">car decoration service</a> for theme &amp; flower options.</p>
 
   <h2>Airport Taxi from Kukas</h2>
   <p>Jaipur International Airport (Sanganer) is approximately 35-40 km from Kukas. Call4All provides on-time <strong>airport taxi from Kukas</strong> in sedans and SUVs — early-morning and late-night pickups available. Driver tracks your flight; meet-and-greet at the gate on request.</p>
@@ -280,11 +281,26 @@
   "@type": "BreadcrumbList",
   "itemListElement": [
     {"@type":"ListItem","position":1,"name":"Home","item":"https://call4all.co.in/"},
-    {"@type":"ListItem","position":2,"name":"Rental Cars","item":"https://call4all.co.in/rental-cars.html"},
-    {"@type":"ListItem","position":3,"name":"Car Rental in Kukas","item":"https://call4all.co.in/car-rental-kukas.html"}
+    {"@type":"ListItem","position":2,"name":"Car Rental in Kukas","item":"https://call4all.co.in/car-rental-kukas.html"}
   ]
 }
 </script>
+
+<section class="section car-catalog-section" id="available-cars" aria-labelledby="availableCarsTitle">
+  <span class="section-eyebrow">Live Fleet</span>
+  <h2 class="section-title" id="availableCarsTitle">Available Cars for Rent in <span class="accent">Jaipur &amp; Kukas</span></h2>
+  <div class="title-divider"></div>
+  <p class="section-subtitle">Filter available vehicles by brand or rental need—self-drive, chauffeur, airport, outstation, wedding, corporate, SUV, sedan and luxury.</p>
+  <div class="car-filters" aria-label="Rental car filters">
+    <input id="carPublicSearch" type="search" placeholder="Search brand or model" aria-label="Search car brand or model">
+    <select id="carPublicBrand" aria-label="Filter by car brand"><option value="">All brands</option></select>
+    <select id="carPublicType" aria-label="Filter by rental service"><option value="">All rental services</option></select>
+    <button class="btn btn-outline" id="carFilterReset" type="button">Reset</button>
+  </div>
+  <p class="car-result-count" id="carResultCount" aria-live="polite"></p>
+  <div class="public-car-grid" id="publicCarGrid"><div class="car-loading">Available rental cars loading…</div></div>
+  <noscript><p>Available car inventory और booking के लिए Call4All को +91 7737353588 पर call या WhatsApp करें।</p></noscript>
+</section>
 
 <div class="seo-enhance-mount" data-seo-page="car-rental-kukas"></div>
 <div data-seo-schema="local-business" data-page-url="https://call4all.co.in/car-rental-kukas.html" data-service-name="Car Rental in Kukas Jaipur" hidden></div>
@@ -300,6 +316,7 @@
 <script src="assets/js/site.js"></script>
 <script src="assets/js/seo-local.js"></script>
 <script src="assets/js/booking.js"></script>
+<script src="assets/js/rental-cars-catalog.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const slot = document.getElementById('bookingFormSlot');

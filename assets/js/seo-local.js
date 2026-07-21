@@ -31,7 +31,7 @@
 
   const INTERNAL = {
     carRental: { href: 'car-rental-kukas.html', label: 'Car Rental in Kukas, Jaipur' },
-    carRentalJaipur: { href: 'car-rental-kukas-jaipur.html', label: 'Car Rental Kukas Jaipur' },
+    carRentalJaipur: { href: 'car-rental-kukas.html', label: 'Car Rental Kukas Jaipur' },
     rooms: { href: 'rooms-flats-kukas.html', label: 'Rooms & Flats for Rent in Kukas' },
     roomRent: { href: 'room-rent-kukas-jaipur.html', label: 'Room Rent in Kukas Jaipur' },
     flatRent: { href: 'flat-rent-kukas-jaipur.html', label: 'Flat Rent in Kukas Jaipur' },
@@ -453,37 +453,43 @@
     const serviceName = mount.getAttribute('data-service-name') || 'Call4All Services';
     const schema = {
       '@context': 'https://schema.org',
-      '@type': 'LocalBusiness',
-      '@id': pageUrl + '#localbusiness',
-      name: 'Call4All — ' + serviceName,
-      image: 'https://call4all.co.in/assets/icons/icon-512.png',
+      '@type': 'Service',
+      '@id': pageUrl + '#service',
+      name: serviceName,
       url: pageUrl,
-      telephone: KUKAS.phone,
-      email: KUKAS.email,
-      priceRange: '₹₹',
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: KUKAS.street,
-        addressLocality: KUKAS.locality,
-        addressRegion: KUKAS.region,
-        postalCode: KUKAS.pin,
-        addressCountry: 'IN'
-      },
-      geo: {
-        '@type': 'GeoCoordinates',
-        latitude: KUKAS.lat,
-        longitude: KUKAS.lng
+      provider: {
+        '@type': 'LocalBusiness',
+        '@id': 'https://call4all.co.in/#business',
+        name: 'Call4All',
+        image: 'https://call4all.co.in/assets/icons/icon-512.png',
+        url: 'https://call4all.co.in/',
+        telephone: KUKAS.phone,
+        email: KUKAS.email,
+        priceRange: '₹₹',
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: KUKAS.street,
+          addressLocality: KUKAS.locality,
+          addressRegion: KUKAS.region,
+          postalCode: KUKAS.pin,
+          addressCountry: 'IN'
+        },
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude: KUKAS.lat,
+          longitude: KUKAS.lng
+        },
+        openingHoursSpecification: {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+          opens: '00:00',
+          closes: '23:59'
+        }
       },
       areaServed: [
         { '@type': 'AdministrativeArea', name: 'Kukas, Jaipur' },
         { '@type': 'City', name: 'Jaipur' }
-      ],
-      openingHoursSpecification: {
-        '@type': 'OpeningHoursSpecification',
-        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-        opens: '00:00',
-        closes: '23:59'
-      }
+      ]
     };
     const script = document.createElement('script');
     script.type = 'application/ld+json';

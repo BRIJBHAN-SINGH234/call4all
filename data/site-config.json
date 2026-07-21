@@ -40,7 +40,7 @@
         "title": "Rental Cars",
         "subtitle": "Premium & budget cars for travel and events",
         "background_url": "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=960&q=75&auto=format&fit=crop",
-        "link": "rental-cars.html",
+        "link": "car-rental-kukas.html",
         "order": 1
       },
       {
@@ -50,7 +50,7 @@
         "title": "Rooms & Flats",
         "subtitle": "Quick rentals — rooms, flats, PG, properties",
         "background_url": "https://images.unsplash.com/photo-1501183638710-841dd1904471?w=960&q=75&auto=format&fit=crop",
-        "link": "rooms-flats.html",
+        "link": "rooms-flats-kukas.html",
         "order": 2
       },
       {
@@ -60,7 +60,7 @@
         "title": "Construction Labor",
         "subtitle": "Mistri, mazdoor, thekedar — all just one call away",
         "background_url": "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=960&q=75&auto=format&fit=crop",
-        "link": "construction.html",
+        "link": "construction-labor-kukas.html",
         "order": 3
       },
       {
@@ -70,7 +70,7 @@
         "title": "Home Tutors",
         "subtitle": "Qualified tutors for every class & subject",
         "background_url": "https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=960&q=75&auto=format&fit=crop",
-        "link": "home-tutor.html",
+        "link": "home-tutor-kukas.html",
         "order": 4
       },
       {
@@ -80,7 +80,7 @@
         "title": "Manpower Supply",
         "subtitle": "Skilled & unskilled manpower on demand",
         "background_url": "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=960&q=75&auto=format&fit=crop",
-        "link": "manpower-supply.html",
+        "link": "manpower-supply-kukas.html",
         "order": 5
       },
       {
@@ -90,7 +90,7 @@
         "title": "Marriage Services",
         "subtitle": "Decoration, catering, rentals — A to Z",
         "background_url": "https://images.unsplash.com/photo-1519741497674-611481863552?w=960&q=75&auto=format&fit=crop",
-        "link": "marriage-services.html",
+        "link": "wedding-services-kukas.html",
         "order": 6
       },
       {
@@ -100,7 +100,7 @@
         "title": "Hotel Flower Bouquet",
         "subtitle": "Luxury floral arrangements for hotels & events",
         "background_url": "https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=960&q=75&auto=format&fit=crop",
-        "link": "flower-bouquet.html",
+        "link": "flower-bouquet-kukas.html",
         "order": 7
       },
       {
@@ -110,7 +110,7 @@
         "title": "Car Decoration",
         "subtitle": "Wedding & event car decoration",
         "background_url": "https://images.unsplash.com/photo-1606013519235-f4f8b3ee5ae5?w=960&q=75&auto=format&fit=crop",
-        "link": "car-decoration.html",
+        "link": "car-decoration-kukas.html",
         "order": 8
       }
     ]

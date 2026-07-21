@@ -1,0 +1,49 @@
+name: Notify IndexNow
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '**.html'
+      - 'robots.txt'
+      - 'llms.txt'
+      - 'llms-full.txt'
+      - 'sitemap.xml'
+      - 'data/site-config.json'
+      - 'data/properties.csv'
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build IndexNow payload from canonical sitemap URLs
+        run: |
+          python3 - <<'PY'
+          import json
+          import xml.etree.ElementTree as ET
+
+          root = ET.parse('sitemap.xml').getroot()
+          namespace = {'sm': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
+          urls = [node.text for node in root.findall('sm:url/sm:loc', namespace)]
+          payload = {
+              'host': 'call4all.co.in',
+              'key': 'cf127192d720623add8d8cdf309d9350',
+              'keyLocation': 'https://call4all.co.in/cf127192d720623add8d8cdf309d9350.txt',
+              'urlList': urls,
+          }
+          with open('/tmp/indexnow-payload.json', 'w', encoding='utf-8') as handle:
+              json.dump(payload, handle)
+          PY
+
+      - name: Submit updated URLs to IndexNow
+        run: >-
+          curl --fail-with-body --retry 10 --retry-delay 30 --retry-all-errors
+          -H 'Content-Type: application/json; charset=utf-8'
+          --data-binary @/tmp/indexnow-payload.json
+          https://api.indexnow.org/indexnow

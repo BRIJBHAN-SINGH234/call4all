@@ -8,7 +8,7 @@
  *   - GitHub API calls:  network-only (sensitive, never cache)
  */
 
-const CACHE_VERSION = 'v23-2026-07-18-sitemap';
+const CACHE_VERSION = 'v25-2026-07-21-marketplace';
 const STATIC_CACHE = 'c4a-static-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'c4a-runtime-' + CACHE_VERSION;
 
@@ -17,19 +17,25 @@ const PRECACHE_URLS = [
   '/index.html',
   '/about.html',
   '/contact.html',
-  '/rental-cars.html',
-  '/rooms-flats.html',
-  '/construction.html',
-  '/home-tutor.html',
-  '/manpower-supply.html',
-  '/marriage-services.html',
-  '/flower-bouquet.html',
-  '/car-decoration.html',
+  '/car-rental-kukas.html',
+  '/rooms-flats-kukas.html',
+  '/construction-labor-kukas.html',
+  '/home-tutor-kukas.html',
+  '/manpower-supply-kukas.html',
+  '/wedding-services-kukas.html',
+  '/flower-bouquet-kukas.html',
+  '/car-decoration-kukas.html',
+  '/properties.html',
+  '/second-hand-items.html',
   '/gallery.html',
   '/page.html',
   '/assets/css/style.css',
+  '/assets/css/properties.css',
+  '/assets/css/marketplace.css',
   '/assets/js/site.js',
   '/assets/js/booking.js',
+  '/assets/js/properties.js',
+  '/assets/js/second-hand.js',
   '/Imagelogo.png',
   '/assets/icons/icon-192.png',
   '/assets/icons/icon-512.png',

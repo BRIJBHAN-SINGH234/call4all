@@ -487,6 +487,12 @@
 .home-creative #serviceGrid {
   min-height: auto;
 }
+.home-creative #sliderMount{min-height:clamp(330px,52vw,560px);padding-top:79px;background:var(--primary-dark)}
+.home-creative #sliderMount .slider{height:clamp(330px,52vw,560px)}
+/* The former stacked hero/story banners are now represented by the single auto-slider. */
+.home-creative>.lm-hero,.home-creative>.lm-intro,.home-creative>.lm-split-grid,.home-creative>.lm-story{display:none}
+.home-creative #services{padding-top:64px}
+.home-seo-intro{padding:56px 22px 12px;text-align:center;background:var(--bg-cream)}.home-seo-intro h1{max-width:980px;margin:8px auto;font-size:clamp(34px,5vw,60px)}.home-seo-intro p{max-width:850px;margin:12px auto;color:var(--text-light)}
 .home-creative .service-card {
   border-radius: 0;
   overflow: hidden;
@@ -519,6 +525,8 @@
 }
 
 @media (max-width: 768px) {
+  .home-creative #sliderMount{padding-top:74px;min-height:370px}.home-creative #sliderMount .slider{height:296px}
+  .home-creative .service-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.home-creative .service-card .service-image{min-height:120px}.home-creative .service-body{padding:14px}.home-creative .service-body h3{font-size:17px}.home-creative .service-body p{font-size:13px;line-height:1.5}.home-creative .service-body .btn{width:100%;padding:8px 7px}
   .home-creative .site-nav.open {
     background: rgba(18,35,24,0.98);
   }

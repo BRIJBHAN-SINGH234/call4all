@@ -32,7 +32,7 @@ function isNoindexHtml(content) {
   return /<meta[^>]+name=["']robots["'][^>]+content=["'][^"']*noindex/i.test(content);
 }
 
-function buildEntries(config, htmlFiles, dynamicPages, properties) {
+function buildEntries(config, htmlFiles, dynamicPages, properties, secondHandItems) {
   const base = (config.baseUrl || 'https://call4all.co.in').replace(/\/$/, '');
   const exclude = new Set(config.excludeHtml || []);
   const today = new Date().toISOString().slice(0, 10);
@@ -81,6 +81,12 @@ function buildEntries(config, htmlFiles, dynamicPages, properties) {
     if (!p.id || String(p.status).toLowerCase() !== 'active' || String(p.approval_status).toLowerCase() !== 'approved') continue;
     const lm = (p.reviewed_at || p.timestamp || '').slice(0, 10) || today;
     add(base + '/property.html?id=' + encodeURIComponent(p.id), lm, { priority: 0.9, changefreq: 'daily' });
+  }
+
+  for (const item of secondHandItems || []) {
+    if (!item.id || String(item.status).toLowerCase() !== 'active' || String(item.approval_status).toLowerCase() !== 'approved') continue;
+    const lm = (item.reviewed_at || item.timestamp || '').slice(0, 10) || today;
+    add(base + '/second-hand-item.html?id=' + encodeURIComponent(item.id), lm, { priority: 0.85, changefreq: 'daily' });
   }
 
   entries.sort((a, b) => b.priority - a.priority || a.loc.localeCompare(b.loc));
@@ -139,7 +145,9 @@ function main() {
   const pages = (siteConfig.pages || []).filter((p) => p.enabled !== false && p.slug);
   let properties = [];
   try { properties = parseCsv(fs.readFileSync(path.join(ROOT, 'data/properties.csv'), 'utf8')); } catch (_) { /* optional */ }
-  const entries = buildEntries(config, htmlFiles, pages, properties);
+  let secondHandItems = [];
+  try { secondHandItems = parseCsv(fs.readFileSync(path.join(ROOT, 'data/second-hand-items.csv'), 'utf8')); } catch (_) { /* optional */ }
+  const entries = buildEntries(config, htmlFiles, pages, properties, secondHandItems);
   const xml = toXml(entries);
   const outPath = path.join(ROOT, 'sitemap.xml');
 
