@@ -41,6 +41,8 @@ Allow: /data/rental-cars.csv
 Allow: /data/second-hand-items.csv
 
 # Private data and authenticated management pages
+Disallow: /llms.txt
+Disallow: /llms-full.txt
 Disallow: /data/
 Disallow: /admin.html
 Disallow: /staff.html

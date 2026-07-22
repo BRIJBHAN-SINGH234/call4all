@@ -23,10 +23,8 @@
     "flower-bouquet.html",
     "car-decoration.html"
   ],
-  "extraPaths": [
-    { "path": "llms.txt", "priority": 0.5, "changefreq": "weekly" },
-    { "path": "llms-full.txt", "priority": 0.5, "changefreq": "weekly" }
-  ],
+  "extraPaths": [],
+  "includeDynamicPages": false,
   "dynamicPageDefaults": {
     "priority": 0.75,
     "changefreq": "weekly"

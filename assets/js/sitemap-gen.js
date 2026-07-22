@@ -56,15 +56,17 @@
     });
 
     const dynDefaults = config.dynamicPageDefaults || { priority: 0.75, changefreq: 'weekly' };
-    (dynamicPages || []).forEach((p) => {
-      if (p.enabled === false || !p.slug) return;
-      const lm = (p.updated_at || p.created_at || '').slice(0, 10) || today;
-      add(
-        base + '/page.html?slug=' + encodeURIComponent(p.slug),
-        lm,
-        dynDefaults
-      );
-    });
+    if (config.includeDynamicPages !== false) {
+      (dynamicPages || []).forEach((p) => {
+        if (p.enabled === false || !p.slug) return;
+        const lm = (p.updated_at || p.created_at || '').slice(0, 10) || today;
+        add(
+          base + '/page.html?slug=' + encodeURIComponent(p.slug),
+          lm,
+          dynDefaults
+        );
+      });
+    }
 
     (properties || []).forEach((p) => {
       if (!p.id || String(p.status).toLowerCase() !== 'active' || String(p.approval_status).toLowerCase() !== 'approved') return;

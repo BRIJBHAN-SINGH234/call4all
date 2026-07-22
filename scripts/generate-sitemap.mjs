@@ -71,10 +71,12 @@ function buildEntries(config, htmlFiles, dynamicPages, properties, secondHandIte
   }
 
   const dynDefaults = config.dynamicPageDefaults || { priority: 0.75, changefreq: 'weekly' };
-  for (const p of dynamicPages || []) {
-    if (p.enabled === false || !p.slug) continue;
-    const lm = (p.updated_at || p.created_at || '').slice(0, 10) || today;
-    add(base + '/page.html?slug=' + encodeURIComponent(p.slug), lm, dynDefaults);
+  if (config.includeDynamicPages !== false) {
+    for (const p of dynamicPages || []) {
+      if (p.enabled === false || !p.slug) continue;
+      const lm = (p.updated_at || p.created_at || '').slice(0, 10) || today;
+      add(base + '/page.html?slug=' + encodeURIComponent(p.slug), lm, dynDefaults);
+    }
   }
 
   for (const p of properties || []) {
