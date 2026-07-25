@@ -16,6 +16,7 @@ Disallow: /property-admin.html
 Disallow: /manpower-admin.html
 Disallow: /car-rental-admin.html
 Disallow: /second-hand-admin.html
+Disallow: /handmade-admin.html
 
 User-agent: ChatGPT-User
 Allow: /
@@ -39,6 +40,7 @@ Allow: /data/gallery.csv
 Allow: /data/properties.csv
 Allow: /data/rental-cars.csv
 Allow: /data/second-hand-items.csv
+Allow: /data/handmade-items.csv
 
 # Private data and authenticated management pages
 Disallow: /llms.txt
@@ -50,6 +52,7 @@ Disallow: /property-admin.html
 Disallow: /manpower-admin.html
 Disallow: /car-rental-admin.html
 Disallow: /second-hand-admin.html
+Disallow: /handmade-admin.html
 Disallow: /logo-preview.html
 Disallow: /home-classic.html
 Disallow: /assets/js/admin.js
@@ -58,5 +61,6 @@ Disallow: /assets/js/property-admin.js
 Disallow: /assets/js/manpower-admin.js
 Disallow: /assets/js/car-rental-admin.js
 Disallow: /assets/js/second-hand-admin.js
+Disallow: /assets/js/handmade-admin.js
 
 Sitemap: https://call4all.co.in/sitemap.xml

@@ -40,6 +40,7 @@ window.SITE_CONFIG = {
     { id: 'flower-bouquet',   name: 'Hotel Flower Bouquet',        icon: '🌸', iconName: 'flower',    desc: 'Luxury flower decoration & bouquet service.',                        page: 'flower-bouquet-kukas.html',    image: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=900&q=80&auto=format&fit=crop' },
     { id: 'car-decoration',   name: 'Car Decoration',              icon: '🎀', iconName: 'bow',       desc: 'Luxury car decoration for weddings & events.',                       page: 'car-decoration-kukas.html',    image: 'https://images.unsplash.com/photo-1606013519235-f4f8b3ee5ae5?w=900&q=80&auto=format&fit=crop' },
     { id: 'second-hand',      name: 'Second-Hand Items',           icon: '♻️', iconName: 'shopping-bag', desc: 'Verified used furniture, electronics and more at local prices.',    page: 'second-hand-items.html',       image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=900&q=80&auto=format&fit=crop' },
+    { id: 'handmade',         name: 'Handmade Items',              icon: '🧶', iconName: 'gift', desc: 'Local artisan gifts, decor, jewellery and crafts with live prices.',       page: 'handmade-items.html',          image: 'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=900&q=80&auto=format&fit=crop' },
     { id: 'other',            name: 'Other / Custom Service',      icon: '🛎️', iconName: 'bell',      desc: 'Need something else? Just tell us, we will arrange it.',             page: 'index.html#book',        image: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=900&q=80&auto=format&fit=crop' }
   ],
   slider: {
@@ -890,6 +891,7 @@ function renderHeader(activePage) {
     { href: 'index.html#services', label: 'Services', key: 'services' },
     { href: 'properties.html', label: 'Properties', key: 'properties' },
     { href: 'second-hand-items.html', label: 'Second Hand', key: 'second-hand' },
+    { href: 'handmade-items.html', label: 'Handmade', key: 'handmade' },
     { href: 'gallery.html', label: 'Gallery', key: 'gallery' },
     { href: 'about.html', label: 'About Us', key: 'about' },
     { href: 'contact.html', label: 'Contact Us', key: 'contact' }
