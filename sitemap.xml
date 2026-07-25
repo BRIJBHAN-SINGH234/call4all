@@ -175,16 +175,34 @@
     <priority>0.90</priority>
   </url>
   <url>
+    <loc>https://call4all.co.in/property.html?id=prop-1784985297703</loc>
+    <lastmod>2026-07-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.90</priority>
+  </url>
+  <url>
     <loc>https://call4all.co.in/rooms-flats-kukas.html</loc>
     <lastmod>2026-07-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.90</priority>
   </url>
   <url>
-    <loc>https://call4all.co.in/second-hand-item.html?id=used-1784610204458</loc>
-    <lastmod>2026-07-21</lastmod>
+    <loc>https://call4all.co.in/handmade-item.html?id=handmade-1784960788700</loc>
+    <lastmod>2026-07-25</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.85</priority>
+    <priority>0.88</priority>
+  </url>
+  <url>
+    <loc>https://call4all.co.in/handmade-item.html?id=handmade-1784961435326</loc>
+    <lastmod>2026-07-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.88</priority>
+  </url>
+  <url>
+    <loc>https://call4all.co.in/handmade-item.html?id=handmade-1784961541092</loc>
+    <lastmod>2026-07-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.88</priority>
   </url>
   <url>
     <loc>https://call4all.co.in/second-hand-item.html?id=used-1784610966658</loc>
@@ -194,12 +212,6 @@
   </url>
   <url>
     <loc>https://call4all.co.in/second-hand-item.html?id=used-1784611512469</loc>
-    <lastmod>2026-07-21</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://call4all.co.in/second-hand-item.html?id=used-1784611799911</loc>
     <lastmod>2026-07-21</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.85</priority>
