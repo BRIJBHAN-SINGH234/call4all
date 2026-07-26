@@ -1,8 +1,8 @@
 (function () {
   'use strict';
   const PATH = 'data/handmade-items.csv';
-  const HEADERS = ['id','timestamp','category','title','artisan','materials','price','stock','city','area','contact_phone','image_path','description','meta_title','meta_description','keywords','status','added_by','approval_status','pending_json','reviewed_by','reviewed_at'];
-  const FIELDS = ['category','title','artisan','materials','price','stock','city','area','contact_phone','image_path','description','meta_title','meta_description','keywords'];
+  const HEADERS = ['id','timestamp','category','title','artisan','materials','price','stock','city','area','contact_phone','image_path','description','meta_title','meta_description','keywords','status','added_by','approval_status','pending_json','reviewed_by','reviewed_at','state'];
+  const FIELDS = ['category','title','artisan','materials','price','stock','city','area','contact_phone','image_path','description','meta_title','meta_description','keywords','state'];
   const isAdmin = sessionStorage.getItem('c4a_admin_session') === '1' && !!localStorage.getItem('c4a_admin_token');
   const isStaff = sessionStorage.getItem('c4a_staff_session') === '1' && !!localStorage.getItem('c4a_staff_token');
   const role = isAdmin ? 'admin' : (isStaff ? 'staff' : '');
@@ -47,7 +47,7 @@
   function reset() {
     editing = null;
     const form = document.getElementById('handmadeForm');
-    form.reset(); form.elements.stock.value = '1'; form.elements.city.value = 'Jaipur'; form.elements.image_path.value = '';
+    form.reset(); form.elements.stock.value = '1'; form.elements.image_path.value = '';
     document.getElementById('formTitle').textContent = 'Add Handmade Product';
     document.getElementById('cancelEdit').hidden = true;
     document.getElementById('handmadeImage').value = '';

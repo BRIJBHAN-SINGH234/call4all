@@ -7,6 +7,7 @@
   const image = item => item.image_path || 'assets/icons/icon-512.png';
   const detailUrl = item => 'handmade-item.html?id=' + encodeURIComponent(item.id);
   const absolute = path => new URL(path, location.href).href;
+  const locationName = item => [item.area,item.city,item.state || (item.city === 'Jaipur' ? 'Rajasthan' : '')].filter((value,index,array) => value && array.indexOf(value) === index).join(', ');
 
   async function load() {
     try {
@@ -16,11 +17,11 @@
   }
   function whatsappUrl(item) {
     const number = (window.SITE_CONFIG && window.SITE_CONFIG.whatsappNumber) || '917737353588';
-    const message = ['Hello Call4All, mujhe yeh handmade product order karna hai:','','Product: ' + item.title,'Category: ' + (item.category || 'Handmade'),'Artisan: ' + (item.artisan || 'Not specified'),'Material: ' + (item.materials || 'Not specified'),'Price: ' + money(item.price),'Location: ' + [item.area,item.city].filter(Boolean).join(', '),'Product ID: ' + item.id,'Link: ' + absolute(detailUrl(item))].join('\n');
+    const message = ['Hello Call4All, mujhe yeh handmade product order karna hai:','','Product: ' + item.title,'Category: ' + (item.category || 'Handmade'),'Artisan: ' + (item.artisan || 'Not specified'),'Material: ' + (item.materials || 'Not specified'),'Price: ' + money(item.price),'Location: ' + locationName(item),'Delivery: All India availability confirm karein','Product ID: ' + item.id,'Link: ' + absolute(detailUrl(item))].join('\n');
     return 'https://wa.me/' + number + '?text=' + encodeURIComponent(message);
   }
   function card(item) {
-    return `<article class="market-card"><a href="${detailUrl(item)}"><img src="${safe(image(item))}" alt="${safe(item.title)} handmade by ${safe(item.artisan || 'local artisan')}" loading="lazy" width="420" height="315"></a><div class="market-card-body"><span class="market-badge">${safe(item.category || 'Handmade')}</span><h3><a href="${detailUrl(item)}">${safe(item.title)}</a></h3><p class="market-meta">${safe(item.artisan || 'Local artisan')}${item.materials ? ' · ' + safe(item.materials) : ''}</p><strong>${money(item.price)}</strong><p class="market-location">📍 ${safe([item.area,item.city].filter(Boolean).join(', ') || 'Jaipur')} · ${safe(item.stock)} in stock</p><div class="market-actions"><a class="btn btn-outline-dark btn-sm" href="${detailUrl(item)}">View Details</a><a class="btn btn-whatsapp btn-sm" href="${whatsappUrl(item)}" target="_blank" rel="noopener">Order on WhatsApp</a></div></div></article>`;
+    return `<article class="market-card"><a href="${detailUrl(item)}"><img src="${safe(image(item))}" alt="${safe(item.title)} handmade by ${safe(item.artisan || 'local artisan')} in ${safe(locationName(item))}" loading="lazy" width="420" height="315"></a><div class="market-card-body"><span class="market-badge">${safe(item.category || 'Handmade')}</span><h3><a href="${detailUrl(item)}">${safe(item.title)}</a></h3><p class="market-meta">${safe(item.artisan || 'Local artisan')}${item.materials ? ' · ' + safe(item.materials) : ''}</p><strong>${money(item.price)}</strong><p class="market-location">📍 ${safe(locationName(item) || 'India')} · ${safe(item.stock)} in stock</p><div class="market-actions"><a class="btn btn-outline-dark btn-sm" href="${detailUrl(item)}">View Details</a><a class="btn btn-whatsapp btn-sm" href="${whatsappUrl(item)}" target="_blank" rel="noopener">Order on WhatsApp</a></div></div></article>`;
   }
   function addJsonLd(data, id) {
     document.getElementById(id)?.remove();
@@ -36,19 +37,19 @@
     const prices = items.map(item => Number(item.price)).filter(price => price > 0);
     const min = Math.min(...prices), max = Math.max(...prices);
     const range = min === max ? money(min) : `${money(min)}–${money(max)}`;
-    document.title = `Handmade Items in Jaipur Near Me | ${range} | Call4All`;
-    const description = `Shop ${items.length} handmade items in Kukas and Jaipur near you. Live prices ${range}; compare local gifts, decor, jewellery, pottery and artisan products.`;
+    document.title = `Buy Handmade Items Online Across India | ${range} | Call4All`;
+    const description = `Shop ${items.length} handmade items from artisans across India. Live prices ${range}; compare gifts, decor, jewellery, pottery and crafts with WhatsApp ordering.`;
     setMeta('meta[name="description"]', description);
     setMeta('meta[property="og:title"]', document.title, true);
     setMeta('meta[property="og:description"]', description, true);
     document.getElementById('handmadePriceRange').textContent = `Live prices: ${range} · Product inventory ke according automatically updated`;
-    document.getElementById('handmadeHeroCopy').textContent = `Local handmade products ${range} — maker, material, stock aur area ke saath.`;
+    document.getElementById('handmadeHeroCopy').textContent = `Handmade products across India ${range} — maker, material, stock aur location ke saath.`;
     addJsonLd({
       '@context':'https://schema.org','@graph':[
         {'@type':'CollectionPage','@id':BASE+'handmade-items.html#page',name:document.title,url:BASE+'handmade-items.html',description},
-        {'@type':'ItemList',name:'Handmade Items in Jaipur',numberOfItems:items.length,itemListElement:items.map((item,index)=>({'@type':'ListItem',position:index+1,name:item.title,url:absolute(detailUrl(item))}))},
+        {'@type':'ItemList',name:'Handmade Items Across India',numberOfItems:items.length,itemListElement:items.map((item,index)=>({'@type':'ListItem',position:index+1,name:item.title,url:absolute(detailUrl(item))}))},
         {'@type':'OfferCatalog',name:'Local Handmade Products',numberOfItems:items.length,itemListElement:items.map(item=>({'@type':'Offer',price:item.price,priceCurrency:'INR',availability:'https://schema.org/InStock',url:absolute(detailUrl(item)),itemOffered:{'@type':'Product',name:item.title,image:absolute(image(item))}}))},
-        {'@type':'LocalBusiness','@id':BASE+'#localbusiness',name:'Call4All',url:BASE,telephone:'+91-7737353588',priceRange:range,address:{'@type':'PostalAddress',addressLocality:'Kukas, Jaipur',addressRegion:'Rajasthan',addressCountry:'IN'},geo:{'@type':'GeoCoordinates',latitude:27.04175,longitude:75.895101},areaServed:['Kukas','Amer','Jaipur']}
+        {'@type':'Organization','@id':BASE+'#organization',name:'Call4All',url:BASE,telephone:'+91-7737353588',areaServed:{'@type':'Country','name':'India'}}
       ]
     }, 'handmade-list-schema');
   }
