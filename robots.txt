@@ -1,12 +1,29 @@
 # Call4All crawler policy
-# Public service pages and the resources required to render them are crawlable.
-# Admin, staff, previews and private operational data are blocked.
+# Public pages and their rendering assets are crawlable. Operational pages and
+# private CSV data are excluded from search crawlers.
 
 User-agent: *
 Allow: /
+Allow: /data/site-config.json
+Allow: /data/gallery.csv
+Allow: /data/properties.csv
+Allow: /data/rental-cars.csv
+Allow: /data/second-hand-items.csv
+Allow: /data/handmade-items.csv
+Disallow: /data/
+Disallow: /admin.html
+Disallow: /staff.html
+Disallow: /property-admin.html
+Disallow: /manpower-admin.html
+Disallow: /car-rental-admin.html
+Disallow: /second-hand-admin.html
+Disallow: /handmade-admin.html
+Disallow: /logo-preview.html
+Disallow: /home-classic.html
+Disallow: /llms.txt
+Disallow: /llms-full.txt
 
-# OpenAI search and user-request crawlers. Explicit rules make the intent clear
-# even though the wildcard rule above already permits public content.
+# OpenAI search and user-request crawlers may access the public site.
 User-agent: OAI-SearchBot
 Allow: /
 Disallow: /data/
@@ -24,7 +41,7 @@ Disallow: /data/
 Disallow: /admin.html
 Disallow: /staff.html
 
-# Training access is intentionally allowed for public pages only.
+# Training access is allowed for public pages only.
 User-agent: GPTBot
 Allow: /
 Disallow: /data/
@@ -33,34 +50,7 @@ Disallow: /staff.html
 Disallow: /property-admin.html
 Disallow: /manpower-admin.html
 Disallow: /car-rental-admin.html
-
-# Public data required by indexable JavaScript-rendered pages
-Allow: /data/site-config.json
-Allow: /data/gallery.csv
-Allow: /data/properties.csv
-Allow: /data/rental-cars.csv
-Allow: /data/second-hand-items.csv
-Allow: /data/handmade-items.csv
-
-# Private data and authenticated management pages
-Disallow: /llms.txt
-Disallow: /llms-full.txt
-Disallow: /data/
-Disallow: /admin.html
-Disallow: /staff.html
-Disallow: /property-admin.html
-Disallow: /manpower-admin.html
-Disallow: /car-rental-admin.html
 Disallow: /second-hand-admin.html
 Disallow: /handmade-admin.html
-Disallow: /logo-preview.html
-Disallow: /home-classic.html
-Disallow: /assets/js/admin.js
-Disallow: /assets/js/staff.js
-Disallow: /assets/js/property-admin.js
-Disallow: /assets/js/manpower-admin.js
-Disallow: /assets/js/car-rental-admin.js
-Disallow: /assets/js/second-hand-admin.js
-Disallow: /assets/js/handmade-admin.js
 
 Sitemap: https://call4all.co.in/sitemap.xml

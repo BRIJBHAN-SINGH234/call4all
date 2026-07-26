@@ -13,8 +13,29 @@ PAGES = [
     "room-rent-kukas-jaipur.html", "car-decoration-kukas.html",
     "construction-labor-kukas.html", "flower-bouquet-kukas.html",
     "home-tutor-kukas.html", "manpower-supply-kukas.html", "rooms-flats-kukas.html",
-    "contact.html", "gallery.html", "about.html",
+    "contact.html", "gallery.html", "about.html", "handmade-items.html", "handmade-item.html",
 ]
+
+OVERRIDES = {
+    "index.html": ("Call4All Jaipur | Property, Rentals & Local Services", "Find property, rental cars, rooms, second-hand items and trusted local services in Jaipur. Call or WhatsApp Call4All for quick assistance."),
+    "about.html": ("About Call4All | Jaipur Local Service Platform", "Learn how Call4All connects Jaipur customers with local providers for property, rentals, tutors, labour, weddings and other everyday services."),
+    "contact.html": ("Contact Call4All Jaipur | Call, WhatsApp or Enquire", "Contact Call4All by phone, WhatsApp, email or enquiry form for property, rentals and local services across Kukas and Jaipur."),
+    "gallery.html": ("Call4All Service Gallery | Jaipur & Kukas", "View photos from Call4All services in Jaipur, including rental cars, rooms, construction, weddings, decoration and manpower work."),
+    "kukas.html": ("Local Services in Kukas Jaipur | Call4All", "Find car rentals, rooms, wedding services, tutors, construction labour and manpower in Kukas, Jaipur through one local contact."),
+    "car-rental-kukas.html": ("Car Rental in Kukas Jaipur | Taxi & Self Drive", "Book verified taxis, driver cars and self-drive rentals in Kukas, Jaipur for airport trips, local travel, weddings and outstation journeys."),
+    "rooms-flats-kukas.html": ("Rooms & Flats for Rent in Kukas Jaipur", "Find verified rooms, PGs and 1BHK to 3BHK flats for rent near NH-48, Arya College, factories and resorts in Kukas, Jaipur."),
+    "room-rent-kukas-jaipur.html": ("Room Rent in Kukas Jaipur | PG & Bachelor Rooms", "Find single rooms, shared rooms and PG accommodation near Arya College, factories and resorts in Kukas, Jaipur. Connect with verified owners."),
+    "flat-rent-kukas-jaipur.html": ("Flat Rent in Kukas Jaipur | 1BHK, 2BHK & 3BHK", "Explore furnished and unfurnished 1BHK, 2BHK and 3BHK flats for rent near NH-48, Arya College and the Kukas resort belt."),
+    "wedding-services-kukas.html": ("Wedding Services in Kukas Jaipur | Call4All", "Plan a Kukas resort wedding with local support for decoration, catering, photography, flowers, guest transport and event staff."),
+    "car-decoration-kukas.html": ("Wedding Car Decoration in Kukas Jaipur", "Book fresh-flower, ribbon and themed wedding car decoration for dulha, dulhan and baraat vehicles at Kukas resorts and Jaipur venues."),
+    "construction-labor-kukas.html": ("Construction Labour in Kukas | Mistri & Thekedar", "Hire mistri, mazdoor, contractors, painters, plumbers and electricians in Kukas, Jaipur for daily work, renovation or full projects."),
+    "flower-bouquet-kukas.html": ("Flower Bouquet Delivery in Kukas Jaipur", "Order fresh bouquets, hotel-room decoration and event flowers in Kukas, Jaipur for birthdays, anniversaries, weddings and gifts."),
+    "home-tutor-kukas.html": ("Home Tutor in Kukas Jaipur | CBSE, RBSE & Exams", "Find home tutors in Kukas for Classes 1–12, CBSE, RBSE, Maths, Science, English, NEET and JEE with flexible timings."),
+    "manpower-supply-kukas.html": ("Manpower Supply in Kukas Jaipur | Local Staff", "Hire skilled and unskilled staff for Kukas factories, resorts, hotels, warehouses, weddings and events on daily or contract terms."),
+    "properties.html": ("Property for Sale & Rent in Kukas Jaipur | Call4All", "Browse approved property for sale, rent and lease near Kukas, Jaipur. Compare photos, prices, dimensions and map locations."),
+    "second-hand-items.html": ("Second-Hand Items in Kukas Jaipur | Call4All", "Browse approved used furniture, electronics and appliances in Kukas and Jaipur. Check photos, condition and price, then enquire on WhatsApp."),
+    "handmade-items.html": ("Handmade Items in Jaipur | Local Artisan Products", "Discover handmade gifts, jewellery, pottery and home decor from local artisans in Kukas and Jaipur, with prices and WhatsApp ordering."),
+}
 
 
 def meta_value(source, key):
@@ -47,6 +68,10 @@ for filename in PAGES:
     title_match = re.search(r'<title>(.*?)</title>', source, re.I | re.S)
     title = unescape(title_match.group(1).strip()) if title_match else "Call4All"
     description = meta_value(source, "description")
+    if filename in OVERRIDES:
+        title, description = OVERRIDES[filename]
+        source = re.sub(r'<title>.*?</title>', f"<title>{escape(title)}</title>", source, count=1, flags=re.I | re.S)
+        source = set_meta(source, "description", description)
     if not description:
         raise ValueError(f"{filename}: meta description is required")
     url = f"{ORIGIN}/" if filename == "index.html" else f"{ORIGIN}/{filename}"
@@ -86,3 +111,11 @@ for filename in PAGES:
     path.write_text(source)
 
 print(f"SEO metadata normalized on {len(PAGES)} public pages.")
+
+# Detail templates start noindex so empty or invalid query-string URLs cannot be
+# indexed. Their client-side renderers switch valid, approved records to index.
+for filename in ("property.html", "second-hand-item.html", "handmade-item.html"):
+    path = ROOT / filename
+    source = path.read_text()
+    source = set_meta(source, "robots", "noindex,follow")
+    path.write_text(source)

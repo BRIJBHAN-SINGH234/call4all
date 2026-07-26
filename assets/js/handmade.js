@@ -74,7 +74,8 @@
     const city = item.city || 'Jaipur', area = item.area || city, canonical = absolute(detailUrl(item));
     const title = item.meta_title || `${item.title} in ${area} ${city} | ${money(item.price)} | Call4All`;
     const description = item.meta_description || `${item.title}, handmade by ${item.artisan || 'a local artisan'}, available in ${area}, ${city} for ${money(item.price)}. View material, stock and order details.`;
-    document.title = title.slice(0, 70);
+    document.title = title.slice(0, 65);
+    document.querySelector('meta[name="robots"]').content = 'index,follow,max-image-preview:large,max-snippet:-1';
     setMeta('meta[name="description"]', description.slice(0, 170)); setMeta('meta[name="keywords"]', item.keywords || `${item.title}, handmade items near me, handmade products ${city}`);
     setMeta('meta[property="og:title"]', title, true); setMeta('meta[property="og:description"]', description, true); setMeta('meta[property="og:url"]', canonical, true); setMeta('meta[property="og:image"]', absolute(image(item)), true);
     setMeta('meta[name="twitter:title"]', title); setMeta('meta[name="twitter:description"]', description); setMeta('meta[name="twitter:image"]', absolute(image(item)));
