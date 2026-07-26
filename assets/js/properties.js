@@ -18,11 +18,18 @@
       if(host==='youtu.be')return 'https://www.youtube-nocookie.com/embed/'+encodeURIComponent(parsed.pathname.slice(1));
       if(host.endsWith('youtube.com')){const id=parsed.searchParams.get('v')||parsed.pathname.split('/').filter(Boolean).pop();return id?'https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id):''}
       if(host.endsWith('vimeo.com')){const id=parsed.pathname.split('/').filter(Boolean).pop();return /^\d+$/.test(id)?'https://player.vimeo.com/video/'+id:''}
+      if(host==='drive.google.com'&&parsed.pathname.includes('/file/d/')){const id=parsed.pathname.split('/file/d/')[1].split('/')[0];return id?'https://drive.google.com/file/d/'+encodeURIComponent(id)+'/preview':''}
       if(/\.(mp4|webm|ogg)$/i.test(parsed.pathname))return parsed.href;
     }catch(_){}
     return '';
   }
-  function videoButton(p){return videoEmbed(p.video_url)?`<button class="btn btn-video btn-sm" type="button" data-video="${safe(p.video_url)}">▶ Watch Video</button>`:''}
+  function validVideoUrl(url){try{return /^https?:$/.test(new URL(url).protocol)}catch(_){return false}}
+  function videoButton(p){
+    if(!validVideoUrl(p.video_url))return '';
+    return videoEmbed(p.video_url)
+      ?`<button class="btn btn-video btn-sm" type="button" data-video="${safe(p.video_url)}">▶ Watch Video</button>`
+      :`<a class="btn btn-video btn-sm" href="${safe(p.video_url)}" target="_blank" rel="noopener">▶ Open Video</a>`;
+  }
   function bindVideoButtons(root=document){
     root.querySelectorAll('[data-video]').forEach(button=>button.onclick=()=>{
       const source=videoEmbed(button.dataset.video);if(!source)return;
