@@ -33,10 +33,11 @@
   function bindVideoButtons(root=document){
     root.querySelectorAll('[data-video]').forEach(button=>button.onclick=()=>{
       const source=videoEmbed(button.dataset.video);if(!source)return;
-      const direct=/\.(mp4|webm|ogg)(?:$|\?)/i.test(source),joiner=source.includes('?')?'&':'?';
+      const direct=/\.(mp4|webm|ogg)(?:$|\?)/i.test(source),isDrive=source.includes('drive.google.com/file/d/');
+      const playerSource=isDrive?source:source+(source.includes('?')?'&':'?')+'autoplay=1';
       const modal=document.createElement('div');modal.className='video-modal';modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-label','Property video');
-      modal.innerHTML=`<div class="video-modal-box"><button class="video-close" type="button" aria-label="Close video">×</button><div class="video-frame">${direct?`<video src="${safe(source)}" controls autoplay playsinline></video>`:`<iframe src="${safe(source+joiner+'autoplay=1')}" title="Property video" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`}</div></div>`;
-      const close=()=>modal.remove();modal.onclick=e=>{if(e.target===modal)close()};modal.querySelector('.video-close').onclick=close;document.body.appendChild(modal);modal.querySelector('.video-close').focus();
+      modal.innerHTML=`<div class="video-modal-box"><button class="video-close" type="button" aria-label="Close video">×</button><div class="video-frame">${direct?`<video src="${safe(source)}" controls autoplay playsinline></video>`:`<iframe src="${safe(playerSource)}" title="Property video" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`}</div></div>`;
+      const close=()=>{modal.remove();document.body.classList.remove('video-open')};modal.onclick=e=>{if(e.target===modal)close()};modal.querySelector('.video-close').onclick=close;document.body.classList.add('video-open');document.body.appendChild(modal);modal.querySelector('.video-close').focus();
     });
   }
   function card(p){return `<article class="property-list-card"><a href="${detailUrl(p)}"><img src="${safe(image(p.image_path))}" alt="${safe(p.title)} property ${safe(type(p))} in ${safe(locationName(p))}" loading="lazy"></a><div class="property-list-body"><span class="property-type type-${type(p)==='Sale'?'sale':'rent'}">${typeIcon(p)} ${safe(type(p))}</span><h3><a href="${detailUrl(p)}">${safe(p.title)}</a></h3><strong class="property-card-price">${money(p.price)}</strong><p>📍 ${safe(locationName(p))}</p><p>📐 ${safe(p.width_ft)} × ${safe(p.height_ft)} ft · ${Number(p.width_ft)*Number(p.height_ft)||0} sq ft</p><div class="property-card-actions"><a class="property-view-link" href="${detailUrl(p)}">View details →</a>${videoButton(p)}<a class="btn btn-whatsapp btn-sm" href="${whatsappUrl(p)}" target="_blank" rel="noopener">Book</a></div></div></article>`}
