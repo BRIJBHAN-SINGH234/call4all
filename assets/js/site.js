@@ -1138,6 +1138,9 @@ function showIosInstallHintIfNeeded() {
   const dismissed = localStorage.getItem('c4a_ios_install_hint_dismissed');
 
   if (!isIos || isStandalone || dismissed) return;
+  const appName = location.pathname.endsWith('/admin.html')
+    ? 'Call4All Admin'
+    : (location.pathname.endsWith('/staff.html') ? 'Call4All Staff' : 'Call4All');
 
   const hint = document.createElement('div');
   hint.id = 'iosInstallHint';
@@ -1150,7 +1153,7 @@ function showIosInstallHintIfNeeded() {
     <div style="display:flex;align-items:flex-start;gap:10px;">
       <div style="font-size:24px;">📲</div>
       <div style="flex:1;">
-        <strong>Install Call4All on your iPhone</strong><br>
+        <strong>Install ${appName} on your iPhone</strong><br>
         Tap the <strong>Share</strong> icon ⎋ in Safari, then tap <strong>"Add to Home Screen"</strong>.
       </div>
       <button aria-label="Dismiss" style="background:transparent;border:none;color:white;font-size:22px;cursor:pointer;line-height:1;" onclick="this.closest('#iosInstallHint').remove();localStorage.setItem('c4a_ios_install_hint_dismissed','1');">×</button>

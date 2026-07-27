@@ -8,7 +8,7 @@
  *   - GitHub API calls:  network-only (sensitive, never cache)
  */
 
-const CACHE_VERSION = 'v25-2026-07-21-marketplace';
+const CACHE_VERSION = 'v26-2026-07-27-role-apps';
 const STATIC_CACHE = 'c4a-static-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'c4a-runtime-' + CACHE_VERSION;
 
@@ -39,7 +39,11 @@ const PRECACHE_URLS = [
   '/Imagelogo.png',
   '/assets/icons/icon-192.png',
   '/assets/icons/icon-512.png',
-  '/manifest.json'
+  '/manifest.json',
+  '/admin.html',
+  '/staff.html',
+  '/admin-manifest.json',
+  '/staff-manifest.json'
 ];
 
 self.addEventListener('install', event => {
