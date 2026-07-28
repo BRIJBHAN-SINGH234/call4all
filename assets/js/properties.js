@@ -7,7 +7,7 @@
   const type=p=>p.property_type==='Sale'?'Sale':'Lease/Rent';
   const typeIcon=p=>type(p)==='Sale'?'🏷️':'🔑';
   const locationName=p=>[p.city||'Jaipur',p.state||'Rajasthan'].filter(Boolean).join(', ');
-  const detailUrl=p=>'property-'+String(p.id||'').toLowerCase().replace(/[^a-z0-9-]+/g,'-')+'.html';
+  const detailUrl=p=>'property.html?id='+encodeURIComponent(String(p.id||''));
   const absoluteUrl=(value,fallback)=>{try{return new URL(value||fallback,location.href).href}catch(_){return new URL(fallback,location.href).href}};
   function setMeta(selector,attribute,value){
     let meta=document.querySelector(selector);

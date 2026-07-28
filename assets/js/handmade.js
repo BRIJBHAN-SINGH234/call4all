@@ -5,7 +5,7 @@
   const safe = value => String(value || '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const money = value => new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR', maximumFractionDigits:0 }).format(Number(value || 0));
   const image = item => item.image_path || 'assets/icons/icon-512.png';
-  const detailUrl = item => 'handmade-' + String(item.id || '').toLowerCase().replace(/[^a-z0-9-]+/g, '-') + '.html';
+  const detailUrl = item => 'handmade-item.html?id=' + encodeURIComponent(String(item.id || ''));
   const absolute = path => new URL(path, location.href).href;
   const locationName = item => [item.area,item.city,item.state || (item.city === 'Jaipur' ? 'Rajasthan' : '')].filter((value,index,array) => value && array.indexOf(value) === index).join(', ');
 
