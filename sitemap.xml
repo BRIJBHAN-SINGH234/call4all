@@ -92,7 +92,7 @@
   </url>
   <url>
     <loc>https://call4all.co.in/property.html?id=prop-1784385645859</loc>
-    <lastmod>2026-07-26</lastmod>
+    <lastmod>2026-07-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.90</priority>
   </url>
@@ -248,6 +248,12 @@
   </url>
   <url>
     <loc>https://call4all.co.in/gallery.html</loc>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://call4all.co.in/property-prop-1784385645859.html</loc>
     <lastmod>2026-07-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
