@@ -71,7 +71,8 @@
     (properties || []).forEach((p) => {
       if (!p.id || String(p.status).toLowerCase() !== 'active' || String(p.approval_status).toLowerCase() !== 'approved') return;
       const lm = (p.reviewed_at || p.timestamp || '').slice(0, 10) || today;
-      add(base + '/property.html?id=' + encodeURIComponent(p.id), lm, { priority: 0.9, changefreq: 'daily' });
+      const page = 'property-' + String(p.id).toLowerCase().replace(/[^a-z0-9-]+/g, '-') + '.html';
+      add(base + '/' + page, lm, { priority: 0.9, changefreq: 'daily' });
     });
 
     entries.sort((a, b) => b.priority - a.priority || a.loc.localeCompare(b.loc));

@@ -4,7 +4,7 @@
   const safe = value => String(value || '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
   const money = value => value ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Number(value)) : 'Price on request';
   const image = item => item.image_path || 'assets/icons/icon-512.png';
-  const detailUrl = item => 'second-hand-item.html?id=' + encodeURIComponent(item.id);
+  const detailUrl = item => 'second-hand-' + String(item.id || '').toLowerCase().replace(/[^a-z0-9-]+/g, '-') + '.html';
 
   async function load() {
     try {
@@ -67,7 +67,7 @@
   async function detailPage() {
     const mount = document.getElementById('secondHandDetail');
     if (!mount) return;
-    const id = new URLSearchParams(location.search).get('id');
+    const id = mount.dataset.catalogId || new URLSearchParams(location.search).get('id');
     const item = (await load()).find(entry => entry.id === id);
     if (!item) { mount.innerHTML = '<p class="empty-map">Item not found or no longer available.</p>'; return; }
     const canonical = new URL(detailUrl(item), location.href).href;

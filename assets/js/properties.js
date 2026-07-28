@@ -7,7 +7,13 @@
   const type=p=>p.property_type==='Sale'?'Sale':'Lease/Rent';
   const typeIcon=p=>type(p)==='Sale'?'🏷️':'🔑';
   const locationName=p=>[p.city||'Jaipur',p.state||'Rajasthan'].filter(Boolean).join(', ');
-  const detailUrl=p=>'property.html?id='+encodeURIComponent(p.id);
+  const detailUrl=p=>'property-'+String(p.id||'').toLowerCase().replace(/[^a-z0-9-]+/g,'-')+'.html';
+  const absoluteUrl=(value,fallback)=>{try{return new URL(value||fallback,location.href).href}catch(_){return new URL(fallback,location.href).href}};
+  function setMeta(selector,attribute,value){
+    let meta=document.querySelector(selector);
+    if(!meta){meta=document.createElement('meta');const match=selector.match(/^meta\[(name|property)="([^"]+)"\]$/);if(!match)return;meta.setAttribute(match[1],match[2]);document.head.appendChild(meta)}
+    meta.setAttribute('content',value);
+  }
   async function load(){try{return(await window.CsvAPI.loadAllPublic('data/properties.csv')).items.filter(p=>String(p.status).toLowerCase()==='active'&&String(p.approval_status).toLowerCase()==='approved')}catch(e){console.warn(e);return[]}}
   const whatsappUrl=p=>{const number=(window.SITE_CONFIG&&window.SITE_CONFIG.whatsappNumber)||'917737353588',message=['Hello Call4All, mujhe yeh property book/visit karni hai:','','Property: '+p.title,'Type: '+type(p),'Location: '+locationName(p),'Price: '+money(p.price),'Size: '+p.width_ft+' × '+p.height_ft+' ft','Listing ID: '+p.id,'Link: '+new URL(detailUrl(p),location.href).href].join('\n');return 'https://wa.me/'+number+'?text='+encodeURIComponent(message)};
 
@@ -65,18 +71,29 @@
 
   async function detailPage(){
     const mount=document.getElementById('propertyDetail');if(!mount)return;
-    const id=new URLSearchParams(location.search).get('id'),p=(await load()).find(x=>x.id===id);
+    const id=mount.dataset.catalogId||new URLSearchParams(location.search).get('id'),p=(await load()).find(x=>x.id===id);
     if(!p){mount.innerHTML='<p class="empty-map">Property not found or no longer active.</p>';return}
-    const canonical=`https://call4all.co.in/${detailUrl(p)}`,place=locationName(p);
-    document.title=`${p.title} ${type(p)} in ${place} | Call4All`;
-    const desc=`${p.title} available for ${type(p)} in ${place}. Price ${money(p.price)}, size ${p.width_ft} × ${p.height_ft} feet. View photos, video and map location.`;
-    document.querySelector('meta[name="description"]')?.setAttribute('content',desc);document.querySelector('meta[name="robots"]')?.setAttribute('content','index,follow,max-image-preview:large,max-video-preview:-1');
+    const generatedCanonical=`https://call4all.co.in/${detailUrl(p)}`,place=locationName(p);
+    const canonical=absoluteUrl(p.canonical_url,generatedCanonical);
+    const generatedTitle=`${p.title} ${type(p)} in ${place} | Call4All`;
+    const generatedDesc=`${p.title} available for ${type(p)} in ${place}. Price ${money(p.price)}, size ${p.width_ft} × ${p.height_ft} feet. View photos, video and map location.`;
+    const seoTitle=(p.meta_title||generatedTitle).trim(),desc=(p.meta_description||generatedDesc).trim();
+    const socialTitle=(p.og_title||seoTitle).trim(),socialDesc=(p.og_description||desc).trim();
+    const mainImage=absoluteUrl(p.image_path,'assets/icons/icon-512.png'),socialImage=absoluteUrl(p.og_image,mainImage);
+    const imageAlt=(p.image_alt||`${p.title} ${type(p)} in ${place}`).trim();
+    const robotsBase=(p.robots||'index,follow').trim();
+    const robots=robotsBase.startsWith('index')?robotsBase+',max-image-preview:large,max-snippet:-1,max-video-preview:-1':robotsBase;
+    document.title=seoTitle;
+    setMeta('meta[name="description"]','name',desc);
+    setMeta('meta[name="keywords"]','name',(p.seo_keywords||`${p.title}, ${type(p)} property in ${place}, property in ${place}`).trim());
+    setMeta('meta[name="robots"]','name',robots);
     let link=document.querySelector('link[rel="canonical"]');if(!link){link=document.createElement('link');link.rel='canonical';document.head.appendChild(link)}link.href=canonical;
-    [['og:title',document.title],['og:description',desc],['og:url',canonical],['og:image',new URL(image(p.image_path),location.href).href]].forEach(([key,value])=>{let meta=document.querySelector(`meta[property="${key}"]`);if(!meta){meta=document.createElement('meta');meta.setAttribute('property',key);document.head.appendChild(meta)}meta.content=value});
-    mount.innerHTML=`<article class="detail-card"><img src="${safe(image(p.image_path))}" alt="${safe(p.title)} ${safe(type(p))} in ${safe(place)}"><div class="detail-content"><a href="properties.html">← Back to all properties</a><span class="property-type type-${type(p)==='Sale'?'sale':'rent'}">${typeIcon(p)} ${safe(type(p))}</span><h1>${safe(p.title)}</h1><div class="detail-price">${money(p.price)}</div><p class="property-location">📍 ${safe(place)}</p><div class="detail-grid"><div class="detail-stat"><small>Width</small><strong>${safe(p.width_ft)} feet</strong></div><div class="detail-stat"><small>Height / Length</small><strong>${safe(p.height_ft)} feet</strong></div><div class="detail-stat"><small>Total area</small><strong>${Number(p.width_ft)*Number(p.height_ft)||0} sq ft</strong></div><div class="detail-stat"><small>Listing type</small><strong>${safe(type(p))}</strong></div></div><p>${safe(p.description)||'Contact Call4All for more information about this property.'}</p><div class="detail-actions"><a class="btn btn-primary" href="https://www.google.com/maps?q=${encodeURIComponent(p.latitude+','+p.longitude)}" target="_blank" rel="noopener">Open directions</a>${videoButton(p)}<a class="btn btn-whatsapp" href="${whatsappUrl(p)}" target="_blank" rel="noopener">Book on WhatsApp</a></div></div></article>`;
+    [['og:type','product'],['og:site_name','Call4All'],['og:locale','en_IN'],['og:title',socialTitle],['og:description',socialDesc],['og:url',canonical],['og:image',socialImage],['og:image:secure_url',socialImage],['og:image:alt',imageAlt],['product:price:amount',String(p.price||'')],['product:price:currency','INR']].forEach(([key,value])=>setMeta(`meta[property="${key}"]`,'property',value));
+    [['twitter:card','summary_large_image'],['twitter:title',socialTitle],['twitter:description',socialDesc],['twitter:image',socialImage],['twitter:image:alt',imageAlt]].forEach(([key,value])=>setMeta(`meta[name="${key}"]`,'name',value));
+    mount.innerHTML=`<article class="detail-card"><img src="${safe(image(p.image_path))}" alt="${safe(imageAlt)}"><div class="detail-content"><a href="properties.html">← Back to all properties</a><span class="property-type type-${type(p)==='Sale'?'sale':'rent'}">${typeIcon(p)} ${safe(type(p))}</span><h1>${safe(p.title)}</h1><div class="detail-price">${money(p.price)}</div><p class="property-location">📍 ${safe(place)}</p><div class="detail-grid"><div class="detail-stat"><small>Width</small><strong>${safe(p.width_ft)} feet</strong></div><div class="detail-stat"><small>Height / Length</small><strong>${safe(p.height_ft)} feet</strong></div><div class="detail-stat"><small>Total area</small><strong>${Number(p.width_ft)*Number(p.height_ft)||0} sq ft</strong></div><div class="detail-stat"><small>Listing type</small><strong>${safe(type(p))}</strong></div></div><p>${safe(p.description)||'Contact Call4All for more information about this property.'}</p><div class="detail-actions"><a class="btn btn-primary" href="https://www.google.com/maps?q=${encodeURIComponent(p.latitude+','+p.longitude)}" target="_blank" rel="noopener">Open directions</a>${videoButton(p)}<a class="btn btn-whatsapp" href="${whatsappUrl(p)}" target="_blank" rel="noopener">Book on WhatsApp</a></div></div></article>`;
     bindVideoButtons(mount);
-    const schema={'@context':'https://schema.org','@type':'RealEstateListing',name:p.title,description:p.description||desc,url:canonical,image:new URL(image(p.image_path),location.href).href,datePosted:p.timestamp,offers:{'@type':'Offer',price:p.price,priceCurrency:'INR',availability:'https://schema.org/InStock'},address:{'@type':'PostalAddress',addressLocality:p.city||'Jaipur',addressRegion:p.state||'Rajasthan',addressCountry:'IN'},geo:{'@type':'GeoCoordinates',latitude:p.latitude,longitude:p.longitude},floorSize:{'@type':'QuantitativeValue',value:Number(p.width_ft)*Number(p.height_ft),unitCode:'FTK'}};
-    if(videoEmbed(p.video_url))schema.video={'@type':'VideoObject',name:p.title+' property video',description:desc,thumbnailUrl:new URL(image(p.image_path),location.href).href,uploadDate:p.timestamp,contentUrl:p.video_url};
+    const schema={'@context':'https://schema.org','@type':'RealEstateListing',name:p.title,headline:seoTitle,description:p.meta_description||p.description||desc,url:canonical,image:[mainImage],datePosted:p.timestamp,offers:{'@type':'Offer',price:p.price,priceCurrency:'INR',availability:'https://schema.org/InStock',url:canonical},address:{'@type':'PostalAddress',addressLocality:p.city||'Jaipur',addressRegion:p.state||'Rajasthan',addressCountry:'IN'},geo:{'@type':'GeoCoordinates',latitude:p.latitude,longitude:p.longitude},floorSize:{'@type':'QuantitativeValue',value:Number(p.width_ft)*Number(p.height_ft),unitCode:'FTK'}};
+    if(videoEmbed(p.video_url))schema.video={'@type':'VideoObject',name:p.title+' property video',description:desc,thumbnailUrl:mainImage,uploadDate:p.timestamp,contentUrl:p.video_url};
     const s=document.createElement('script');s.type='application/ld+json';s.textContent=JSON.stringify(schema);document.head.appendChild(s);
   }
   window.PropertyCatalog={load,card,whatsappUrl,type};

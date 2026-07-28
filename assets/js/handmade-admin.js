@@ -1,8 +1,8 @@
 (function () {
   'use strict';
   const PATH = 'data/handmade-items.csv';
-  const HEADERS = ['id','timestamp','category','title','artisan','materials','price','stock','city','area','contact_phone','image_path','description','meta_title','meta_description','keywords','status','added_by','approval_status','pending_json','reviewed_by','reviewed_at','state'];
-  const FIELDS = ['category','title','artisan','materials','price','stock','city','area','contact_phone','image_path','description','meta_title','meta_description','keywords','state'];
+  const HEADERS = ['id','timestamp','category','title','artisan','materials','price','stock','city','area','contact_phone','image_path','description','meta_title','meta_description','keywords','status','added_by','approval_status','pending_json','reviewed_by','reviewed_at','state','og_title','og_description','og_image','image_alt','robots'];
+  const FIELDS = ['category','title','artisan','materials','price','stock','city','area','contact_phone','image_path','description','meta_title','meta_description','keywords','state','og_title','og_description','og_image','image_alt','robots'];
   const isAdmin = sessionStorage.getItem('c4a_admin_session') === '1' && !!localStorage.getItem('c4a_admin_token');
   const isStaff = sessionStorage.getItem('c4a_staff_session') === '1' && !!localStorage.getItem('c4a_staff_token');
   const role = isAdmin ? 'admin' : (isStaff ? 'staff' : '');
@@ -63,11 +63,11 @@
     if (draft) FIELDS.forEach(field => item[field] = draft[field] ?? item[field]);
     item.pending_json = ''; item.approval_status = 'Approved'; item.status = 'Active';
     item.reviewed_by = user(); item.reviewed_at = new Date().toISOString(); items[index] = item;
-    try { await persist(items, 'Approve handmade product ' + id); } catch (error) { alert(error.message); }
+    try { await window.CatalogPageGenerator.generate('handmade', item, token()); await persist(items, 'Approve handmade product ' + id); } catch (error) { alert(error.message); }
   }
   async function remove(id) {
     if (!confirm('Is handmade product ko permanently delete karna hai?')) return;
-    try { await persist(state.items.filter(item => item.id !== id), 'Delete handmade product ' + id); } catch (error) { alert(error.message); }
+    try { const item=state.items.find(entry=>entry.id===id);await window.CatalogPageGenerator.retire('handmade',item,token());await persist(state.items.filter(item => item.id !== id), 'Delete handmade product ' + id); } catch (error) { alert(error.message); }
   }
   async function save(event) {
     event.preventDefault();
@@ -97,14 +97,17 @@
         const row = { id:'handmade-' + Date.now(), timestamp:new Date().toISOString(), status:isAdmin ? 'Active' : 'Inactive', added_by:user(), approval_status:isAdmin ? 'Approved' : 'Pending', pending_json:'', reviewed_by:isAdmin ? user() : '', reviewed_at:isAdmin ? new Date().toISOString() : '' };
         FIELDS.forEach(field => row[field] = draft[field]); items.push(row);
       }
+      if (isAdmin) { status.textContent = 'SEO page generate ho raha hai…'; await window.CatalogPageGenerator.generate('handmade', items[index >= 0 ? index : items.length - 1], token()); }
       await persist(items, (isAdmin ? 'Save ' : 'Submit ') + 'handmade product');
-      status.textContent = isAdmin ? '✅ Product published' : '✅ Admin approval ke liye submit ho gaya';
+      status.textContent = isAdmin ? '✅ Product aur SEO page published' : '✅ Admin approval ke liye submit ho gaya';
       reset();
     } catch (error) { status.textContent = '❌ ' + error.message; }
     finally { button.disabled = false; }
   }
   document.addEventListener('DOMContentLoaded', () => {
     if (!authorize()) return;
+    const seoTitle=document.querySelector('[name="meta_title"]');seoTitle.required=true;const seoDescription=document.querySelector('[name="meta_description"]');seoDescription.required=true;seoDescription.minLength=80;document.querySelector('[name="keywords"]').required=true;document.getElementById('saveStatus').insertAdjacentHTML('beforebegin','<label>Social / OG title</label><input name="og_title" maxlength="95"><label>Social / OG description</label><textarea name="og_description" maxlength="220" rows="3"></textarea><label>Social / OG image URL</label><input name="og_image" type="url"><label>Image alt text *</label><input name="image_alt" required maxlength="160"><label>Search indexing</label><select name="robots"><option value="index,follow">Index &amp; follow</option><option value="noindex,follow">No index</option></select>');
+    if(isAdmin){const list=document.getElementById('handmadeAdminList');list.insertAdjacentHTML('beforebegin','<button class="pa-btn" id="rebuildHandmadePages" type="button">Rebuild All SEO Pages</button>');document.getElementById('rebuildHandmadePages').onclick=async e=>{const button=e.currentTarget,rows=state.items.filter(x=>x.status==='Active'&&x.approval_status==='Approved');button.disabled=true;try{for(let i=0;i<rows.length;i++){button.textContent=`Generating ${i+1}/${rows.length}…`;await window.CatalogPageGenerator.generate('handmade',rows[i],token())}button.textContent=`✅ ${rows.length} SEO pages rebuilt`}catch(error){button.textContent='❌ '+error.message}finally{button.disabled=false}}}
     document.getElementById('handmadeForm').addEventListener('submit', save);
     document.getElementById('cancelEdit').onclick = reset;
     load();

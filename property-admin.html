@@ -17,7 +17,19 @@
 <label>Property image</label><input id="propertyImage" type="file" accept="image/png,image/jpeg,image/webp">
 <label>Property video link</label><input name="video_url" type="url" inputmode="url" placeholder="YouTube, Google Drive file, Vimeo or direct video URL"><small class="field-help">Google Drive par folder link ke bajay video file ka public share link use karein. Frontend par video button automatically show hoga.</small>
 <label>Description</label><textarea name="description" rows="4" placeholder="Property ki complete details…"></textarea>
+<fieldset class="pa-seo-fields"><legend>SEO &amp; Social Sharing</legend>
+<small class="field-help">Fields blank chhodne par property title, description aur main image se SEO tags automatically ban jayenge.</small>
+<label>SEO title *</label><input name="meta_title" required maxlength="70" placeholder="e.g. 2BHK Flat for Rent in Jaipur | Call4All"><small class="field-help">Google title ke liye 50–60 characters best rehte hain.</small>
+<label>Meta description *</label><textarea name="meta_description" required rows="3" minlength="80" maxlength="170" placeholder="Property, price, location aur main benefit 150–160 characters mein…"></textarea>
+<label>SEO keywords *</label><input name="seo_keywords" required placeholder="2BHK flat Jaipur, flat for rent Kukas, furnished flat"><small class="field-help">Comma-separated relevant search phrases.</small>
+<label>Social / OG title</label><input name="og_title" maxlength="95" placeholder="Facebook, WhatsApp aur other social sharing title">
+<label>Social / OG description</label><textarea name="og_description" rows="3" maxlength="220" placeholder="Social share par dikhne wali short description"></textarea>
+<label>Social / OG image URL</label><input name="og_image" type="url" inputmode="url" placeholder="https://example.com/property-share-image.jpg"><small class="field-help">Blank hone par property image use hogi. Recommended size 1200 × 630 px.</small>
+<label>Image alt text *</label><input name="image_alt" required maxlength="160" placeholder="e.g. Furnished 2BHK flat for rent in Kukas Jaipur">
+<label>Canonical URL</label><input name="canonical_url" type="url" inputmode="url" placeholder="Automatic individual property URL"><small class="field-help">Normally blank rakhein; generated permanent HTML page ka URL automatically use hoga.</small>
+<label>Search indexing</label><select name="robots"><option value="index,follow">Index &amp; follow (recommended)</option><option value="noindex,follow">Do not index, follow links</option><option value="noindex,nofollow">Do not index or follow</option></select>
+</fieldset>
 <label>Status</label><select name="status"><option>Active</option><option>Inactive</option></select>
 <div id="saveStatus" style="margin-top:10px"></div><div class="pa-actions"><button class="pa-btn gold" type="submit">Save Property</button><button class="pa-btn" id="cancelEdit" type="button" hidden>Cancel</button></div>
-</form></section><section class="pa-card"><h2>Saved Properties</h2><div id="propertyList"><p>Loading…</p></div></section></div></main>
+</form></section><section class="pa-card"><h2>Saved Properties</h2><button class="pa-btn" id="rebuildPropertyPages" type="button">Rebuild All SEO Pages</button><small class="field-help">Existing approved properties ke individual HTML pages generate/update karega.</small><div id="propertyList"><p>Loading…</p></div></section></div></main>
 <script src="assets/js/site.js"></script><script src="assets/js/booking.js"></script><script src="assets/js/property-admin.js"></script></body></html>

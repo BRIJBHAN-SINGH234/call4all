@@ -5,7 +5,7 @@
   const safe = value => String(value || '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const money = value => new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR', maximumFractionDigits:0 }).format(Number(value || 0));
   const image = item => item.image_path || 'assets/icons/icon-512.png';
-  const detailUrl = item => 'handmade-item.html?id=' + encodeURIComponent(item.id);
+  const detailUrl = item => 'handmade-' + String(item.id || '').toLowerCase().replace(/[^a-z0-9-]+/g, '-') + '.html';
   const absolute = path => new URL(path, location.href).href;
   const locationName = item => [item.area,item.city,item.state || (item.city === 'Jaipur' ? 'Rajasthan' : '')].filter((value,index,array) => value && array.indexOf(value) === index).join(', ');
 
@@ -70,7 +70,7 @@
   }
   async function detailPage() {
     const mount = document.getElementById('handmadeDetail'); if (!mount) return;
-    const items = await load(), id = new URLSearchParams(location.search).get('id'), item = items.find(entry => entry.id === id);
+    const items = await load(), id = mount.dataset.catalogId || new URLSearchParams(location.search).get('id'), item = items.find(entry => entry.id === id);
     if (!item) { document.title = 'Handmade Product Not Found | Call4All'; document.querySelector('meta[name="robots"]').content = 'noindex,follow'; mount.innerHTML = '<p class="empty-map">Product not found or currently out of stock. <a href="handmade-items.html">See available handmade items</a>.</p>'; return; }
     const city = item.city || 'Jaipur', area = item.area || city, canonical = absolute(detailUrl(item));
     const title = item.meta_title || `${item.title} in ${area} ${city} | ${money(item.price)} | Call4All`;

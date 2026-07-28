@@ -395,8 +395,9 @@ window.CsvAPI = (function () {
     'data/staff.csv': ['id', 'email', 'password_hash', 'name', 'phone', 'role', 'status', 'created_at', 'created_by'],
     'data/areas.csv': ['id', 'city', 'area', 'status', 'created_at'],
     'data/gallery.csv': ['id', 'timestamp', 'category', 'title', 'description', 'image_path', 'featured', 'sort_order', 'status', 'added_by'],
-    'data/properties.csv': ['id', 'timestamp', 'property_type', 'title', 'contact_phone', 'latitude', 'longitude', 'price', 'width_ft', 'height_ft', 'image_path', 'description', 'status', 'added_by', 'approval_status', 'pending_json', 'reviewed_by', 'reviewed_at'],
-    'data/second-hand-items.csv': ['id', 'timestamp', 'category', 'title', 'brand', 'condition', 'price', 'city', 'area', 'contact_phone', 'image_path', 'description', 'status', 'added_by', 'approval_status', 'pending_json', 'reviewed_by', 'reviewed_at'],
+    'data/properties.csv': ['id', 'timestamp', 'property_type', 'title', 'contact_phone', 'latitude', 'longitude', 'price', 'width_ft', 'height_ft', 'image_path', 'description', 'status', 'added_by', 'approval_status', 'pending_json', 'reviewed_by', 'reviewed_at', 'video_url', 'city', 'state', 'meta_title', 'meta_description', 'seo_keywords', 'og_title', 'og_description', 'og_image', 'image_alt', 'canonical_url', 'robots'],
+    'data/second-hand-items.csv': ['id', 'timestamp', 'category', 'title', 'brand', 'condition', 'price', 'city', 'area', 'contact_phone', 'image_path', 'description', 'status', 'added_by', 'approval_status', 'pending_json', 'reviewed_by', 'reviewed_at', 'meta_title', 'meta_description', 'seo_keywords', 'og_title', 'og_description', 'og_image', 'image_alt', 'robots'],
+    'data/handmade-items.csv': ['id', 'timestamp', 'category', 'title', 'artisan', 'materials', 'price', 'stock', 'city', 'area', 'contact_phone', 'image_path', 'description', 'meta_title', 'meta_description', 'keywords', 'status', 'added_by', 'approval_status', 'pending_json', 'reviewed_by', 'reviewed_at', 'state', 'og_title', 'og_description', 'og_image', 'image_alt', 'robots'],
     'data/manpower.csv': ['id', 'timestamp', 'name', 'contact_phone', 'types', 'city', 'area', 'address', 'experience', 'availability', 'notes', 'added_by'],
     'data/manpower-types.csv': ['id', 'name', 'status', 'created_at', 'created_by'],
     'data/rental-cars.csv': ['id', 'timestamp', 'brand', 'model', 'image_path', 'service_types', 'price', 'city', 'seats', 'fuel', 'transmission', 'description', 'status', 'added_by'],
@@ -715,3 +716,10 @@ window.CsvAPI = (function () {
     parseCsv
   };
 })();
+
+/* Admin catalogue pages need the static SEO page builder before their manager
+ * script runs. document.write is intentional here: booking.js is parser-loaded
+ * at the end of those HTML documents, so the dependency remains synchronous. */
+if (/-admin\.html$/i.test(location.pathname)) {
+  document.write('<script src="assets/js/catalog-page-generator.js"><\/script>');
+}
