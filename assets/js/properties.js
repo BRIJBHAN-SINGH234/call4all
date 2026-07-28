@@ -8,6 +8,7 @@
   const typeIcon=p=>type(p)==='Sale'?'🏷️':'🔑';
   const locationName=p=>[p.city||'Jaipur',p.state||'Rajasthan'].filter(Boolean).join(', ');
   const detailUrl=p=>'property.html?id='+encodeURIComponent(String(p.id||''));
+  const idFromPath=()=>{const match=location.pathname.match(/\/property-(prop-[a-z0-9-]+)\.html$/i);return match?match[1]:''};
   const absoluteUrl=(value,fallback)=>{try{return new URL(value||fallback,location.href).href}catch(_){return new URL(fallback,location.href).href}};
   function setMeta(selector,attribute,value){
     let meta=document.querySelector(selector);
@@ -71,7 +72,7 @@
 
   async function detailPage(){
     const mount=document.getElementById('propertyDetail');if(!mount)return;
-    const id=mount.dataset.catalogId||new URLSearchParams(location.search).get('id'),p=(await load()).find(x=>x.id===id);
+    const id=mount.dataset.catalogId||new URLSearchParams(location.search).get('id')||idFromPath(),p=(await load()).find(x=>x.id===id);
     if(!p){mount.innerHTML='<p class="empty-map">Property not found or no longer active.</p>';return}
     const generatedCanonical=`https://call4all.co.in/${detailUrl(p)}`,place=locationName(p);
     const canonical=absoluteUrl(p.canonical_url,generatedCanonical);
