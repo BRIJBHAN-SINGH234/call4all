@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<title>बिक्री पत्र – डेटा फॉर्म</title>
+<style>
+  :root{
+    --paper:#f6f1e6;
+    --paper-dark:#ece3d1;
+    --ink:#2b2420;
+    --ink-soft:#5b5348;
+    --seal:#8c2a2a;
+    --seal-dark:#6e1f1f;
+    --gold:#a97e33;
+    --line:#d8cbb0;
+    --ok:#3f6b4a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      radial-gradient(circle at 15% 8%, rgba(140,42,42,0.05), transparent 40%),
+      radial-gradient(circle at 85% 92%, rgba(169,126,51,0.06), transparent 40%);
+    color:var(--ink);
+    font-family: "Noto Serif Devanagari","Noto Sans Devanagari","Segoe UI",Georgia,serif;
+    padding:0 0 60px;
+  }
+  header{
+    text-align:center;
+    padding:34px 20px 22px;
+    border-bottom:3px double var(--gold);
+    position:relative;
+  }
+  header .seal{
+    width:56px;height:56px;border-radius:50%;
+    border:3px solid var(--seal);
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 10px;
+    color:var(--seal);font-weight:700;font-size:22px;
+    font-family: Georgia, serif;
+    background:radial-gradient(circle, #fff6e8 0%, var(--paper-dark) 100%);
+  }
+  header h1{
+    margin:0; font-size:28px; letter-spacing:.5px; color:var(--seal-dark);
+  }
+  header p{margin:6px 0 0; color:var(--ink-soft); font-size:14px;}
+
+  .wrap{max-width:900px;margin:0 auto;padding:26px 18px;}
+
+  .section{
+    background:#fffdf8;
+    border:1px solid var(--line);
+    border-radius:6px;
+    margin-bottom:18px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.03);
+    overflow:hidden;
+  }
+  .section > .head{
+    display:flex;align-items:center;gap:10px;
+    padding:14px 18px;
+    cursor:pointer;
+    background:linear-gradient(180deg,#fffaf0,#f7efdd);
+    border-bottom:1px solid var(--line);
+    user-select:none;
+  }
+  .section > .head .num{
+    width:26px;height:26px;border-radius:50%;
+    background:var(--seal);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:700;flex:0 0 auto;
+  }
+  .section > .head h2{margin:0;font-size:17px;color:var(--ink);flex:1;}
+  .section > .head .chev{transition:transform .2s;color:var(--gold);font-size:14px;}
+  .section.closed > .head .chev{transform:rotate(-90deg);}
+  .section > .body{padding:18px 20px 4px;}
+  .section.closed > .body{display:none;}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;}
+  .grid .full{grid-column:1/-1;}
+  @media (max-width:600px){.grid{grid-template-columns:1fr;}}
+
+  label{
+    display:block;font-size:12.5px;color:var(--ink-soft);
+    margin-bottom:4px; font-weight:600;
+  }
+  input[type=text], textarea{
+    width:100%;
+    padding:9px 11px;
+    border:1px solid var(--line);
+    border-radius:4px;
+    background:#fffef9;
+    font-family:inherit;
+    font-size:15px;
+    color:var(--ink);
+  }
+  textarea{resize:vertical;min-height:44px;}
+  input:focus, textarea:focus{outline:2px solid var(--gold);outline-offset:1px;}
+  .field{margin-bottom:12px;}
+  .hint{font-size:11.5px;color:#9a8f7d;margin-top:2px;}
+
+  .format-row{
+    display:flex;gap:14px;align-items:center;flex-wrap:wrap;
+    padding:16px 20px;background:#fffaf0;
+    border:1px solid var(--line);border-radius:6px;margin-bottom:18px;
+  }
+  .format-row select{
+    padding:9px 14px;border-radius:4px;border:1px solid var(--line);
+    font-size:15px;background:#fff;font-family:inherit;
+  }
+  .format-row label{margin:0;font-size:14px;color:var(--ink);font-weight:700;}
+
+  .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px;}
+  button{
+    font-family:inherit;font-size:15px;font-weight:700;
+    padding:12px 22px;border-radius:5px;border:none;cursor:pointer;
+    transition:transform .08s ease;
+  }
+  button:active{transform:scale(0.98);}
+  .btn-primary{background:var(--seal);color:#fff;}
+  .btn-primary:hover{background:var(--seal-dark);}
+  .btn-secondary{background:#fff;color:var(--ink);border:1px solid var(--line);}
+  .btn-secondary:hover{background:var(--paper-dark);}
+
+  #output-wrap{display:none;margin-top:20px;}
+  #output-wrap.show{display:block;}
+  #jsonOut{
+    width:100%;min-height:180px;
+    font-family:"Courier New",monospace;font-size:12.5px;
+    background:#fbf7ee;border:1px solid var(--line);border-radius:5px;
+    padding:12px;color:#3a352d;
+  }
+  .status{font-size:13px;margin-top:8px;font-weight:600;}
+  .status.ok{color:var(--ok);}
+  .note{
+    background:#fbf3e2;border:1px solid var(--gold);border-radius:6px;
+    padding:14px 16px;font-size:13.5px;color:#5b4a1f;line-height:1.6;margin-bottom:18px;
+  }
+  .missing{color:var(--seal);font-weight:700;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="seal">श्री</div>
+  <h1>बिक्री पत्र — डेटा फॉर्म</h1>
+  <p>हर बार बदलने वाली जानकारी यहाँ भरें · बाकी दस्तावेज़ पहले जैसा रहेगा</p>
+</header>
+
+<div class="wrap">
+
+  <div class="note">
+    <b>कैसे काम करता है:</b> नीचे सभी बदलने वाले फ़ील्ड भरें → नीचे <b>Format</b> चुनें (Word / PDF) →
+    <b>"डेटा तैयार करें"</b> दबाएँ → जो टेक्स्ट बॉक्स खुलेगा उसे कॉपी करके वापस Claude की चैट में पेस्ट करें।
+    Claude आपका असली दस्तावेज़ बनाकर पहले <b>प्रीव्यू</b> दिखाएगा — अगर कुछ गलत हो तो यहीं फॉर्म में बदलकर दोबारा भेज दें,
+    ठीक होने पर आपको डाउनलोड लिंक मिल जाएगा।
+  </div>
+
+  <div class="format-row">
+    <label>📄 आउटपुट फॉर्मेट:</label>
+    <select id="format">
+      <option value="docx">Word (.docx)</option>
+      <option value="pdf">PDF (.pdf)</option>
+      <option value="both">दोनों (docx + pdf)</option>
+    </select>
+  </div>
+
+  <form id="deedForm">
+
+    <!-- 1. Date -->
+    <div class="section" data-idx="1">
+      <div class="head"><div class="num">1</div><h2>दिनांक (Deed Date)</h2><div class="chev">▾</div></div>
+      <div class="body">
+        <div class="grid">
+          <div class="field"><label>बिक्री पत्र की तारीख़ (DEED_DATE)</label>
+            <input type="text" name="DEED_DATE" placeholder="30/07/2026"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Seller -->
+    <div class="section" data-idx="2">
+      <div class="head"><div class="num">2</div><h2>प्रथम पक्ष / विक्रेता (Seller)</h2><div class="chev">▾</div></div>
+      <div class="body">
+        <div class="grid">
+          <div class="field"><label>नाम (SELLER_NAME)</label><input type="text" name="SELLER_NAME"></div>
+          <div class="field"><label>पिता का नाम (SELLER_FATHER)</label><input type="text" name="SELLER_FATHER"></div>
+          <div class="field"><label>आयु (SELLER_AGE)</label><input type="text" name="SELLER_AGE"></div>
+          <div class="field"><label>जाति (SELLER_CASTE)</label><input type="text" name="SELLER_CASTE"></div>
+          <div class="field full"><label>पता (SELLER_ADDRESS)</label><textarea name="SELLER_ADDRESS"></textarea></div>
+          <div class="field"><label>आधार नंबर (SELLER_AADHAR)</label><input type="text" name="SELLER_AADHAR" placeholder="1234 5678 9012"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Buyer -->
+    <div class="section" data-idx="3">
+      <div class="head"><div class="num">3</div><h2>द्वितीय पक्ष / क्रेता (Buyer)</h2><div class="chev">▾</div></div>
+      <div class="body">
+        <div class="grid">
+          <div class="field"><label>नाम (BUYER_NAME)</label><input type="text" name="BUYER_NAME"></div>
+          <div class="field"><label>पिता का नाम (BUYER_FATHER)</label><input type="text" name="BUYER_FATHER"></div>
+          <div class="field"><label>आयु (BUYER_AGE)</label><input type="text" name="BUYER_AGE"></div>
+          <div class="field"><label>जाति (BUYER_CASTE)</label><input type="text" name="BUYER_CASTE"></div>
+          <div class="field full"><label>पता (BUYER_ADDRESS)</label><textarea name="BUYER_ADDRESS"></textarea></div>
+          <div class="field"><label>आधार नंबर (BUYER_AADHAR)</label><input type="text" name="BUYER_AADHAR" placeholder="1234 5678 9012"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Property -->
+    <div class="section" data-idx="4">
+      <div class="head"><div class="num">4</div><h2>प्लॉट / सम्पत्ति विवरण (Property)</h2><div class="chev">▾</div></div>
+      <div class="body">
+        <div class="grid">
+          <div class="field full"><label>योजना का नाम (SCHEME_NAME)</label><input type="text" name="SCHEME_NAME"></div>
+          <div class="field"><label>प्लॉट नंबर (PLOT_NUMBER)</label><input type="text" name="PLOT_NUMBER"></div>
+          <div class="field"><label>पूर्व दिशा प्लॉट नंबर (PLOT_EAST)</label><input type="text" name="PLOT_EAST"></div>
+          <div class="field"><label>पश्चिम दिशा प्लॉट नंबर (PLOT_WEST)</label><input type="text" name="PLOT_WEST"></div>
+          <div class="field"><label>कुल क्षेत्रफल — वर्गगज (TOTAL_AREA_SQYD)</label><input type="text" name="TOTAL_AREA_SQYD" placeholder="78.33"></div>
+          <div class="field"><label>कुल क्षेत्रफल — वर्गमीटर (TOTAL_AREA_SQM)</label><input type="text" name="TOTAL_AREA_SQM" placeholder="65.49"></div>
+          <div class="field"><label>उत्तर-दक्षिण पूर्व दिशा — फीट (DIM_NE)</label><input type="text" name="DIM_NE"></div>
+          <div class="field"><label>उत्तर-दक्षिण पूर्व दिशा — इंच (DIM_NE_IN)</label><input type="text" name="DIM_NE_IN"></div>
+          <div class="field"><label>उत्तर-दक्षिण पश्चिम दिशा — फीट (DIM_NW)</label><input type="text" name="DIM_NW"></div>
+          <div class="field"><label>उत्तर-दक्षिण पश्चिम दिशा — इंच (DIM_NW_IN)</label><input type="text" name="DIM_NW_IN"></div>
+          <div class="field"><label>पूर्व-पश्चिम दिशा — फीट (DIM_EW)</label><input type="text" name="DIM_EW"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Allotment -->
+    <div class="section" data-idx="5">
+      <div class="head"><div class="num">5</div><h2>आवंटन विवरण (Allotment)</h2><div class="chev">▾</div></div>
+      <div class="body">
+        <div class="grid">
+          <div class="field"><label>आवंटन दिनांक (ALLOTMENT_DATE)</label><input type="text" name="ALLOTMENT_DATE" placeholder="10/06/2024"></div>
+          <div class="field"><label>रसीद संख्या (RECEIPT_NUMBER)</label><input type="text" name="RECEIPT_NUMBER" placeholder="66949"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Payment -->
+    <div class="section" data-idx="6">
+      <div class="head"><div class="num">6</div><h2>भुगतान विवरण (Payment)</h2><div class="chev">▾</div></div>
+      <div class="body">
+        <div class="grid">
+          <div class="field"><label>कुल विक्रय राशि — अंकों में (SALE_PRICE)</label><input type="text" name="SALE_PRICE" placeholder="4,82,000"></div>
+          <div class="field"><label>राशि — शब्दों में (SALE_PRICE_WORDS)</label><input type="text" name="SALE_PRICE_WORDS" placeholder="चार लाख बयासी हजार"></div>
+          <div class="field"><label>चैक नंबर (CHEQUE_NUMBER)</label><input type="text" name="CHEQUE_NUMBER"></div>
+          <div class="field full"><label>बैंक व शाखा (BANK_BRANCH)</label><input type="text" name="BANK_BRANCH" placeholder="पंजाब नेशनल बैंक, नादौती (करौली), राजस्थान"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. Witness 1 -->
+    <div class="section" data-idx="7">
+      <div class="head"><div class="num">7</div><h2>गवाह संख्या 1 (Witness 1)</h2><div class="chev">▾</div></div>
+      <div class="body">
+        <div class="grid">
+          <div class="field"><label>नाम (WITNESS1_NAME)</label><input type="text" name="WITNESS1_NAME"></div>
+          <div class="field"><label>पिता का नाम (WITNESS1_FATHER)</label><input type="text" name="WITNESS1_FATHER"></div>
+          <div class="field"><label>आयु (WITNESS1_AGE)</label><input type="text" name="WITNESS1_AGE"></div>
+          <div class="field"><label>जाति (WITNESS1_CASTE)</label><input type="text" name="WITNESS1_CASTE"></div>
+          <div class="field full"><label>पता (WITNESS1_ADDRESS)</label><textarea name="WITNESS1_ADDRESS"></textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. Witness 2 -->
+    <div class="section" data-idx="8">
+      <div class="head"><div class="num">8</div><h2>गवाह संख्या 2 (Witness 2)</h2><div class="chev">▾</div></div>
+      <div class="body">
+        <div class="grid">
+          <div class="field"><label>नाम (WITNESS2_NAME)</label><input type="text" name="WITNESS2_NAME"></div>
+          <div class="field"><label>पिता का नाम (WITNESS2_FATHER)</label><input type="text" name="WITNESS2_FATHER"></div>
+          <div class="field"><label>आयु (WITNESS2_AGE)</label><input type="text" name="WITNESS2_AGE"></div>
+          <div class="field"><label>जाति (WITNESS2_CASTE)</label><input type="text" name="WITNESS2_CASTE"></div>
+          <div class="field full"><label>पता (WITNESS2_ADDRESS)</label><textarea name="WITNESS2_ADDRESS"></textarea></div>
+        </div>
+      </div>
+    </div>
+
+  </form>
+
+  <div class="actions">
+    <button type="button" class="btn-primary" id="genBtn">📝 डेटा तैयार करें</button>
+    <button type="button" class="btn-secondary" id="fillSampleBtn">उदाहरण भरें (Test)</button>
+    <button type="button" class="btn-secondary" id="clearBtn">सब साफ़ करें</button>
+  </div>
+
+  <div id="output-wrap">
+    <label style="margin-top:16px;">यह टेक्स्ट कॉपी करें और Claude की चैट में पेस्ट करें 👇</label>
+    <textarea id="jsonOut" readonly></textarea>
+    <div class="actions">
+      <button type="button" class="btn-primary" id="copyBtn">📋 कॉपी करें</button>
+    </div>
+    <div class="status" id="statusMsg"></div>
+  </div>
+
+</div>
+
+<script>
+// collapse/expand sections
+document.querySelectorAll('.section > .head').forEach(h => {
+  h.addEventListener('click', () => h.parentElement.classList.toggle('closed'));
+});
+
+const REQUIRED_ORDER = [
+"DEED_DATE",
+"SELLER_NAME","SELLER_FATHER","SELLER_AGE","SELLER_CASTE","SELLER_ADDRESS","SELLER_AADHAR",
+"BUYER_NAME","BUYER_FATHER","BUYER_AGE","BUYER_CASTE","BUYER_ADDRESS","BUYER_AADHAR",
+"SCHEME_NAME","PLOT_NUMBER","PLOT_EAST","PLOT_WEST","TOTAL_AREA_SQYD","TOTAL_AREA_SQM",
+"DIM_NE","DIM_NE_IN","DIM_NW","DIM_NW_IN","DIM_EW",
+"ALLOTMENT_DATE","RECEIPT_NUMBER",
+"SALE_PRICE","SALE_PRICE_WORDS","CHEQUE_NUMBER","BANK_BRANCH",
+"WITNESS1_NAME","WITNESS1_FATHER","WITNESS1_AGE","WITNESS1_CASTE","WITNESS1_ADDRESS",
+"WITNESS2_NAME","WITNESS2_FATHER","WITNESS2_AGE","WITNESS2_CASTE","WITNESS2_ADDRESS"
+];
+
+function collectData(){
+  const form = document.getElementById('deedForm');
+  const data = {};
+  REQUIRED_ORDER.forEach(k => {
+    const el = form.elements[k];
+    data[k] = el ? el.value.trim() : "";
+  });
+  return data;
+}
+
+document.getElementById('genBtn').addEventListener('click', () => {
+  const data = collectData();
+  const format = document.getElementById('format').value;
+  const missing = REQUIRED_ORDER.filter(k => !data[k]);
+
+  const payload = {
+    instruction: "Bikri Patra (sale deed) ke liye ye values template me bharo, docx/pdf generate karo, pehle preview dikhao.",
+    output_format: format,
+    values: data
+  };
+  document.getElementById('jsonOut').value = JSON.stringify(payload, null, 2);
+  document.getElementById('output-wrap').classList.add('show');
+  const statusEl = document.getElementById('statusMsg');
+  if(missing.length){
+    statusEl.innerHTML = '⚠️ ये फ़ील्ड खाली हैं, फिर भी भेज सकते हैं पर बेहतर होगा भर दें: <span class="missing">' + missing.join(', ') + '</span>';
+    statusEl.className = 'status';
+  } else {
+    statusEl.textContent = '✅ सभी फ़ील्ड भर गए हैं — नीचे से कॉपी करके चैट में पेस्ट करें।';
+    statusEl.className = 'status ok';
+  }
+  document.getElementById('output-wrap').scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+document.getElementById('copyBtn').addEventListener('click', () => {
+  const ta = document.getElementById('jsonOut');
+  ta.select();
+  document.execCommand('copy');
+  const btn = document.getElementById('copyBtn');
+  const orig = btn.textContent;
+  btn.textContent = '✅ कॉपी हो गया';
+  setTimeout(()=>btn.textContent = orig, 1500);
+});
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  document.getElementById('deedForm').reset();
+  document.getElementById('output-wrap').classList.remove('show');
+});
+
+document.getElementById('fillSampleBtn').addEventListener('click', () => {
+  const sample = {
+    DEED_DATE:"30/07/2026",
+    SELLER_NAME:"राजेन्द्र कुमार शर्मा", SELLER_FATHER:"जगदीश प्रसाद शर्मा", SELLER_AGE:"44",
+    SELLER_CASTE:"हरियाणा ब्राह्मण", SELLER_ADDRESS:"ग्राम कूकस, तहसील आमेर, जिला जयपुर, (राजस्थान)",
+    SELLER_AADHAR:"7774 8996 9283",
+    BUYER_NAME:"कृष्णावतार सिंह", BUYER_FATHER:"गजराज सिंह", BUYER_AGE:"66",
+    BUYER_CASTE:"राजपूत", BUYER_ADDRESS:"गुड़ा चन्द्रजी मार्ग, नड़ौती, नादौती, जिला करौली, (राजस्थान)",
+    BUYER_AADHAR:"4076 9405 5827",
+    SCHEME_NAME:"गणपति एनक्लेव", PLOT_NUMBER:"141", PLOT_EAST:"140", PLOT_WEST:"142",
+    TOTAL_AREA_SQYD:"78.33", TOTAL_AREA_SQM:"65.49",
+    DIM_NE:"22", DIM_NE_IN:"9", DIM_NW:"24", DIM_NW_IN:"3", DIM_EW:"30",
+    ALLOTMENT_DATE:"10/06/2024", RECEIPT_NUMBER:"66949",
+    SALE_PRICE:"4,82,000", SALE_PRICE_WORDS:"चार लाख बयासी हजार", CHEQUE_NUMBER:"895356",
+    BANK_BRANCH:"पंजाब नेशनल बैंक, नादौती (करौली), राजस्थान",
+    WITNESS1_NAME:"रोहित शर्मा", WITNESS1_FATHER:"युवराज शर्मा", WITNESS1_AGE:"24",
+    WITNESS1_CASTE:"हरियाणा ब्राह्मण", WITNESS1_ADDRESS:"ब्राह्मणों का मौहल्ला, ग्राम कूकस, तहसील आमेर, जिला जयपुर, राजस्थान।",
+    WITNESS2_NAME:"रमेश चन्द शर्मा", WITNESS2_FATHER:"छीतर मल शर्मा", WITNESS2_AGE:"47",
+    WITNESS2_CASTE:"हरियाणा ब्राह्मण", WITNESS2_ADDRESS:"तेजाजी मन्दिर के पास, ग्राम कूकस, तहसील आमेर, जिला जयपुर, राजस्थान।"
+  };
+  const form = document.getElementById('deedForm');
+  Object.keys(sample).forEach(k => { if(form.elements[k]) form.elements[k].value = sample[k]; });
+});
+</script>
+
+</body>
+</html>
