@@ -537,6 +537,7 @@
 .home-creative{background:#fff;color:#171717}
 .home-creative .site-header.scrolled{background:#111;box-shadow:0 4px 18px rgba(0,0,0,.16)}
 .home-creative #sliderMount{background:#111}
+.home-creative #sliderMount .slide::before{background:linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.76))}
 .home-creative .home-inventory-section{background:#f7f7f7}
 .home-creative .home-inventory-section.alt{background:#fff}
 .home-creative .section-eyebrow{color:#6c4ee3}
@@ -545,9 +546,24 @@
 .home-creative .lm-verified,.home-creative .cta-strip{background:#111}
 .home-creative .lm-verified h2,.home-creative .cta-strip h2{color:#fff}
 .home-creative .lm-process-step{border-radius:14px;border:1px solid #e8e8e8;box-shadow:0 6px 22px rgba(0,0,0,.06)}
+.home-creative h1,.home-creative h2,.home-creative h3,.home-creative h4,.home-creative .section-title{color:#171717}
+.home-creative p,.home-creative .section-subtitle,.home-creative .service-body p,.home-creative .testimonial-text{color:#626262}
+.home-creative .section-title .accent{color:#6c4ee3;font-style:normal}
+.home-creative .btn-accent{background:#6c4ee3!important;border-color:#6c4ee3!important;color:#fff!important;box-shadow:none!important}
+.home-creative .btn-accent:hover{background:#5538c7!important;border-color:#5538c7!important;color:#fff!important}
+.home-creative .btn-outline{border-color:#d7d7d7;color:#181818;background:#fff}
+.home-creative .btn-outline:hover{background:#f1efff;border-color:#6c4ee3;color:#5538c7}
+.home-creative .service-card,.home-creative .testimonial-card,.home-creative .faq-item{border-color:#e7e7e7;background:#fff;box-shadow:0 5px 18px rgba(0,0,0,.06)}
+.home-creative .cta-strip h2,.home-creative .cta-strip p{color:#fff}
+.home-creative .section-dark h2,.home-creative .section-dark h3,.home-creative .section-dark p,.home-creative .lm-kukas h2,.home-creative .lm-kukas p{color:#fff}
 
 @media (max-width: 768px) {
+  .home-creative .lm-preloader{display:none}
   .home-creative .site-nav.open{background:#111}
   .home-creative .home-inventory-head h2{font-size:27px;letter-spacing:-.5px}
   .home-creative .home-inventory-head p{font-size:13px;line-height:1.5}
+  .home-creative .section-title{font-size:25px;line-height:1.2}
+  .home-creative .section-subtitle{font-size:13px;line-height:1.55}
+  .home-creative .section{padding-left:14px;padding-right:14px}
+  .home-creative .btn{border-radius:9px;font-weight:700}
 }

@@ -12,10 +12,13 @@
 .catalog-slider[data-catalog-variant="property"] .property-list-card{border:1px solid #e8e8e8;box-shadow:0 5px 18px rgba(0,0,0,.06)}
 .catalog-slider[data-catalog-variant="property"] .property-card-price{color:#181818}
 .catalog-slider[data-catalog-variant="property"] .property-view-link{color:#5538c7}
+.btn-property-call{background:#6c4ee3!important;border-color:#6c4ee3!important;color:#fff!important}
+.btn-property-call:hover{background:#5538c7!important;border-color:#5538c7!important}
 @media(max-width:640px){
   .catalog-slider[data-catalog-variant="property"]{padding:0}
   .catalog-slider[data-catalog-variant="property"] .catalog-slider-viewport{overflow:visible}
   .catalog-slider[data-catalog-variant="property"] .catalog-slider-track{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .catalog-slider[data-catalog-variant="property"] .catalog-slider-track>*{min-width:0;width:100%;max-width:100%}
   .catalog-slider[data-catalog-variant="property"] .catalog-slider-arrow{top:auto;bottom:-43px;transform:none}
   .catalog-slider[data-catalog-variant="property"] .catalog-slider-arrow:hover,
   .catalog-slider[data-catalog-variant="property"] .catalog-slider-arrow:focus-visible{transform:scale(1.04)}
@@ -29,8 +32,9 @@
   .catalog-slider[data-catalog-variant="property"] .property-list-body h3{font-size:14px;line-height:1.25;margin:4px 0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
   .catalog-slider[data-catalog-variant="property"] .property-card-price{font-size:16px;margin:4px 0}
   .catalog-slider[data-catalog-variant="property"] .property-list-body p{font-size:11px;line-height:1.35;margin:3px 0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1;overflow:hidden}
-  .catalog-slider[data-catalog-variant="property"] .property-card-actions{margin-top:6px}
+  .catalog-slider[data-catalog-variant="property"] .property-card-actions{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:7px}
   .catalog-slider[data-catalog-variant="property"] .property-card-actions .btn-video,
-  .catalog-slider[data-catalog-variant="property"] .property-card-actions .btn-whatsapp{display:none}
-  .catalog-slider[data-catalog-variant="property"] .property-view-link{font-size:11px;margin-top:0}
+  .catalog-slider[data-catalog-variant="property"] .property-view-link{display:none}
+  .catalog-slider[data-catalog-variant="property"] .property-card-actions .btn-video{display:none!important}
+  .catalog-slider[data-catalog-variant="property"] .property-card-actions .btn{display:flex;align-items:center;justify-content:center;min-width:0!important;width:100%;padding:7px 2px;border-radius:7px;font-size:9px;line-height:1.1;white-space:nowrap}
 }

@@ -16,6 +16,7 @@
   }
   async function load(){try{return(await window.CsvAPI.loadAllPublic('data/properties.csv')).items.filter(p=>String(p.status).toLowerCase()==='active'&&String(p.approval_status).toLowerCase()==='approved')}catch(e){console.warn(e);return[]}}
   const whatsappUrl=p=>{const number=(window.SITE_CONFIG&&window.SITE_CONFIG.whatsappNumber)||'917737353588',message=['Hello Call4All, mujhe yeh property book/visit karni hai:','','Property: '+p.title,'Type: '+type(p),'Location: '+locationName(p),'Price: '+money(p.price),'Size: '+p.width_ft+' × '+p.height_ft+' ft','Listing ID: '+p.id,'Link: '+new URL(detailUrl(p),location.href).href].join('\n');return 'https://wa.me/'+number+'?text='+encodeURIComponent(message)};
+  const callUrl=()=>{const number=(window.SITE_CONFIG&&window.SITE_CONFIG.phone)||'+917737353588';return 'tel:'+String(number).replace(/[^+\d]/g,'')};
 
   function videoEmbed(url){
     if(!url)return '';
@@ -46,7 +47,7 @@
       const close=()=>{modal.remove();document.body.classList.remove('video-open')};modal.onclick=e=>{if(e.target===modal)close()};modal.querySelector('.video-close').onclick=close;document.body.classList.add('video-open');document.body.appendChild(modal);modal.querySelector('.video-close').focus();
     });
   }
-  function card(p){return `<article class="property-list-card"><a href="${detailUrl(p)}"><img src="${safe(image(p.image_path))}" alt="${safe(p.title)} property ${safe(type(p))} in ${safe(locationName(p))}" loading="lazy"></a><div class="property-list-body"><span class="property-type type-${type(p)==='Sale'?'sale':'rent'}">${typeIcon(p)} ${safe(type(p))}</span><h3><a href="${detailUrl(p)}">${safe(p.title)}</a></h3><strong class="property-card-price">${money(p.price)}</strong><p>📍 ${safe(locationName(p))}</p><p>📐 ${safe(p.width_ft)} × ${safe(p.height_ft)} ft · ${Number(p.width_ft)*Number(p.height_ft)||0} sq ft</p><div class="property-card-actions"><a class="property-view-link" href="${detailUrl(p)}">View details →</a>${videoButton(p)}<a class="btn btn-whatsapp btn-sm" href="${whatsappUrl(p)}" target="_blank" rel="noopener">Book</a></div></div></article>`}
+  function card(p){return `<article class="property-list-card"><a href="${detailUrl(p)}"><img src="${safe(image(p.image_path))}" alt="${safe(p.title)} property ${safe(type(p))} in ${safe(locationName(p))}" loading="lazy"></a><div class="property-list-body"><span class="property-type type-${type(p)==='Sale'?'sale':'rent'}">${typeIcon(p)} ${safe(type(p))}</span><h3><a href="${detailUrl(p)}">${safe(p.title)}</a></h3><strong class="property-card-price">${money(p.price)}</strong><p>📍 ${safe(locationName(p))}</p><p>📐 ${safe(p.width_ft)} × ${safe(p.height_ft)} ft · ${Number(p.width_ft)*Number(p.height_ft)||0} sq ft</p><div class="property-card-actions"><a class="property-view-link" href="${detailUrl(p)}">View details →</a>${videoButton(p)}<a class="btn btn-property-call btn-sm" href="${callUrl()}">☎ Call</a><a class="btn btn-whatsapp btn-sm" href="${whatsappUrl(p)}" target="_blank" rel="noopener">WhatsApp</a></div></div></article>`}
   function addItemListSchema(list){const s=document.createElement('script');s.type='application/ld+json';s.textContent=JSON.stringify({'@context':'https://schema.org','@type':'ItemList',name:'Properties for Sale and Rent Across India',numberOfItems:list.length,itemListElement:list.map((p,i)=>({'@type':'ListItem',position:i+1,url:'https://call4all.co.in/'+detailUrl(p),name:p.title}))});document.head.appendChild(s)}
 
   async function mapPage(){
@@ -96,6 +97,6 @@
     if(videoEmbed(p.video_url))schema.video={'@type':'VideoObject',name:p.title+' property video',description:desc,thumbnailUrl:mainImage,uploadDate:p.timestamp,contentUrl:p.video_url};
     const s=document.createElement('script');s.type='application/ld+json';s.textContent=JSON.stringify(schema);document.head.appendChild(s);
   }
-  window.PropertyCatalog={load,card,whatsappUrl,type};
+  window.PropertyCatalog={load,card,whatsappUrl,callUrl,type};
   document.addEventListener('DOMContentLoaded',()=>{mapPage();detailPage()});
 })();
