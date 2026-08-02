@@ -20,6 +20,7 @@
 .btn-property-call:hover{background:#333!important;border-color:#333!important}
 .btn-whatsapp{background:#6c4ee3!important;border-color:#6c4ee3!important;color:#fff!important}
 .inventory-view-all .btn{background:#181818!important;background-image:none!important;border-color:#181818!important;box-shadow:none!important}
+.tiffin-home-section{padding:70px 22px;background:#fff}.tiffin-home-inner{max-width:1240px;margin:auto}.tiffin-home-card{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,.65fr);overflow:hidden;border:1px solid #e7e7e7;border-radius:18px;background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.07)}.tiffin-home-image{display:block;min-height:330px;background:#d7bd83}.tiffin-home-image img{width:100%;height:100%;min-height:330px;object-fit:cover}.tiffin-home-content{display:flex;flex-direction:column;justify-content:center;padding:34px}.tiffin-home-content h3{margin:7px 0;font-size:clamp(24px,3vw,36px)}.tiffin-home-content h3 a{color:#171717}.tiffin-home-price{margin:5px 0 12px;color:#6c4ee3;font-size:clamp(30px,4vw,46px);font-weight:850;letter-spacing:-1px}.tiffin-home-items,.tiffin-home-area{color:#626262;line-height:1.65}.tiffin-home-area{margin-top:8px;font-size:13px;font-weight:650}.tiffin-home-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:22px}.tiffin-home-actions .btn{justify-content:center;min-width:0;padding:11px 9px;font-size:12px}.tiffin-home-actions .btn-outline-dark{grid-column:1/-1}
 @media(max-width:640px){
   .catalog-slider[data-catalog-variant="property"]{padding:0}
   .catalog-slider[data-catalog-variant="property"] .catalog-slider-viewport{overflow:visible}
@@ -45,4 +46,5 @@
   .catalog-slider[data-catalog-variant="property"] .property-card-actions .btn{display:flex;align-items:center;justify-content:center;min-width:0!important;width:100%;padding:7px 2px;border-radius:7px;font-size:9px;line-height:1.1;white-space:nowrap}
   .inventory-view-all{margin-top:24px}
   .inventory-view-all .btn{width:min(100%,260px);min-width:0;padding:12px 20px}
+  .tiffin-home-section{padding:48px 14px}.tiffin-home-card{grid-template-columns:1fr;border-radius:14px}.tiffin-home-image{min-height:190px}.tiffin-home-image img{min-height:190px;object-position:62% center}.tiffin-home-content{padding:18px}.tiffin-home-content h3{font-size:22px}.tiffin-home-price{font-size:32px}.tiffin-home-items{font-size:13px}.tiffin-home-actions .btn{padding:10px 5px;font-size:10px}
 }

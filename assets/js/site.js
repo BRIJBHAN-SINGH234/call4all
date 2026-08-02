@@ -895,6 +895,7 @@ function renderHeader(activePage) {
     { href: 'index.html', label: 'Home', key: 'home' },
     { href: 'index.html#services', label: 'Services', key: 'services' },
     { href: 'properties.html', label: 'Properties', key: 'properties' },
+    { href: 'tiffin-center-kukas.html', label: 'Tiffin', key: 'tiffin' },
     { href: 'second-hand-items.html', label: 'Second Hand', key: 'second-hand' },
     { href: 'handmade-items.html', label: 'Handmade', key: 'handmade' },
     { href: 'gallery.html', label: 'Gallery', key: 'gallery' },
