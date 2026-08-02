@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updated_at": "2026-07-09T09:12:00.393Z",
+  "updated_at": "2026-08-02T19:03:00.000Z",
   "branding": {
     "site_name": "Call4All",
     "tagline": "One Call. Every Service. Done.",
@@ -112,6 +112,16 @@
         "background_url": "https://images.unsplash.com/photo-1606013519235-f4f8b3ee5ae5?w=960&q=75&auto=format&fit=crop",
         "link": "car-decoration-kukas.html",
         "order": 8
+      },
+      {
+        "id": "s9",
+        "enabled": true,
+        "title": "Tiffin Center in Kukas",
+        "subtitle": "Fresh packed thali from ₹40",
+        "background_url": "assets/uploads/tiffin-center-kukas-banner.png",
+        "link": "tiffin-center-kukas.html",
+        "image_only": true,
+        "order": 9
       }
     ]
   },

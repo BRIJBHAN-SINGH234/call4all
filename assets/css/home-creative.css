@@ -539,6 +539,8 @@
 .home-creative .site-header.scrolled{background:#111;box-shadow:0 4px 18px rgba(0,0,0,.16)}
 .home-creative #sliderMount{background:#111}
 .home-creative #sliderMount .slide::before{background:linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.76))}
+.home-creative #sliderMount .slide-image-only{background-size:cover;background-position:center;background-color:#d8bd82}
+.home-creative #sliderMount .slide-image-only::before{display:none}
 .home-creative .home-inventory-section{background:#f7f7f7}
 .home-creative .home-inventory-section.alt{background:#fff}
 .home-creative .section-eyebrow{color:#6c4ee3}
@@ -566,4 +568,5 @@
   .home-creative .section-subtitle{font-size:13px;line-height:1.55}
   .home-creative .section{padding-left:14px;padding-right:14px}
   .home-creative .btn{border-radius:9px;font-weight:700}
+  .home-creative #sliderMount .slide-image-only{background-position:26% center}
 }

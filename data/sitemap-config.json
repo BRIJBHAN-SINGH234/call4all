@@ -37,6 +37,7 @@
     { "pattern": "^handmade-items\\.html$", "priority": 0.95, "changefreq": "daily" },
     { "pattern": "^property\\.html$", "priority": 0.90, "changefreq": "daily" },
     { "pattern": "^kukas\\.html$", "priority": 0.95, "changefreq": "weekly" },
+    { "pattern": "^tiffin-center-kukas\\.html$", "priority": 0.95, "changefreq": "daily" },
     { "pattern": "room-rent-kukas-jaipur|flat-rent-kukas-jaipur", "priority": 0.92, "changefreq": "weekly" },
     { "pattern": "car-rental-kukas\\.html$|wedding-services-kukas\\.html$", "priority": 0.95, "changefreq": "weekly" },
     { "pattern": "-kukas", "priority": 0.9, "changefreq": "weekly" },

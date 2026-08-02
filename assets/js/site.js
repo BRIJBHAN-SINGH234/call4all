@@ -41,6 +41,7 @@ window.SITE_CONFIG = {
     { id: 'car-decoration',   name: 'Car Decoration',              icon: '🎀', iconName: 'bow',       desc: 'Luxury car decoration for weddings & events.',                       page: 'car-decoration-kukas.html',    image: 'https://images.unsplash.com/photo-1606013519235-f4f8b3ee5ae5?w=900&q=80&auto=format&fit=crop' },
     { id: 'second-hand',      name: 'Second-Hand Items',           icon: '♻️', iconName: 'shopping-bag', desc: 'Verified used furniture, electronics and more at local prices.',    page: 'second-hand-items.html',       image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=900&q=80&auto=format&fit=crop' },
     { id: 'handmade',         name: 'Handmade Items',              icon: '🧶', iconName: 'gift', desc: 'Local artisan gifts, decor, jewellery and crafts with live prices.',       page: 'handmade-items.html',          image: 'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=900&q=80&auto=format&fit=crop' },
+    { id: 'tiffin-center',    name: 'Tiffin Center & Packed Thali', icon: '🍱', desc: 'Fresh veg tiffin and packed thali delivery in Kukas from ₹40.', page: 'tiffin-center-kukas.html', image: 'assets/uploads/tiffin-center-kukas-banner.png' },
     { id: 'other',            name: 'Other / Custom Service',      icon: '🛎️', iconName: 'bell',      desc: 'Need something else? Just tell us, we will arrange it.',             page: 'index.html#book',        image: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=900&q=80&auto=format&fit=crop' }
   ],
   slider: {
@@ -54,7 +55,8 @@ window.SITE_CONFIG = {
       { id: 's5', enabled: true, icon: '👷', iconName: 'hard-hat', title: 'Manpower Supply',       subtitle: 'Skilled & unskilled manpower on demand',             background_url: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1900&q=80&auto=format&fit=crop', link: 'manpower-supply-kukas.html',   order: 5 },
       { id: 's6', enabled: true, icon: '💍', iconName: 'ring',     title: 'Marriage Services',     subtitle: 'Decoration, catering, rentals — A to Z',             background_url: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=1900&q=80&auto=format&fit=crop', link: 'wedding-services-kukas.html', order: 6 },
       { id: 's7', enabled: true, icon: '🌸', iconName: 'flower',   title: 'Hotel Flower Bouquet',  subtitle: 'Luxury floral arrangements for hotels & events',     background_url: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=1900&q=80&auto=format&fit=crop', link: 'flower-bouquet-kukas.html',    order: 7 },
-      { id: 's8', enabled: true, icon: '🎀', iconName: 'bow',      title: 'Car Decoration',        subtitle: 'Wedding & event car decoration',                     background_url: 'https://images.unsplash.com/photo-1606013519235-f4f8b3ee5ae5?w=1900&q=80&auto=format&fit=crop', link: 'car-decoration-kukas.html',    order: 8 }
+      { id: 's8', enabled: true, icon: '🎀', iconName: 'bow',      title: 'Car Decoration',        subtitle: 'Wedding & event car decoration',                     background_url: 'https://images.unsplash.com/photo-1606013519235-f4f8b3ee5ae5?w=1900&q=80&auto=format&fit=crop', link: 'car-decoration-kukas.html',    order: 8 },
+      { id: 's9', enabled: true, title: 'Tiffin Center in Kukas', subtitle: 'Fresh packed thali from ₹40', background_url: 'assets/uploads/tiffin-center-kukas-banner.png', link: 'tiffin-center-kukas.html', image_only: true, order: 9 }
     ]
   },
   pages: []
@@ -337,16 +339,19 @@ function renderSlider() {
       <div class="slides" id="slides">
         ${slides.map((s, i) => {
           const iconHtml = s.iconName ? `<span class="slide-icon">${ico(s.iconName)}</span>` : '';
-          const inner = `${iconHtml}<div>${escapeHtml(s.title || '')}</div><div class="slide-sub">${escapeHtml(s.subtitle || '')}</div>`;
+          const inner = s.image_only
+            ? `<span class="sr-only">${escapeHtml(s.title || 'Featured service')} — ${escapeHtml(s.subtitle || '')}</span>`
+            : `${iconHtml}<div>${escapeHtml(s.title || '')}</div><div class="slide-sub">${escapeHtml(s.subtitle || '')}</div>`;
           const bgUrl = s.background_url || '';
           const lazyClass = (i > 0 && bgUrl) ? ' slide-lazy' : '';
           const dataBg = bgUrl ? ` data-bg="${escapeAttr(bgUrl)}"` : '';
           let style = i === 0 && bgUrl ? '' : '';
           if (s.link) style += 'text-decoration:none;';
           const styleAttr = style ? ` style="${style}"` : '';
+          const imageOnlyClass = s.image_only ? ' slide-image-only' : '';
           return s.link
-            ? `<a class="slide${lazyClass}" href="${escapeAttr(s.link)}"${dataBg}${styleAttr}>${inner}</a>`
-            : `<div class="slide${lazyClass}"${dataBg}${styleAttr}>${inner}</div>`;
+            ? `<a class="slide${lazyClass}${imageOnlyClass}" href="${escapeAttr(s.link)}"${dataBg}${styleAttr}>${inner}</a>`
+            : `<div class="slide${lazyClass}${imageOnlyClass}"${dataBg}${styleAttr}>${inner}</div>`;
         }).join('')}
       </div>
       <button class="arrow right" type="button" aria-label="Next" onclick="moveSlide(1)">&#10095;</button>
