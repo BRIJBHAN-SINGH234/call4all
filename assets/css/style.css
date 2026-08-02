@@ -9,25 +9,25 @@
 }
 
 :root {
-  /* Earth-tone luxury palette (forest green + warm gold) */
-  --primary: #1f3a2e;
-  --primary-dark: #122318;
-  --accent: #c9a36a;
-  --accent-dark: #a17f47;
+  /* Clean service-marketplace palette: ink, white and restrained violet. */
+  --primary: #181818;
+  --primary-dark: #0f0f0f;
+  --accent: #6c4ee3;
+  --accent-dark: #5538c7;
   --success: #25d366;
   --danger: #b3261e;
-  --text: #2a2a2a;
-  --text-light: #6b6b6b;
-  --bg-light: #f7f3ec;
-  --bg-cream: #faf6ef;
+  --text: #171717;
+  --text-light: #666;
+  --bg-light: #f6f6f6;
+  --bg-cream: #f8f8f8;
   --white: #fff;
-  --shadow: 0 6px 24px rgba(20, 35, 24, 0.08);
-  --shadow-lg: 0 18px 50px rgba(20, 35, 24, 0.18);
-  --radius: 14px;
+  --shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 16px 42px rgba(0, 0, 0, 0.14);
+  --radius: 12px;
   --transition: all 0.3s ease;
 
   /* Typography */
-  --font-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-heading: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   --font-body: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
@@ -2921,4 +2921,3 @@ body.festival-independence {
   .seo-areas-list { columns: 1; }
   .seo-block { padding: 36px 16px; }
 }
-

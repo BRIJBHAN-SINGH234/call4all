@@ -59,7 +59,7 @@
   padding: 18px 40px;
 }
 .home-creative .site-header.scrolled {
-  background: rgba(18, 35, 24, 0.96);
+  background: #22274d
   box-shadow: 0 4px 24px rgba(0,0,0,0.25);
   padding: 10px 40px;
 }
@@ -531,4 +531,23 @@
     background: rgba(18,35,24,0.98);
   }
   .home-creative .site-nav.open a { color: #fff; }
+}
+
+/* Clean, high-contrast marketplace finish for the public homepage. */
+.home-creative{background:#fff;color:#171717}
+.home-creative .site-header.scrolled{background:#111;box-shadow:0 4px 18px rgba(0,0,0,.16)}
+.home-creative #sliderMount{background:#111}
+.home-creative .home-inventory-section{background:#f7f7f7}
+.home-creative .home-inventory-section.alt{background:#fff}
+.home-creative .section-eyebrow{color:#6c4ee3}
+.home-creative .btn-primary{background:#181818;border-color:#181818;color:#fff}
+.home-creative .btn-primary:hover{background:#6c4ee3;border-color:#6c4ee3}
+.home-creative .lm-verified,.home-creative .cta-strip{background:#111}
+.home-creative .lm-verified h2,.home-creative .cta-strip h2{color:#fff}
+.home-creative .lm-process-step{border-radius:14px;border:1px solid #e8e8e8;box-shadow:0 6px 22px rgba(0,0,0,.06)}
+
+@media (max-width: 768px) {
+  .home-creative .site-nav.open{background:#111}
+  .home-creative .home-inventory-head h2{font-size:27px;letter-spacing:-.5px}
+  .home-creative .home-inventory-head p{font-size:13px;line-height:1.5}
 }

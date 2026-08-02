@@ -16,11 +16,11 @@ window.SITE_CONFIG = {
   aboutText: 'Your one-call solution for every need. From rental cars and rooms to construction labor, home tutors, and event services - we connect you to trusted providers.',
   theme: {
     preset: 'resort',
-    primary: '#1f3a2e',
-    primary_dark: '#122318',
-    accent: '#c9a36a',
-    accent_dark: '#a17f47',
-    background: '#faf6ef',
+    primary: '#181818',
+    primary_dark: '#0f0f0f',
+    accent: '#6c4ee3',
+    accent_dark: '#5538c7',
+    background: '#ffffff',
     festival_overlay: 'none',
     festival_banner: ''
   },

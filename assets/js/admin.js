@@ -2045,18 +2045,22 @@ async function regenerateSitemap({ silent } = {}) {
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Generating...'; }
 
   try {
-    const [config, htmlFiles, propertyData] = await Promise.all([
+    const [config, htmlFiles, propertyData, secondHandData, handmadeData] = await Promise.all([
       window.C4aSitemapGen.loadConfig(),
       listRootHtmlFiles(token),
-      window.CsvAPI.loadAllPublic('data/properties.csv').catch(() => ({ items: [] }))
+      window.CsvAPI.loadAllPublic('data/properties.csv').catch(() => ({ items: [] })),
+      window.CsvAPI.loadAllPublic('data/second-hand-items.csv').catch(() => ({ items: [] })),
+      window.CsvAPI.loadAllPublic('data/handmade-items.csv').catch(() => ({ items: [] }))
     ]);
     const pages = ensurePagesArray().filter((p) => p.enabled !== false && p.slug);
     const properties = propertyData.items || [];
-    const xml = window.C4aSitemapGen.generate(config, htmlFiles, pages, properties);
+    const secondHandItems = secondHandData.items || [];
+    const handmadeItems = handmadeData.items || [];
+    const xml = window.C4aSitemapGen.generate(config, htmlFiles, pages, properties, secondHandItems, handmadeItems);
     const sha = await window.CsvAPI.getFileSha('sitemap.xml', token);
     await window.CsvAPI.putFile('sitemap.xml', xml, sha, token, 'Auto-generate sitemap.xml (admin)');
 
-    const count = window.C4aSitemapGen.buildEntries(config, htmlFiles, pages, properties).length;
+    const count = window.C4aSitemapGen.buildEntries(config, htmlFiles, pages, properties, secondHandItems, handmadeItems).length;
     const msg = `✅ Sitemap updated — ${count} URLs. Submit https://call4all.co.in/sitemap.xml in Google Search Console if needed.`;
     if (status) status.textContent = msg;
     if (!silent) showMsg('settingsMsg', msg, 'success');

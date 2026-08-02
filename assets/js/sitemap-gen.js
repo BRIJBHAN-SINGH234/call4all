@@ -22,7 +22,7 @@
     return config.default || { priority: 0.8, changefreq: 'weekly' };
   }
 
-  function buildEntries(config, htmlFiles, dynamicPages, properties) {
+  function buildEntries(config, htmlFiles, dynamicPages, properties, secondHandItems, handmadeItems) {
     const base = (config.baseUrl || 'https://call4all.co.in').replace(/\/$/, '');
     const exclude = new Set(config.excludeHtml || []);
     const today = new Date().toISOString().slice(0, 10);
@@ -71,8 +71,19 @@
     (properties || []).forEach((p) => {
       if (!p.id || String(p.status).toLowerCase() !== 'active' || String(p.approval_status).toLowerCase() !== 'approved') return;
       const lm = (p.reviewed_at || p.timestamp || '').slice(0, 10) || today;
-      const page = 'property-' + String(p.id).toLowerCase().replace(/[^a-z0-9-]+/g, '-') + '.html';
-      add(base + '/' + page, lm, { priority: 0.9, changefreq: 'daily' });
+      add(base + '/property.html?id=' + encodeURIComponent(p.id), lm, { priority: 0.9, changefreq: 'daily' });
+    });
+
+    (secondHandItems || []).forEach((item) => {
+      if (!item.id || String(item.status).toLowerCase() !== 'active' || String(item.approval_status).toLowerCase() !== 'approved') return;
+      const lm = (item.reviewed_at || item.timestamp || '').slice(0, 10) || today;
+      add(base + '/second-hand-item.html?id=' + encodeURIComponent(item.id), lm, { priority: 0.85, changefreq: 'daily' });
+    });
+
+    (handmadeItems || []).forEach((item) => {
+      if (!item.id || String(item.status).toLowerCase() !== 'active' || String(item.approval_status).toLowerCase() !== 'approved' || Number(item.stock || 0) < 1) return;
+      const lm = (item.reviewed_at || item.timestamp || '').slice(0, 10) || today;
+      add(base + '/handmade-item.html?id=' + encodeURIComponent(item.id), lm, { priority: 0.88, changefreq: 'daily' });
     });
 
     entries.sort((a, b) => b.priority - a.priority || a.loc.localeCompare(b.loc));
@@ -97,8 +108,8 @@
     );
   }
 
-  function generate(config, htmlFiles, dynamicPages, properties) {
-    return toXml(buildEntries(config, htmlFiles, dynamicPages, properties));
+  function generate(config, htmlFiles, dynamicPages, properties, secondHandItems, handmadeItems) {
+    return toXml(buildEntries(config, htmlFiles, dynamicPages, properties, secondHandItems, handmadeItems));
   }
 
   async function loadConfig() {
