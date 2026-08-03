@@ -15,7 +15,7 @@
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 10px; /* Reduced for mobile */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -27,31 +27,40 @@
             background: white;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            padding: 30px;
-            margin: 20px 0;
+            padding: 15px; /* Mobile friendly padding */
+            margin: 10px 0;
+        }
+        
+        @media (min-width: 600px) {
+            body { padding: 20px; }
+            .container { padding: 30px; margin: 20px 0; }
         }
         
         header {
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
             border-bottom: 2px solid #e0e0e0;
         }
         
         h1 {
             color: #2c3e50;
-            font-size: 2.3rem;
-            margin-bottom: 10px;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+        
+        @media (min-width: 600px) {
+            h1 { font-size: 2.3rem; }
         }
         
         .subtitle {
             color: #7f8c8d;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
         
         .form-section {
-            margin-bottom: 30px;
-            padding: 20px;
+            margin-bottom: 25px;
+            padding: 15px;
             border-radius: 10px;
             background-color: #f8f9fa;
             border-left: 5px solid #3498db;
@@ -59,51 +68,76 @@
         
         .section-title {
             color: #2980b9;
-            margin-bottom: 20px;
-            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
         }
         
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: 1fr; /* Default 1 column for mobile */
+            gap: 15px;
+        }
+        
+        /* Tablets and Desktops grid setup */
+        @media (min-width: 600px) {
+            .form-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+            .span-2-desktop { grid-column: span 2; }
         }
         
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 5px;
         }
         
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: bold;
             color: #34495e;
+            font-size: 14px;
         }
         
         input, textarea, select {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
+            outline: none;
+        }
+        
+        input:focus, select:focus {
+            border-color: #3498db;
         }
         
         .button-container {
             display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 30px;
-            flex-wrap: wrap;
+            flex-direction: column; /* Stack buttons on mobile */
+            gap: 12px;
+            margin-top: 25px;
+        }
+        
+        @media (min-width: 600px) {
+            .button-container {
+                flex-direction: row;
+                justify-content: center;
+                gap: 20px;
+            }
         }
         
         .btn {
-            padding: 15px 30px;
-            font-size: 18px;
+            width: 100%;
+            padding: 14px 20px;
+            font-size: 16px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
             transition: all 0.2s;
+            text-align: center;
+        }
+        
+        @media (min-width: 600px) {
+            .btn { width: auto; font-size: 18px; padding: 15px 30px; }
         }
         
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
@@ -111,29 +145,37 @@
         .btn-print { background: #2980b9; color: white; }
         .btn-reset { background: #e74c3c; color: white; }
         
-        /* Screen Preview CSS */
+        /* Mobile responsive wrapper for Preview Box */
         .preview-container {
-            margin-top: 40px;
+            margin-top: 30px;
             width: 100%;
             display: none;
+            overflow-x: auto; /* Enables horizontal swipe on mobile so document doesn't break layout */
+            padding-bottom: 15px;
         }
         
         .legal-page {
             background: #ffffff;
             border: 2px solid #2c3e50;
             box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            padding: 60px 60px;
-            margin-bottom: 40px;
+            padding: 30px 20px; /* Reduced for preview mode */
+            margin-bottom: 30px;
             position: relative;
-            min-height: 1050px;
+            width: 100%;
+            min-width: 600px; /* Keeps legal text aspect ratio readable during preview */
+            min-height: 900px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
         
+        @media (min-width: 768px) {
+            .legal-page { padding: 60px 60px; min-height: 1050px; }
+        }
+        
         .stamp-area-placeholder {
             width: 100%;
-            height: 180px;
+            height: 140px;
             border: 2px dashed #bdc3c7;
             background: #fafbfc;
             display: flex;
@@ -141,36 +183,46 @@
             justify-content: center;
             color: #7f8c8d;
             font-weight: bold;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        @media (min-width: 768px) {
+            .stamp-area-placeholder { height: 180px; margin-bottom: 30px; font-size: 16px; }
         }
         
         .page-header-title {
             text-align: center;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: bold;
             text-decoration: underline;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         
         .page-number-top {
             position: absolute;
-            top: 20px;
-            right: 40px;
-            font-size: 18px;
+            top: 15px;
+            right: 20px;
+            font-size: 16px;
             font-weight: bold;
         }
         
         .legal-content {
-            font-size: 17px;
-            line-height: 2.2;
+            font-size: 16px;
+            line-height: 2;
             text-align: justify;
             color: #000;
             flex-grow: 1;
         }
         
+        @media (min-width: 768px) {
+            .legal-content { font-size: 17px; line-height: 2.2; }
+        }
+        
         .legal-content p {
-            margin-bottom: 20px;
-            text-indent: 40px;
+            margin-bottom: 15px;
+            text-indent: 30px;
         }
         
         .highlight {
@@ -180,9 +232,9 @@
         }
         
         .page-footer-signatures {
-            margin-top: 30px;
+            margin-top: 25px;
             border-top: 1px dashed #000;
-            padding-top: 20px;
+            padding-top: 15px;
         }
         
         .sig-table {
@@ -192,8 +244,9 @@
         
         .sig-table td {
             width: 50%;
-            padding: 10px 0;
+            padding: 8px 0;
             vertical-align: top;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -201,7 +254,7 @@
     <div class="container">
         <header>
             <h1>बिक्री पत्र (Sale Deed) जनरेटर</h1>
-            <p class="subtitle">5-पेज फॉर्मेट | डायनामिक PDF फाइल नाम सपोर्ट</p>
+            <p class="subtitle">5-पेज फॉर्मेट | मोबाइल एवं टैबलेट फ्रेंडली व्यू</p>
         </header>
         
         <form id="saleForm">
@@ -213,7 +266,7 @@
                     <div class="form-group"><label>पिता का नाम</label><input type="text" id="sellerFather" value="जगदीश प्रसाद शर्मा"></div>
                     <div class="form-group"><label>आयु (वर्ष)</label><input type="number" id="sellerAge" value="44"></div>
                     <div class="form-group"><label>जाति</label><input type="text" id="sellerCaste" value="हरियाणा ब्राह्मण"></div>
-                    <div class="form-group" style="grid-column: span 2;"><label>पूर्ण निवास पता</label><input type="text" id="sellerAddress" value="ग्राम कूकस, तहसील आमेर, जिला जयपुर, (राजस्थान)"></div>
+                    <div class="form-group span-2-desktop"><label>पूर्ण निवास पता</label><input type="text" id="sellerAddress" value="ग्राम कूकस, तहसील आमेर, जिला जयपुर, (राजस्थान)"></div>
                     <div class="form-group"><label>आधार नंबर</label><input type="text" id="sellerAadhar" value="[Aadhaar Redacted]"></div>
                 </div>
             </div>
@@ -226,7 +279,7 @@
                     <div class="form-group"><label>पिता का नाम</label><input type="text" id="buyerFather" value="गजराज सिंह"></div>
                     <div class="form-group"><label>आयु (वर्ष)</label><input type="number" id="buyerAge" value="66"></div>
                     <div class="form-group"><label>जाति</label><input type="text" id="buyerCaste" value="राजपूत"></div>
-                    <div class="form-group" style="grid-column: span 2;"><label>पूर्ण निवास पता</label><input type="text" id="buyerAddress" value="गुड़ा चन्द्रजी मार्ग, नड़ौती, नादौती, जिला करौली, (राजस्थान)"></div>
+                    <div class="form-group span-2-desktop"><label>पूर्ण निवास पता</label><input type="text" id="buyerAddress" value="गुड़ा चन्द्रजी मार्ग, नड़ौती, नादौती, जिला करौली, (राजस्थान)"></div>
                     <div class="form-group"><label>आधार नंबर</label><input type="text" id="buyerAadhar" value="[Aadhaar Redacted]"></div>
                 </div>
             </div>
@@ -271,7 +324,7 @@
                         </select>
                     </div>
                     <div class="form-group" id="chkNoGroup"><label id="paymentNoLabel">चेक नम्बर</label><input type="text" id="chequeNumber" value="895356"></div>
-                    <div class="form-group" id="bankGroup" style="grid-column: span 2;"><label>बैंक नाम व शाखा</label><input type="text" id="bankBranch" value="पंजाब नेशनल बैंक शाखा नादौती (करौली), राजस्थान"></div>
+                    <div class="form-group id="bankGroup" class="span-2-desktop"><label>बैंक नाम व शाखा</label><input type="text" id="bankBranch" value="पंजाब नेशनल बैंक शाखा नादौती (करौली), राजस्थान"></div>
                 </div>
             </div>
             
@@ -283,13 +336,13 @@
                     <div class="form-group"><label>पिता का नाम</label><input type="text" id="w1Father" value="युवराज शर्मा"></div>
                     <div class="form-group"><label>आयु</label><input type="number" id="w1Age" value="24"></div>
                     <div class="form-group"><label>जाति</label><input type="text" id="w1Caste" value="हरियाणा ब्राह्मण"></div>
-                    <div class="form-group" style="grid-column: span 2;"><label>पता</label><input type="text" id="w1Address" value="निवासी ब्राह्मणों का मौहल्ला, ग्राम कूकस, तहसील आमेर, जिला जयपुर, राजस्थान।"></div>
+                    <div class="form-group span-2-desktop"><label>पता</label><input type="text" id="w1Address" value="निवासी ब्राह्मणों का मौहल्ला, ग्राम कूकस, तहसील आमेर, जिला जयपुर, राजस्थान।"></div>
                     
                     <div class="form-group"><label>गवाह 2 नाम</label><input type="text" id="w2Name" value="रमेश चन्द शर्मा"></div>
                     <div class="form-group"><label>पिता का नाम</label><input type="text" id="w2Father" value="छीतर मल शर्मा"></div>
                     <div class="form-group"><label>आयु</label><input type="number" id="w2Age" value="47"></div>
                     <div class="form-group"><label>जाति</label><input type="text" id="w2Caste" value="हरियाणा ब्राह्मण"></div>
-                    <div class="form-group" style="grid-column: span 2;"><label>पता</label><input type="text" id="w2Address" value="निवासी तेजाजी मन्दिर के पास, ग्राम कूकस, तहसील आमेर, जिला जयपुर, राजस्थान।"></div>
+                    <div class="form-group span-2-desktop"><label>पता</label><input type="text" id="w2Address" value="निवासी तेजाजी मन्दिर के पास, ग्राम कूकस, तहसील आमेर, जिला जयपुर, राजस्थान।"></div>
                 </div>
             </div>
 
@@ -303,7 +356,6 @@
         <div class="preview-container" id="legalDocumentOutput"></div>
     </div>
 
-    <!-- Hidden iframe used for absolute clean print rendering -->
     <iframe id="printFrame" style="display:none; width:0; height:0; border:none;"></iframe>
 
     <script>
@@ -314,14 +366,14 @@
             const label = document.getElementById('paymentNoLabel');
             
             if (mode === 'नकद') {
-                chkGroup.style.display = 'none';
-                bankGroup.style.display = 'none';
+                if(chkGroup) chkGroup.style.display = 'none';
+                if(bankGroup) bankGroup.style.display = 'none';
             } else {
-                chkGroup.style.display = 'block';
-                bankGroup.style.display = 'block';
-                if (mode === 'चेक') label.innerText = "चेक नम्बर";
-                else if (mode === 'ऑनलाइन') label.innerText = "ट्रांजैक्शन ID / UTR नंबर";
-                else if (mode === 'बैंक ड्राफ्ट') label.innerText = "डिमांड ड्राफ्ट (DD) नंबर";
+                if(chkGroup) chkGroup.style.display = 'block';
+                if(bankGroup) bankGroup.style.display = 'block';
+                if (mode === 'चेक' && label) label.innerText = "चेक नम्बर";
+                else if (mode === 'ऑनलाइन' && label) label.innerText = "ट्रांजैक्शन ID / UTR नंबर";
+                else if (mode === 'बैंक ड्राफ्ट' && label) label.innerText = "डिमांड ड्राफ्ट (DD) नंबर";
             }
         }
 
@@ -368,8 +420,8 @@
             const priceW = document.getElementById('salePriceWords').value;
             
             const payType = document.getElementById('paymentType').value;
-            const payNo = document.getElementById('chequeNumber').value;
-            const bank = document.getElementById('bankBranch').value;
+            const payNo = document.getElementById('chequeNumber') ? document.getElementById('chequeNumber').value : '';
+            const bank = document.getElementById('bankBranch') ? document.getElementById('bankBranch').value : '';
 
             const w1 = document.getElementById('w1Name').value;
             const w1F = document.getElementById('w1Father').value;
@@ -447,7 +499,7 @@
                         <p>यह है कि यदि प्रथम पक्ष के स्वयं के स्वामित्व हक-हकूक की त्रुटि की वजह से उक्त विक्रित प्लॉट उक्त द्वितीय पक्ष के अधिकार तथा कब्जे से निकल जाता है तो ऐसी सूरत में द्वितीय पक्ष को अधिकार होगा कि वह उक्त वर्णित प्लॉट के ऐसे समय की कीमत मय विकास खर्च के प्रथम पक्ष से जिस प्रकार चाहे एक मुश्त वसूल कर लेवे।</p>
                         <p>यह है कि अब उक्त द्वितीय पक्ष उक्त विक्रित प्लॉट के समस्त सरकारी रिकॉर्ड में अपना नाम दर्ज करावे, बैंक से ऋण प्राप्त करें तथा इसमें पुख्ता निर्माण करावे, नल-बिजली, टेलीफोन वगैरह का कनेक्शन प्राप्त करें। यदि इस सम्बन्ध में प्रथम पक्ष के बयानों व शहादत की लिखित व मौखिक आवश्यकता होगी तो इस हेतु अपना पूर्ण सहयोग देने हेतु प्रथम पक्ष हमेशा वचनबद्ध रहेगा।</p>
                         <p>यह है कि अब प्रथम पक्ष का एवं प्रथम पक्ष के उत्तराधिकारियों का उक्त विक्रित प्लॉट से किसी प्रकार का कोई हक व सम्बन्ध नहीं रहा है तथा नाहीं भविष्य में होगा। अब उक्त द्वितीय पक्ष उक्त विक्रित प्लॉट से समस्त प्रकार के फायदे उठावें, तथा इसको किसी अन्य के हित में रहन, विक्रय, बख्शीश करें।</p>
-                        <p>यह है कि उक्त वर्णित प्लॉट में किसी प्रकार का और कोई कच्चा/पक्का निर्माण नहीं है तथा उक्त विक्रित सम्पत्ति की बाजारू कीमत आज की दिवस में जरे कीमत से अधिक नहीं है।</p>
+                        <p>यह है कि उक्त वर्णित प्लॉट में किसी प्रकार का और कोई कब्जा/पक्का निर्माण नहीं है तथा उक्त विक्रित सम्पत्ति की बाजारू कीमत आज की दिवस में जरे कीमत से अधिक नहीं है।</p>
                         <p>यह है कि इस विक्रय-पत्र के साथ संलग्न नक्शा इस विक्रय-पत्र का एक अभिन्न अंश रहेगा।</p>
                     </div>
                     ${midPageSignatures}
@@ -495,15 +547,11 @@
         }
         
         function printDocumentDirectly() {
-            // DYNAMIC FILE NAMING LOGIC
             const sellerName = document.getElementById('sellerName').value.trim() || "विक्रेता";
             const buyerName = document.getElementById('buyerName').value.trim() || "क्रेता";
-            
-            // Clean up name string to remove spaces or unwanted chars for safe file generation
             const originalTitle = document.title;
             const dynamicPDFName = `${sellerName}_एवं_${buyerName}_बिक्री_पत्र`;
             
-            // Forces the browser print dialog to adopt this dynamic title as the suggested PDF filename
             document.title = dynamicPDFName;
 
             const htmlContent = generateHTMLContent();
@@ -566,8 +614,6 @@
             setTimeout(function() {
                 pri.focus();
                 pri.print();
-                
-                // Restores the original browser tab name seamlessly after the print sequence fires
                 document.title = originalTitle;
             }, 600); 
         }
