@@ -247,6 +247,12 @@
     <priority>0.90</priority>
   </url>
   <url>
+    <loc>https://call4all.co.in/property.html?id=prop-1786189435606</loc>
+    <lastmod>2026-08-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.90</priority>
+  </url>
+  <url>
     <loc>https://call4all.co.in/rooms-flats-kukas.html</loc>
     <lastmod>2026-08-08</lastmod>
     <changefreq>weekly</changefreq>
@@ -500,6 +506,12 @@
   </url>
   <url>
     <loc>https://call4all.co.in/property-prop-1786187060635.html</loc>
+    <lastmod>2026-08-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://call4all.co.in/property-prop-1786189435606.html</loc>
     <lastmod>2026-08-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
