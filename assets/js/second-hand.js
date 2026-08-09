@@ -69,7 +69,7 @@
     if (!mount) return;
     const id = mount.dataset.catalogId || new URLSearchParams(location.search).get('id');
     const item = (await load()).find(entry => entry.id === id);
-    if (!item) { mount.innerHTML = '<p class="empty-map">Item not found or no longer available.</p>'; return; }
+    if (!item) { document.querySelector('meta[name="robots"]')?.setAttribute('content', 'noindex,follow'); mount.innerHTML = '<p class="empty-map">Item not found or no longer available.</p>'; return; }
     const canonical = new URL(detailUrl(item), location.href).href;
     const description = `${item.title}, ${item.condition || 'used'} condition, available in ${item.city || 'Jaipur'} for ${money(item.price)}.`;
     document.title = `${item.title} Second Hand in ${item.city || 'Jaipur'} | Call4All`;

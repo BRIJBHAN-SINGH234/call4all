@@ -74,7 +74,7 @@
   async function detailPage(){
     const mount=document.getElementById('propertyDetail');if(!mount)return;
     const id=mount.dataset.catalogId||new URLSearchParams(location.search).get('id'),p=(await load()).find(x=>x.id===id);
-    if(!p){mount.innerHTML='<p class="empty-map">Property not found or no longer active.</p>';return}
+    if(!p){setMeta('meta[name="robots"]','name','noindex,follow');mount.innerHTML='<p class="empty-map">Property not found or no longer active.</p>';return}
     const generatedCanonical=`https://call4all.co.in/${detailUrl(p)}`,place=locationName(p);
     const canonical=absoluteUrl(p.canonical_url,generatedCanonical);
     const generatedTitle=`${p.title} ${type(p)} in ${place} | Call4All`;
