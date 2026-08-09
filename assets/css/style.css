@@ -2939,3 +2939,5 @@ body{background:#fff;color:#171717}
 .float-btn.whatsapp{background:#6c4ee3!important;box-shadow:0 6px 18px rgba(108,78,227,.28)!important}
 .float-btn.call{background:#181818!important;box-shadow:0 6px 18px rgba(0,0,0,.24)!important}
 .float-btn::before{display:none}
+
+.public-content-guide{background:#f7f6fb;padding:64px 22px;border-top:1px solid #e6e2f2}.content-guide-inner{max-width:1050px;margin:auto}.content-guide-inner h2{max-width:850px;margin:8px 0 24px;font-size:clamp(28px,4vw,44px);line-height:1.18}.content-guide-inner p{max-width:980px;margin:0 0 20px;color:#40404a;font-size:16px;line-height:1.82}.content-guide-inner a{color:#5538c7;font-weight:700;text-decoration:underline;text-underline-offset:3px}.content-guide-inner a:hover{color:#181818}@media(max-width:600px){.public-content-guide{padding:44px 18px}.content-guide-inner p{font-size:15px;line-height:1.72}}

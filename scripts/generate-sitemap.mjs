@@ -82,7 +82,8 @@ function buildEntries(config, htmlFiles, dynamicPages, properties, secondHandIte
   for (const p of properties || []) {
     if (!p.id || String(p.status).toLowerCase() !== 'active' || String(p.approval_status).toLowerCase() !== 'approved') continue;
     const lm = (p.reviewed_at || p.timestamp || '').slice(0, 10) || today;
-    add(base + '/property.html?id=' + encodeURIComponent(p.id), lm, { priority: 0.9, changefreq: 'daily' });
+    // Property detail pages are generated as crawlable static SEO pages.
+    add(base + '/property-' + encodeURIComponent(p.id) + '.html', lm, { priority: 0.9, changefreq: 'daily' });
   }
 
   for (const item of secondHandItems || []) {

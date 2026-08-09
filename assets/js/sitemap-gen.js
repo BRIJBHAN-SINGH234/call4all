@@ -71,7 +71,8 @@
     (properties || []).forEach((p) => {
       if (!p.id || String(p.status).toLowerCase() !== 'active' || String(p.approval_status).toLowerCase() !== 'approved') return;
       const lm = (p.reviewed_at || p.timestamp || '').slice(0, 10) || today;
-      add(base + '/property.html?id=' + encodeURIComponent(p.id), lm, { priority: 0.9, changefreq: 'daily' });
+      // Match the generated, indexable property SEO-page path.
+      add(base + '/property-' + encodeURIComponent(p.id) + '.html', lm, { priority: 0.9, changefreq: 'daily' });
     });
 
     (secondHandItems || []).forEach((item) => {
