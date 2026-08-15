@@ -6,7 +6,7 @@
   const image=p=>p||'assets/icons/icon-512.png';
   const type=p=>p.property_type==='Sale'?'Sale':'Lease/Rent';
   const typeIcon=p=>type(p)==='Sale'?'🏷️':'🔑';
-  const locationName=p=>[p.city||'Jaipur',p.state||'Rajasthan'].filter(Boolean).join(', ');
+  const locationName=p=>(p.location || [p.city||'Jaipur',p.state||'Rajasthan'].filter(Boolean).join(', ')).trim();
   const detailUrl=p=>'property.html?id='+encodeURIComponent(String(p.id||''));
   const absoluteUrl=(value,fallback)=>{try{return new URL(value||fallback,location.href).href}catch(_){return new URL(fallback,location.href).href}};
   function setMeta(selector,attribute,value){
@@ -48,7 +48,7 @@
       const close=()=>{modal.remove();document.body.classList.remove('video-open')};modal.onclick=e=>{if(e.target===modal)close()};modal.querySelector('.video-close').onclick=close;document.body.classList.add('video-open');document.body.appendChild(modal);modal.querySelector('.video-close').focus();
     });
   }
-  function card(p){return `<article class="property-list-card"><a href="${detailUrl(p)}"><img src="${safe(image(p.image_path))}" alt="${safe(p.title)} property ${safe(type(p))} in ${safe(locationName(p))}" loading="lazy"></a><div class="property-list-body"><span class="property-type type-${type(p)==='Sale'?'sale':'rent'}">${typeIcon(p)} ${safe(type(p))}</span><h3><a href="${detailUrl(p)}">${safe(p.title)}</a></h3><strong class="property-card-price">${money(p.price)}</strong><p>📍 ${safe(locationName(p))}</p><p>📐 ${safe(p.width_ft)} × ${safe(p.height_ft)} ft · ${Number(p.width_ft)*Number(p.height_ft)||0} sq ft</p><div class="property-card-actions"><a class="property-view-link" href="${detailUrl(p)}">View details →</a>${videoButton(p)}<a class="btn btn-property-call btn-sm" href="${callUrl()}">☎ Call</a><a class="btn btn-whatsapp btn-sm" href="${whatsappUrl(p)}" target="_blank" rel="noopener">WhatsApp</a></div></div></article>`}
+  function card(p){return `<article class="property-list-card"><a href="${detailUrl(p)}"><img src="${safe(image(p.image_path))}" alt="${safe(p.title)} property ${safe(type(p))} in ${safe(locationName(p))}" loading="lazy"></a><div class="property-list-body"><span class="property-type type-${type(p)==='Sale'?'sale':'rent'}">${typeIcon(p)} ${safe(type(p))}</span><h3><a href="${detailUrl(p)}">${safe(p.title)}</a></h3><h2 class="property-location-tag">📍 ${safe(locationName(p))}</h2><strong class="property-card-price">${money(p.price)}</strong><p>📐 ${safe(p.width_ft)} × ${safe(p.height_ft)} ft · ${Number(p.width_ft)*Number(p.height_ft)||0} sq ft</p><div class="property-card-actions"><a class="property-view-link" href="${detailUrl(p)}">View details →</a>${videoButton(p)}<a class="btn btn-property-call btn-sm" href="${callUrl()}">☎ Call</a><a class="btn btn-whatsapp btn-sm" href="${whatsappUrl(p)}" target="_blank" rel="noopener">WhatsApp</a></div></div></article>`}
   function addItemListSchema(list){const s=document.createElement('script');s.type='application/ld+json';s.textContent=JSON.stringify({'@context':'https://schema.org','@type':'ItemList',name:'Properties for Sale and Rent Across India',numberOfItems:list.length,itemListElement:list.map((p,i)=>({'@type':'ListItem',position:i+1,url:'https://call4all.co.in/'+detailUrl(p),name:p.title}))});document.head.appendChild(s)}
 
   async function mapPage(){
@@ -67,7 +67,7 @@
     if(markerBounds.isValid())map.fitBounds(markerBounds.pad(.25),{maxZoom:12});
     addItemListSchema(list);
     const grid=document.getElementById('propertyListGrid'),count=document.getElementById('propertyCount'),search=document.getElementById('propertySearch'),filter=document.getElementById('propertyTypeFilter');
-    function render(){const q=(search.value||'').toLowerCase(),t=filter.value,shown=list.filter(p=>(!t||type(p)===t)&&(!q||(p.title+' '+p.description+' '+p.city+' '+p.state+' '+type(p)).toLowerCase().includes(q)));grid.innerHTML=shown.length?shown.map(card).join(''):'<p class="empty-map">No matching property found.</p>';count.textContent=shown.length+' of '+list.length+' properties';bindVideoButtons(grid);markers.forEach(m=>{const show=shown.includes(m._property);if(show&&!map.hasLayer(m))m.addTo(map);if(!show&&map.hasLayer(m))m.removeFrom(map)})}
+    function render(){const q=(search.value||'').toLowerCase(),t=filter.value,shown=list.filter(p=>(!t||type(p)===t)&&(!q||(p.title+' '+p.description+' '+p.location+' '+p.city+' '+p.state+' '+type(p)+' '+(p.location ? p.location.replace(/,/g,' ') : '')).toLowerCase().includes(q)));grid.innerHTML=shown.length?shown.map(card).join(''):'<p class="empty-map">No matching property found.</p>';count.textContent=shown.length+' of '+list.length+' properties';bindVideoButtons(grid);markers.forEach(m=>{const show=shown.includes(m._property);if(show&&!map.hasLayer(m))m.addTo(map);if(!show&&map.hasLayer(m))m.removeFrom(map)})}
     search.addEventListener('input',render);filter.addEventListener('change',render);render();
   }
 
@@ -81,13 +81,14 @@
     const generatedDesc=`${p.title} available for ${type(p)} in ${place}. Price ${money(p.price)}, size ${p.width_ft} × ${p.height_ft} feet. View photos, video and map location.`;
     const seoTitle=(p.meta_title||generatedTitle).trim(),desc=(p.meta_description||generatedDesc).trim();
     const socialTitle=(p.og_title||seoTitle).trim(),socialDesc=(p.og_description||desc).trim();
+    const seoLocationText = locationName(p);
     const mainImage=absoluteUrl(p.image_path,'assets/icons/icon-512.png'),socialImage=absoluteUrl(p.og_image,mainImage);
     const imageAlt=(p.image_alt||`${p.title} ${type(p)} in ${place}`).trim();
     const robotsBase=(p.robots||'index,follow').trim();
     const robots=robotsBase.startsWith('index')?robotsBase+',max-image-preview:large,max-snippet:-1,max-video-preview:-1':robotsBase;
     document.title=seoTitle;
-    setMeta('meta[name="description"]','name',desc);
-    setMeta('meta[name="keywords"]','name',(p.seo_keywords||`${p.title}, ${type(p)} property in ${place}, property in ${place}`).trim());
+    setMeta('meta[name="description"]','name',desc.includes(seoLocationText) ? desc : `${desc} Location: ${seoLocationText}.`);
+    setMeta('meta[name="keywords"]','name',(p.seo_keywords||`${p.title}, ${type(p)} property in ${seoLocationText}, ${seoLocationText} near me, property near ${seoLocationText}, ${p.city || 'Jaipur'} ${p.state || 'Rajasthan'}`).trim());
     setMeta('meta[name="robots"]','name',robots);
     let link=document.querySelector('link[rel="canonical"]');if(!link){link=document.createElement('link');link.rel='canonical';document.head.appendChild(link)}link.href=canonical;
     [['og:type','product'],['og:site_name','Call4All'],['og:locale','en_IN'],['og:title',socialTitle],['og:description',socialDesc],['og:url',canonical],['og:image',socialImage],['og:image:secure_url',socialImage],['og:image:alt',imageAlt],['product:price:amount',String(p.price||'')],['product:price:currency','INR']].forEach(([key,value])=>setMeta(`meta[property="${key}"]`,'property',value));

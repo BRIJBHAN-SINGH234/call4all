@@ -1,7 +1,7 @@
 (function(){
   const PATH='data/properties.csv';
-  const HEADERS=['id','timestamp','property_type','title','contact_phone','latitude','longitude','price','width_ft','height_ft','image_path','description','status','added_by','approval_status','pending_json','reviewed_by','reviewed_at','video_url','city','state','meta_title','meta_description','seo_keywords','og_title','og_description','og_image','image_alt','canonical_url','robots'];
-  const DATA_FIELDS=['property_type','title','contact_phone','latitude','longitude','price','width_ft','height_ft','image_path','description','video_url','city','state','meta_title','meta_description','seo_keywords','og_title','og_description','og_image','image_alt','canonical_url','robots'];
+  const HEADERS=['id','timestamp','property_type','title','contact_phone','latitude','longitude','price','width_ft','height_ft','image_path','description','status','added_by','approval_status','pending_json','reviewed_by','reviewed_at','video_url','city','state','location','meta_title','meta_description','seo_keywords','og_title','og_description','og_image','image_alt','canonical_url','robots'];
+  const DATA_FIELDS=['property_type','title','contact_phone','latitude','longitude','price','width_ft','height_ft','image_path','description','video_url','city','state','location','meta_title','meta_description','seo_keywords','og_title','og_description','og_image','image_alt','canonical_url','robots'];
   const isAdmin=sessionStorage.getItem('c4a_admin_session')==='1'&&!!localStorage.getItem('c4a_admin_token');
   const isStaff=sessionStorage.getItem('c4a_staff_session')==='1'&&!!localStorage.getItem('c4a_staff_token');
   const role=isAdmin?'admin':(isStaff?'staff':'');
