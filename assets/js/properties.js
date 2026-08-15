@@ -69,8 +69,10 @@
     if(markerBounds.isValid())map.fitBounds(markerBounds.pad(.25),{maxZoom:12});
     addItemListSchema(list);
     const grid=document.getElementById('propertyListGrid'),count=document.getElementById('propertyCount'),search=document.getElementById('propertySearch'),filter=document.getElementById('propertyTypeFilter'),minPriceInput=document.getElementById('propertyMinPrice'),maxPriceInput=document.getElementById('propertyMaxPrice'),resetButton=document.getElementById('propertyResetFilters');
+    if(minPriceInput && !minPriceInput.value) minPriceInput.value='100';
+    if(maxPriceInput && !maxPriceInput.value) maxPriceInput.value='50000';
     function render(){const q=(search.value||'').toLowerCase(),t=filter.value,minPrice=priceValue(minPriceInput.value),maxPrice=priceValue(maxPriceInput.value),shown=list.filter(p=>(!t||type(p)===t)&&priceMatches(p,minPrice,maxPrice)&&(!q||(p.title+' '+p.description+' '+p.location+' '+p.city+' '+p.state+' '+type(p)+' '+(p.location ? p.location.replace(/,/g,' ') : '')).toLowerCase().includes(q)));grid.innerHTML=shown.length?shown.map(card).join(''):'<p class="empty-map">No matching property found.</p>';count.textContent=shown.length+' of '+list.length+' properties';bindVideoButtons(grid);markers.forEach(m=>{const show=shown.includes(m._property);if(show&&!map.hasLayer(m))m.addTo(map);if(!show&&map.hasLayer(m))m.removeFrom(map)})}
-    search.addEventListener('input',render);filter.addEventListener('change',render);minPriceInput.addEventListener('input',render);maxPriceInput.addEventListener('input',render);resetButton.addEventListener('click',()=>{search.value='';filter.value='';minPriceInput.value='';maxPriceInput.value='';render()});render();
+    search.addEventListener('input',render);filter.addEventListener('change',render);minPriceInput.addEventListener('input',render);maxPriceInput.addEventListener('input',render);resetButton.addEventListener('click',()=>{search.value='';filter.value='';minPriceInput.value='100';maxPriceInput.value='50000';render()});render();
   }
 
   async function detailPage(){
