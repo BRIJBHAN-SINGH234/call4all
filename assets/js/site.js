@@ -966,6 +966,7 @@ function renderFooter() {
             <li><a href="index.html#gallery">Gallery</a></li>
             <li><a href="about.html">About Us</a></li>
             <li><a href="contact.html">Contact Us</a></li>
+            <li><a href="legal-policies.html">Legal Policies</a></li>
             <li><a href="index.html#book">Book a Service</a></li>
           </ul>
         </div>
