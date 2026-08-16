@@ -6,7 +6,11 @@
   const image=p=>p||'assets/icons/icon-512.png';
   const type=p=>p.property_type==='Sale'?'Sale':'Lease/Rent';
   const typeIcon=p=>type(p)==='Sale'?'🏷️':'🔑';
-  const locationName=p=>(p.location || [p.city||'Jaipur',p.state||'Rajasthan'].filter(Boolean).join(', ')).trim();
+  const locationName=p=>{
+    const value=(p.location || '').trim();
+    if(value) return value;
+    return 'Kukas, Jaipur, Rajasthan';
+  };
   const detailUrl=p=>'property.html?id='+encodeURIComponent(String(p.id||''));
   const absoluteUrl=(value,fallback)=>{try{return new URL(value||fallback,location.href).href}catch(_){return new URL(fallback,location.href).href}};
   function setMeta(selector,attribute,value){
