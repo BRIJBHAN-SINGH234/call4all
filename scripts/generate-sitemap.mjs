@@ -32,7 +32,7 @@ function isNoindexHtml(content) {
   return /<meta[^>]+name=["']robots["'][^>]+content=["'][^"']*noindex/i.test(content);
 }
 
-function buildEntries(config, htmlFiles, dynamicPages, properties, secondHandItems, handmadeItems) {
+function buildEntries(config, htmlFiles, dynamicPages, properties, secondHandItems, handmadeItems, menuItems) {
   const base = (config.baseUrl || 'https://call4all.co.in').replace(/\/$/, '');
   const exclude = new Set(config.excludeHtml || []);
   const today = new Date().toISOString().slice(0, 10);
@@ -98,6 +98,11 @@ function buildEntries(config, htmlFiles, dynamicPages, properties, secondHandIte
     add(base + '/handmade-item.html?id=' + encodeURIComponent(item.id), lm, { priority: 0.88, changefreq: 'daily' });
   }
 
+  for (const item of menuItems || []) {
+    if (!item.slug || String(item.status).toLowerCase() !== 'active') continue;
+    add(base + '/menu-item.html?slug=' + encodeURIComponent(item.slug), (item.updated_at || '').slice(0, 10) || today, { priority: 0.82, changefreq: 'weekly' });
+  }
+
   entries.sort((a, b) => b.priority - a.priority || a.loc.localeCompare(b.loc));
   return entries;
 }
@@ -158,7 +163,9 @@ function main() {
   try { secondHandItems = parseCsv(fs.readFileSync(path.join(ROOT, 'data/second-hand-items.csv'), 'utf8')); } catch (_) { /* optional */ }
   let handmadeItems = [];
   try { handmadeItems = parseCsv(fs.readFileSync(path.join(ROOT, 'data/handmade-items.csv'), 'utf8')); } catch (_) { /* optional */ }
-  const entries = buildEntries(config, htmlFiles, pages, properties, secondHandItems, handmadeItems);
+  let menuItems = [];
+  try { menuItems = parseCsv(fs.readFileSync(path.join(ROOT, 'data/tiffin-menu.csv'), 'utf8')); } catch (_) { /* optional */ }
+  const entries = buildEntries(config, htmlFiles, pages, properties, secondHandItems, handmadeItems, menuItems);
   const xml = toXml(entries);
   const outPath = path.join(ROOT, 'sitemap.xml');
 

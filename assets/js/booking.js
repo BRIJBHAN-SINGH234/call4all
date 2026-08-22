@@ -402,6 +402,7 @@ window.CsvAPI = (function () {
     'data/manpower-types.csv': ['id', 'name', 'status', 'created_at', 'created_by'],
     'data/rental-cars.csv': ['id', 'timestamp', 'brand', 'model', 'image_path', 'service_types', 'price', 'city', 'seats', 'fuel', 'transmission', 'description', 'status', 'added_by'],
     'data/car-rental-types.csv': ['id', 'group', 'name', 'status', 'created_at', 'created_by']
+    ,'data/tiffin-menu.csv': ['id', 'name', 'price', 'description', 'seo_title', 'seo_description', 'seo_keywords', 'slug', 'status', 'sort_order', 'updated_at']
   };
 
   async function getFile(path, token) {
