@@ -23,8 +23,8 @@ function renderBookingForm(options) {
   return `
     <section class="booking-section" id="book">
       <div class="booking-card">
-        <h2>📋 Book a Service / Submit Your Requirement</h2>
-        <p class="subtitle">Fill out the form or call <a href="tel:" data-call-link><strong data-brand-phone></strong></a> — we'll connect you to a service provider.</p>
+        <h2>📋 Find the Right Service</h2>
+        <p class="subtitle">Share your requirement or call <a href="tel:" data-call-link><strong data-brand-phone></strong></a> — we will help you connect with a suitable provider.</p>
         <form id="bookingForm" novalidate>
           <div class="form-row">
             <div class="form-group">
@@ -37,7 +37,7 @@ function renderBookingForm(options) {
             </div>
           </div>
           <div class="form-group">
-            <label for="bf_service">Service Required *</label>
+              <label for="bf_service">What do you need? *</label>
             <select id="bf_service" name="service" required>
               <option value="">-- Select a service --</option>
               ${optionsHtml}
@@ -66,9 +66,9 @@ function renderBookingForm(options) {
             <textarea id="bf_message" name="message" placeholder="Briefly describe what you need (date, quantity, budget, etc.)" required></textarea>
           </div>
           <button type="submit" class="btn btn-success btn-block" id="bf_submit">
-            <span id="bf_submit_text">📤 Submit & Send via WhatsApp</span>
+            <span id="bf_submit_text">📤 Send Requirement on WhatsApp</span>
           </button>
-          <p class="form-note">On submit, a WhatsApp chat will open — send the message and we'll reply within 1 hour.</p>
+          <p class="form-note">WhatsApp will open with your requirement. Please send the message so our team can respond.</p>
           <div class="form-message" id="bf_msg"></div>
         </form>
       </div>
@@ -272,14 +272,14 @@ function handleBookingSubmit(e) {
     };
   } else {
     showFormMessage(
-      '✅ Your request is ready (Ref: ' + id + '). Send the message in the WhatsApp tab and we will reply within 1 hour.',
+    '✅ Your request is ready (Ref: ' + id + '). Send the message in the WhatsApp tab so our team can review it.',
       'success'
     );
     // Reset form for next submission after a short delay
     setTimeout(() => {
       form.reset();
       submitBtn.disabled = false;
-      submitText.textContent = '📤 Submit & Send via WhatsApp';
+      submitText.textContent = '📤 Send Requirement on WhatsApp';
     }, 1500);
   }
 }

@@ -4,7 +4,7 @@
    Defaults below are used until `data/site-config.json` is loaded. */
 window.SITE_CONFIG = {
   businessName: 'Call4All',
-  tagline: 'One Call. Every Service. Done.',
+  tagline: 'One trusted place for everyday services.',
   logoUrl: 'Imagelogo.png',
   logoHeight: 55,
   phone: '+917737353588',
@@ -13,7 +13,7 @@ window.SITE_CONFIG = {
   email: 'info@call4all.co.in',
   website: 'www.call4all.co.in',
   address: 'India',
-  aboutText: 'Your one-call solution for every need. From rental cars and rooms to construction labor, home tutors, and event services - we connect you to trusted providers.',
+  aboutText: 'Call4All brings essential services together in one trusted marketplace. Explore verified listings, share your requirement and connect with suitable providers across India.',
   theme: {
     preset: 'resort',
     primary: '#181818',
@@ -31,9 +31,9 @@ window.SITE_CONFIG = {
     branch: 'main'
   },
   services: [
-    { id: 'rental-cars',      name: 'Rental Cars',                 icon: '🚗', iconName: 'car',       desc: 'Premium & budget car rental for events and travel.',                 page: 'car-rental-kukas.html',       image: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=900&q=80&auto=format&fit=crop' },
-    { id: 'rooms-flats',      name: 'Rooms & Flats',               icon: '🏠', iconName: 'home',      desc: 'Rent rooms, flats and properties easily.',                            page: 'rooms-flats-kukas.html',       image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=900&q=80&auto=format&fit=crop' },
-    { id: 'manpower-supply',  name: 'Manpower Supply',             icon: '👷', iconName: 'hard-hat',  desc: 'Skilled & unskilled manpower for any requirement.',                  page: 'manpower-supply-kukas.html',   image: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=900&q=80&auto=format&fit=crop' },
+    { id: 'rental-cars',      name: 'Rental Cars',                 icon: '🚗', iconName: 'car',       desc: 'Comfortable cars for travel, transfers and events.',               page: 'car-rental-kukas.html',       image: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=900&q=80&auto=format&fit=crop' },
+    { id: 'rooms-flats',      name: 'Rooms & Flats',               icon: '🏠', iconName: 'home',      desc: 'Explore rooms, flats, PGs and properties.',                          page: 'rooms-flats-kukas.html',       image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=900&q=80&auto=format&fit=crop' },
+    { id: 'manpower-supply',  name: 'Manpower Supply',             icon: '👷', iconName: 'hard-hat',  desc: 'Workforce solutions for businesses and events.',                    page: 'manpower-supply-kukas.html',   image: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=900&q=80&auto=format&fit=crop' },
     { id: 'construction',     name: 'Construction Labor / Thekedar', icon: '🧱', iconName: 'bricks',  desc: 'Construction labor, contractors and thekedar for your project.',     page: 'construction-labor-kukas.html', image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=900&q=80&auto=format&fit=crop' },
     { id: 'home-tutor',       name: 'Home Tutor',                  icon: '📚', iconName: 'book',      desc: 'Qualified home tutors for all classes and subjects.',                page: 'home-tutor-kukas.html',        image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=900&q=80&auto=format&fit=crop' },
     { id: 'marriage-services',name: 'Marriage Services',           icon: '💍', iconName: 'ring',      desc: 'Complete wedding planning, decoration & rental items.',              page: 'wedding-services-kukas.html', image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=900&q=80&auto=format&fit=crop' },
@@ -41,7 +41,7 @@ window.SITE_CONFIG = {
     { id: 'car-decoration',   name: 'Car Decoration',              icon: '🎀', iconName: 'bow',       desc: 'Luxury car decoration for weddings & events.',                       page: 'car-decoration-kukas.html',    image: 'https://images.unsplash.com/photo-1606013519235-f4f8b3ee5ae5?w=900&q=80&auto=format&fit=crop' },
     { id: 'second-hand',      name: 'Second-Hand Items',           icon: '♻️', iconName: 'shopping-bag', desc: 'Verified used furniture, electronics and more at local prices.',    page: 'second-hand-items.html',       image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=900&q=80&auto=format&fit=crop' },
     { id: 'handmade',         name: 'Handmade Items',              icon: '🧶', iconName: 'gift', desc: 'Local artisan gifts, decor, jewellery and crafts with live prices.',       page: 'handmade-items.html',          image: 'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=900&q=80&auto=format&fit=crop' },
-    { id: 'tiffin-center',    name: 'Tiffin Center & Packed Thali', icon: '🍱', desc: 'Fresh veg tiffin and packed thali delivery in Kukas from ₹40.', page: 'tiffin-center-kukas.html', image: 'assets/uploads/tiffin-center-kukas-banner.png' },
+    { id: 'tiffin-center',    name: 'Call4Thali Meals',           icon: '🍱', desc: 'Fresh vegetarian meals and packed thali from Rs 49.',             page: 'tiffin-center-kukas.html', image: 'assets/uploads/tiffin-center-kukas-banner.png' },
     { id: 'other',            name: 'Other / Custom Service',      icon: '🛎️', iconName: 'bell',      desc: 'Need something else? Just tell us, we will arrange it.',             page: 'index.html#book',        image: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=900&q=80&auto=format&fit=crop' }
   ],
   slider: {
@@ -56,7 +56,7 @@ window.SITE_CONFIG = {
       { id: 's6', enabled: true, icon: '💍', iconName: 'ring',     title: 'Marriage Services',     subtitle: 'Decoration, catering, rentals — A to Z',             background_url: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=1900&q=80&auto=format&fit=crop', link: 'wedding-services-kukas.html', order: 6 },
       { id: 's7', enabled: true, icon: '🌸', iconName: 'flower',   title: 'Hotel Flower Bouquet',  subtitle: 'Luxury floral arrangements for hotels & events',     background_url: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=1900&q=80&auto=format&fit=crop', link: 'flower-bouquet-kukas.html',    order: 7 },
       { id: 's8', enabled: true, icon: '🎀', iconName: 'bow',      title: 'Car Decoration',        subtitle: 'Wedding & event car decoration',                     background_url: 'https://images.unsplash.com/photo-1606013519235-f4f8b3ee5ae5?w=1900&q=80&auto=format&fit=crop', link: 'car-decoration-kukas.html',    order: 8 },
-      { id: 's9', enabled: true, title: 'Tiffin Center in Kukas', subtitle: 'Fresh packed thali from ₹40', background_url: 'assets/uploads/tiffin-center-kukas-banner.png', link: 'tiffin-center-kukas.html', image_only: true, order: 9 }
+      { id: 's9', enabled: true, title: 'Call4Thali', subtitle: 'Fresh vegetarian meals from Rs 49', background_url: 'assets/uploads/tiffin-center-kukas-banner.png', link: 'tiffin-center-kukas.html', image_only: true, order: 9 }
     ]
   },
   pages: []
@@ -981,7 +981,7 @@ function renderFooter() {
             <li>${ico('whatsapp')}<a href="https://wa.me/${cfg.whatsappNumber}" target="_blank">WhatsApp Chat</a></li>
             <li>${ico('mail')}<a href="mailto:${cfg.email}">${cfg.email}</a></li>
             <li>${ico('globe')}<span>${cfg.website}</span></li>
-            <li>${ico('clock')}<span>24/7 Available</span></li>
+            <li>${ico('clock')}<span>Availability depends on the service</span></li>
           </ul>
         </div>
       </div>
