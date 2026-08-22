@@ -324,8 +324,8 @@
     ).join('');
     return `
       <section class="seo-block seo-pricing" aria-labelledby="seo-pricing-title">
-        <span class="section-eyebrow">Pricing Guide</span>
-        <h2 class="section-title" id="seo-pricing-title">Indicative <span class="accent">Pricing</span> (Kukas &amp; Jaipur)</h2>
+        <span class="section-eyebrow">Kukas &amp; Jaipur Pricing Guide</span>
+        <h2 class="section-title" id="seo-pricing-title">Indicative <span class="accent">Pricing</span> for ${esc(service)} in Kukas, Jaipur</h2>
         <div class="title-divider"></div>
         <p class="section-subtitle">Rates are indicative and depend on season, vehicle/property type and duration. Call for an exact quote.</p>
         <div class="seo-table-wrap">
@@ -345,8 +345,8 @@
     ).join('');
     return `
       <section class="seo-block seo-benefits" aria-labelledby="seo-benefits-title">
-        <span class="section-eyebrow">Why Call4All</span>
-        <h2 class="section-title" id="seo-benefits-title">Benefits of Booking <span class="accent">Through Call4All</span></h2>
+        <span class="section-eyebrow">Why Choose Call4All</span>
+        <h2 class="section-title" id="seo-benefits-title">A Clearer Way to Find Services in <span class="accent">Kukas, Jaipur</span></h2>
         <div class="title-divider"></div>
         <div class="seo-benefits-grid">${cards}</div>
       </section>`;
@@ -358,13 +358,13 @@
       `<div class="seo-local-section"><h2>${s.title}</h2><p>${s.body}</p></div>`
     ).join('');
     const intro = kukasOnly
-      ? `<p class="lead">This page is optimised for customers searching for services in <strong>Kukas, Jaipur (PIN ${KUKAS.pin})</strong> — NH-48 highway belt, Arya College area, resort zone and marble factory colonies.</p>`
-      : `<p class="lead">Call4All serves <strong>Kukas, Jaipur (PIN ${KUKAS.pin})</strong> and greater Jaipur with verified providers. Local landmarks we cover include Arya College, The Leela Palace area, Kukas resort belt and marble factory zone.</p>`;
+      ? `<p class="lead">This Call4All service page is designed for customers looking for <strong>${esc(service)} in Kukas, Jaipur (PIN ${KUKAS.pin})</strong>. Explore indicative information, then confirm availability, pricing and timelines for your requirement.</p>`
+      : `<p class="lead">Call4All connects customers with relevant service options in <strong>Kukas, Jaipur (PIN ${KUKAS.pin})</strong> and nearby areas. Explore the category, compare available information and contact us for the next step.</p>`;
     return `
       <section class="seo-block seo-local-content">
         ${intro}
         ${blocks}
-        <h2>Local Areas We Serve Near Kukas</h2>
+        <h2>Service Coverage Around Kukas, Jaipur</h2>
         <ul class="seo-areas-list">
           ${KUKAS.landmarks.map(l => `<li>${esc(l)}</li>`).join('')}
           <li>Achrol, Chomu, Amer, Jamwa Ramgarh</li>
@@ -377,8 +377,8 @@
     const mapSrc = `https://maps.google.com/maps?q=${KUKAS.mapQuery}&z=13&output=embed`;
     return `
       <section class="seo-block seo-local-contact" id="local-contact" aria-labelledby="local-contact-title">
-        <span class="section-eyebrow">📍 Local SEO</span>
-        <h2 class="section-title" id="local-contact-title">Find Call4All in <span class="accent">Kukas, Jaipur</span></h2>
+        <span class="section-eyebrow">Kukas, Jaipur Service Coverage</span>
+        <h2 class="section-title" id="local-contact-title">Call4All ${esc(service)} in <span class="accent">Kukas, Jaipur</span></h2>
         <div class="title-divider"></div>
         <p class="section-subtitle">${esc(service)} in Kukas, Jaipur — PIN ${KUKAS.pin}, Rajasthan. Call or visit us on the map below.</p>
         <div class="seo-local-grid">
@@ -390,7 +390,7 @@
               <li><strong>PIN Code:</strong> ${KUKAS.pin}</li>
               <li><strong>Phone:</strong> <a href="tel:${KUKAS.phone}">${KUKAS.phoneDisplay}</a></li>
               <li><strong>Email:</strong> <a href="mailto:${KUKAS.email}">${KUKAS.email}</a></li>
-              <li><strong>Hours:</strong> 24/7 — every day</li>
+              <li><strong>Availability:</strong> Confirmed according to the service and requirement</li>
             </ul>
             <div class="seo-local-cta">
               <a href="tel:${KUKAS.phone}" class="btn btn-accent">📞 Call ${KUKAS.phoneDisplay}</a>
@@ -422,7 +422,7 @@
     return `
       <section class="seo-block seo-internal-links" aria-labelledby="seo-links-title">
         <span class="section-eyebrow">Related Services</span>
-        <h2 class="section-title" id="seo-links-title">More Services in <span class="accent">Kukas &amp; Jaipur</span></h2>
+        <h2 class="section-title" id="seo-links-title">Explore More Call4All Services in <span class="accent">Kukas &amp; Jaipur</span></h2>
         <div class="title-divider"></div>
         <p class="section-subtitle">Explore related Call4All services while you are here for ${esc(service)}.</p>
         <ul class="seo-links-grid">${items}</ul>

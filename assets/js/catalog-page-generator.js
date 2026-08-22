@@ -3,13 +3,13 @@
   const BASE = 'https://call4all.co.in/';
   const esc = value => String(value || '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const slugId = value => String(value || '').toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '');
-  const money = value => '₹' + Number(value || 0).toLocaleString('en-IN');
+  const money = value => 'Rs ' + Number(value || 0).toLocaleString('en-IN');
   const absolute = value => { try { return new URL(value || 'assets/icons/icon-512.png', BASE).href; } catch (_) { return BASE + 'assets/icons/icon-512.png'; } };
   const pagePath = (kind, item) => `${kind}-${slugId(item.id)}.html`;
   const defaults = {
     property: item => {
-      const place = item.location || [item.city || 'Jaipur', item.state || 'Rajasthan'].filter(Boolean).join(', ');
-      return { title:`${item.title} ${item.property_type === 'Sale' ? 'for Sale' : 'for Rent'} in ${place} | Call4All`, description:`${item.title} available in ${place} for ${money(item.price)}. View property photo, size, video, map and booking details.`, keywords:`${item.title}, property in ${place}, ${item.location ? `${item.location} near me` : `property in ${place}`}, property for ${item.property_type === 'Sale' ? 'sale' : 'rent'}`, imageAlt:`${item.title} property in ${place}` };
+      const place = item.location || [item.city || 'Kukas', item.state || 'Rajasthan'].filter(Boolean).join(', ');
+      return { title:`${item.title} ${item.property_type === 'Sale' ? 'for Sale' : 'for Rent'} in ${place}, Jaipur | Call4All`, description:`${item.title} available in ${place}, Jaipur for ${money(item.price)}. View property photo, size, video, map and booking details.`, keywords:`${item.title}, property in ${place}, Kukas Jaipur property, property for ${item.property_type === 'Sale' ? 'sale' : 'rent'}`, imageAlt:`${item.title} property in ${place}, Jaipur` };
     },
     'second-hand': item => ({ title:`${item.title} Second Hand in ${item.city || 'Jaipur'} | Call4All`, description:`Buy ${item.title} in ${item.condition || 'used'} condition from ${[item.area,item.city].filter(Boolean).join(', ')} for ${money(item.price)}. View photo and booking details.`, keywords:`${item.title} second hand, used ${item.category}, second hand items ${item.city || 'Jaipur'}`, imageAlt:`${item.title} second-hand ${item.category || 'item'}` }),
     handmade: item => ({ title:`Buy ${item.title} Online with All India Delivery | Call4All`, description:`Buy ${item.title}, handmade by ${item.artisan || 'an Indian artisan'}, for ${money(item.price)} with delivery across India. View material and ordering details.`, keywords:`${item.title}, handmade ${item.category}, handmade products online India, all India delivery`, imageAlt:`${item.title} handmade by ${item.artisan || 'Indian artisan'}` })
