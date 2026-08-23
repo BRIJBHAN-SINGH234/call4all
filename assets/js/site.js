@@ -259,20 +259,16 @@ function renderAutoLogoSvg(opts) {
 }
 window.renderAutoLogoSvg = renderAutoLogoSvg;
 
-/* Resolve any asset path so it loads correctly from anywhere on the site.
- * Newly-uploaded files inside `assets/uploads/` are served via
- * raw.githubusercontent.com — that bypasses GitHub Pages' build delay so
- * a freshly-uploaded logo/image works *immediately* (no `/` workaround
- * and no waiting for Pages to rebuild). */
+/* Resolve uploaded assets to website-relative paths so their URLs stay on the
+ * published site when users inspect images or copy their links. */
 function assetUrl(path) {
   if (!path) return path;
   if (/^https?:\/\//i.test(path)) return optimizeImageUrl(path);
   if (/^data:/i.test(path)) return path;
   if (path.startsWith('assets/uploads/') || path.startsWith('/assets/uploads/')) {
-    const cfg = window.SITE_CONFIG;
     const clean = path.replace(/^\//, '');
     const version = clean === 'assets/uploads/call4all-c4-logo.png' ? '?v=20260823-2' : '';
-    return `https://raw.githubusercontent.com/${cfg.github.owner}/${cfg.github.repo}/${cfg.github.branch}/${clean}${version}`;
+    return clean + version;
   }
   return path;
 }
