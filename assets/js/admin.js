@@ -2196,7 +2196,7 @@ function buildDefaultSiteConfig() {
     branding: {
       site_name: 'Call4All',
       tagline: 'One Call. Every Service. Done.',
-      logo_url: 'Imagelogo.png',
+      logo_url: 'assets/uploads/call4all-c4-logo.png',
       logo_height: 55
     },
     theme: { ...window.FESTIVAL_PRESETS.default, preset: 'default' },
@@ -2499,7 +2499,7 @@ function getAppIconBg() {
 
 function currentLogoUrl() {
   const b = (siteConfigData.json && siteConfigData.json.branding) || {};
-  const url = b.logo_url || 'Imagelogo.png';
+  const url = b.logo_url || 'assets/uploads/call4all-c4-logo.png';
   if (url.startsWith('http')) return url;
   if (url.startsWith('assets/uploads/')) {
     return `https://raw.githubusercontent.com/${window.SITE_CONFIG.github.owner}/${window.SITE_CONFIG.github.repo}/${window.SITE_CONFIG.github.branch}/${url}`;
@@ -2652,7 +2652,7 @@ function refreshCurrentLogoPreview() {
   const img = document.getElementById('currentLogoPreview');
   if (!box) return;
   const b = (siteConfigData.json && siteConfigData.json.branding) || {};
-  const url = b.logo_url || 'Imagelogo.png';
+  const url = b.logo_url || 'assets/uploads/call4all-c4-logo.png';
   if (url === 'auto-3d') {
     if (typeof renderAutoLogoSvg === 'function') {
       box.innerHTML = renderAutoLogoSvg({ size: 80 });

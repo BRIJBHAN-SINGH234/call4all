@@ -6,7 +6,7 @@ import re
 
 ROOT = Path(__file__).resolve().parent.parent
 ORIGIN = "https://call4all.co.in"
-FALLBACK_IMAGE = f"{ORIGIN}/assets/uploads/logo-1783588318460-logo-1778677681106-call4alllogolatest.png"
+FALLBACK_IMAGE = f"{ORIGIN}/assets/uploads/call4all-c4-logo.png"
 PAGES = [
     "index.html", "properties.html", "second-hand-items.html", "car-rental-kukas.html",
     "kukas.html", "wedding-services-kukas.html", "flat-rent-kukas-jaipur.html",

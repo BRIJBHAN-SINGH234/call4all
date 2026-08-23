@@ -36,7 +36,7 @@ const PRECACHE_URLS = [
   '/assets/js/booking.js',
   '/assets/js/properties.js',
   '/assets/js/second-hand.js',
-  '/Imagelogo.png',
+  '/assets/uploads/call4all-c4-logo.png',
   '/assets/icons/icon-192.png',
   '/assets/icons/icon-512.png',
   '/manifest.json',

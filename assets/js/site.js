@@ -5,7 +5,7 @@
 window.SITE_CONFIG = {
   businessName: 'Call4All',
   tagline: 'One trusted place for everyday services.',
-  logoUrl: 'Imagelogo.png',
+  logoUrl: 'assets/uploads/call4all-c4-logo.png',
   logoHeight: 55,
   phone: '+917737353588',
   phoneDisplay: '+91 7737353588',
@@ -660,7 +660,7 @@ function applyBranding() {
         el.replaceWith(svg);
       }
     } else if (el.tagName === 'IMG') {
-      el.src = assetUrl(cfg.logoUrl || 'Imagelogo.png');
+      el.src = assetUrl(cfg.logoUrl || 'assets/uploads/call4all-c4-logo.png');
       el.alt = (cfg.businessName || 'Call4All') + ' Logo';
       if (cfg.logoHeight) el.style.height = cfg.logoHeight + 'px';
     }
@@ -923,7 +923,7 @@ function renderHeader(activePage) {
   // Special sentinel: 'auto-3d' renders the auto-themed inline SVG instead of an <img>
   const logoMarkup = (cfg.logoUrl === 'auto-3d')
     ? renderAutoLogoSvg({ size: logoHeight })
-    : `<img src="${assetUrl(cfg.logoUrl || 'Imagelogo.png')}" alt="${brandName} Logo" style="height:${logoHeight}px">`;
+    : `<img src="${assetUrl(cfg.logoUrl || 'assets/uploads/call4all-c4-logo.png')}" alt="${brandName} Logo" style="height:${logoHeight}px">`;
   return `
     <header class="site-header">
       <a class="logo" href="index.html" aria-label="${brandName} Home">
