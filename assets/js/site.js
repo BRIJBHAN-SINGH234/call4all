@@ -271,7 +271,8 @@ function assetUrl(path) {
   if (path.startsWith('assets/uploads/') || path.startsWith('/assets/uploads/')) {
     const cfg = window.SITE_CONFIG;
     const clean = path.replace(/^\//, '');
-    return `https://raw.githubusercontent.com/${cfg.github.owner}/${cfg.github.repo}/${cfg.github.branch}/${clean}`;
+    const version = clean === 'assets/uploads/call4all-c4-logo.png' ? '?v=20260823-2' : '';
+    return `https://raw.githubusercontent.com/${cfg.github.owner}/${cfg.github.repo}/${cfg.github.branch}/${clean}${version}`;
   }
   return path;
 }
