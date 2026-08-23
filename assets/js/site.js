@@ -201,11 +201,6 @@ function applyTheme(theme) {
     if (theme.background) document.body.style.background = theme.background;
   }
 
-  // Optional: theme can carry a `logo` URL (or the special 'auto-3d' value).
-  // When present, swap the active site logo so it matches the theme color.
-  if (theme.logo && window.SITE_CONFIG) {
-    window.SITE_CONFIG.logoUrl = theme.logo;
-  }
 }
 
 /* ===== Auto-themed 3D logo (inline SVG)  =====
