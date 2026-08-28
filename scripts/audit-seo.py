@@ -6,6 +6,9 @@ import re
 
 ROOT = Path(__file__).resolve().parent.parent
 SITEMAP = (ROOT / "sitemap.xml").read_text()
+INDEXABLE_DYNAMIC_TEMPLATES = {
+    "property.html", "second-hand-item.html", "handmade-item.html", "menu-item.html"
+}
 files = []
 for match in re.finditer(r'<loc>https://call4all\.co\.in/(?:([^?<]+\.html))?(?:\?[^<]*)?</loc>', SITEMAP):
     filename = match.group(1) or "index.html"
@@ -49,8 +52,13 @@ for filename in files:
         errors.append(f"{filename}: expected exactly one static h1")
 
 # Operational and legacy pages must never become indexable accidentally.
+for filename in INDEXABLE_DYNAMIC_TEMPLATES:
+    source = (ROOT / filename).read_text()
+    if re.search(r'<meta\s+[^>]*(?:name="robots"|name="googlebot"|name="bingbot")[^>]*content="[^"]*noindex', source, re.I):
+        errors.append(f"{filename}: valid dynamic product template must not ship with noindex")
+
 for path in ROOT.glob("*.html"):
-    if path.name in files or path.name == "googleb71665e6b1f52ee2.html":
+    if path.name in files or path.name in INDEXABLE_DYNAMIC_TEMPLATES or path.name == "googleb71665e6b1f52ee2.html":
         continue
     source = path.read_text()
     if not re.search(r'<meta\s+[^>]*name="robots"[^>]*content="[^"]*noindex', source, re.I):
