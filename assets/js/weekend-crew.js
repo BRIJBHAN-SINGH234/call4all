@@ -1,1 +1,107 @@
-(function(){'use strict';const CONFIG='data/weekend-crew.json',GALLERY='data/weekend-crew-gallery.csv',safe=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),asset=p=>window.assetUrl?window.assetUrl(p):p,driveId=url=>{const m=String(url||'').match(/\/d\/([a-zA-Z0-9_-]+)/);return m?m[1]:''},setMeta=(selector,value,property)=>{let el=document.querySelector(selector);if(!el){el=document.createElement('meta');el.setAttribute(property?'property':'name',selector.match(/["']([^"']+)/)?.[1]||'description');document.head.appendChild(el)}el.content=value};async function init(){try{const [configResult,galleryResult]=await Promise.all([CsvAPI.loadJson(CONFIG),CsvAPI.loadAllPublic(GALLERY)]),c=configResult.json||{},rows=(galleryResult.items||[]).filter(x=>String(x.status).toLowerCase()==='active').sort((a,b)=>Number(a.sort_order||99)-Number(b.sort_order||99));if(c.enabled===false){location.href='index.html';return}document.getElementById('weekendEyebrow').textContent=c.eyebrow||'Jaipur-born · Rajasthan-bound';document.getElementById('weekendTitle').innerHTML=safe(c.hero_title||'Find the trail no one is talking about.').replace(/\n/g,'<br>');document.getElementById('weekendSubtitle').textContent=c.hero_subtitle||'';document.getElementById('weekendAbout').textContent=c.about||'';const id=driveId(c.video_url);if(id)document.getElementById('weekendVideo').src=`https://drive.google.com/file/d/${id}/preview?autoplay=1&mute=1`;const message=encodeURIComponent('Hello Call4All, I want details about the next Weekend Crew trek/adventure in Rajasthan.'),wa=`https://wa.me/${String(c.whatsapp||'917737353588').replace(/\D/g,'')}?text=${message}`;document.getElementById('weekendWhatsApp').href=wa;document.getElementById('weekendFinalWhatsApp').href=wa;if(rows.length){const hero=asset(c.og_image||rows[0].image_path),featured=rows.filter(x=>String(x.featured).toLowerCase()==='yes');document.getElementById('wcFeaturedOne').src=asset((featured[0]||rows[0]).image_path);document.getElementById('wcFeaturedTwo').src=asset((featured[1]||rows[1]||rows[0]).image_path);document.getElementById('weekendGallery').innerHTML=rows.map(x=>`<figure><img src="${safe(asset(x.image_path))}" alt="${safe(x.alt_text||'Weekend Crew adventure in Rajasthan')}" loading="lazy" decoding="async"><figcaption>${safe(x.caption)}</figcaption></figure>`).join('');setMeta('meta[property="og:image"]',new URL(hero,location.href).href,true);setMeta('meta[property="og:image:secure_url"]',new URL(hero,location.href).href,true);setMeta('meta[name="twitter:image"]',new URL(hero,location.href).href);const schema=document.createElement('script');schema.type='application/ld+json';schema.id='weekend-gallery-schema';schema.textContent=JSON.stringify({'@context':'https://schema.org','@type':'ImageGallery',name:'Weekend Crew Rajasthan Adventure Gallery',url:location.href,image:rows.map(x=>({'@type':'ImageObject',contentUrl:new URL(asset(x.image_path),location.href).href,caption:x.caption,description:x.alt_text}))});document.head.appendChild(schema)}if(c.seo_title)document.title=c.seo_title;if(c.seo_description)setMeta('meta[name="description"]',c.seo_description)}catch(e){console.warn('Weekend Crew content could not be loaded',e)}}document.addEventListener('DOMContentLoaded',init)})();
+(function () {
+  'use strict';
+
+  const CONFIG = 'data/weekend-crew.json';
+  const GALLERY = 'data/weekend-crew-gallery.csv';
+  const safe = value => String(value == null ? '' : value).replace(/[&<>"']/g, character => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[character]));
+  const asset = path => window.assetUrl ? window.assetUrl(path) : path;
+  const driveId = url => {
+    const match = String(url || '').match(/\/d\/([a-zA-Z0-9_-]+)/);
+    return match ? match[1] : '';
+  };
+  const setMeta = (selector, value, property) => {
+    let element = document.querySelector(selector);
+    if (!element) {
+      element = document.createElement('meta');
+      element.setAttribute(property ? 'property' : 'name', selector.match(/["']([^"']+)/)?.[1] || 'description');
+      document.head.appendChild(element);
+    }
+    element.content = value;
+  };
+  const startVideos = () => {
+    document.querySelectorAll('[data-weekend-video]').forEach(video => {
+      video.muted = true;
+      video.defaultMuted = true;
+      const playback = video.play();
+      if (playback && typeof playback.catch === 'function') playback.catch(() => {});
+    });
+  };
+
+  async function init() {
+    try {
+      const [configResult, galleryResult] = await Promise.all([
+        CsvAPI.loadJson(CONFIG),
+        CsvAPI.loadAllPublic(GALLERY)
+      ]);
+      const config = configResult.json || {};
+      const rows = (galleryResult.items || [])
+        .filter(item => String(item.status).toLowerCase() === 'active')
+        .sort((a, b) => Number(a.sort_order || 99) - Number(b.sort_order || 99));
+
+      if (config.enabled === false) {
+        location.href = 'index.html';
+        return;
+      }
+
+      document.getElementById('weekendEyebrow').textContent = config.eyebrow || 'Jaipur-born · Rajasthan-bound';
+      document.getElementById('weekendTitle').innerHTML = safe(config.hero_title || 'Find the trail no one is talking about.').replace(/\n/g, '<br>');
+      document.getElementById('weekendSubtitle').textContent = config.hero_subtitle || '';
+      document.getElementById('weekendAbout').textContent = config.about || '';
+
+      const id = driveId(config.video_url);
+      if (id) {
+        const streamUrl = `https://drive.usercontent.google.com/download?id=${encodeURIComponent(id)}&export=download&confirm=t`;
+        document.querySelectorAll('[data-weekend-video]').forEach(video => {
+          video.src = streamUrl;
+          video.load();
+          video.addEventListener('loadeddata', startVideos, { once: true });
+        });
+        startVideos();
+      }
+
+      const message = encodeURIComponent('Hello Call4All, I want details about the next Weekend Crew trek/adventure in Rajasthan.');
+      const whatsapp = `https://wa.me/${String(config.whatsapp || '917737353588').replace(/\D/g, '')}?text=${message}`;
+      document.getElementById('weekendWhatsApp').href = whatsapp;
+      document.getElementById('weekendFinalWhatsApp').href = whatsapp;
+
+      if (rows.length) {
+        const hero = asset(config.og_image || rows[0].image_path);
+        const featured = rows.filter(item => String(item.featured).toLowerCase() === 'yes');
+        document.getElementById('wcFeaturedOne').src = asset((featured[0] || rows[0]).image_path);
+        document.getElementById('wcFeaturedTwo').src = asset((featured[1] || rows[1] || rows[0]).image_path);
+        document.getElementById('weekendGallery').innerHTML = rows.map(item => `<figure><img src="${safe(asset(item.image_path))}" alt="${safe(item.alt_text || 'Weekend Crew adventure in Rajasthan')}" loading="lazy" decoding="async"><figcaption>${safe(item.caption)}</figcaption></figure>`).join('');
+        setMeta('meta[property="og:image"]', new URL(hero, location.href).href, true);
+        setMeta('meta[property="og:image:secure_url"]', new URL(hero, location.href).href, true);
+        setMeta('meta[name="twitter:image"]', new URL(hero, location.href).href);
+        const schema = document.createElement('script');
+        schema.type = 'application/ld+json';
+        schema.id = 'weekend-gallery-schema';
+        schema.textContent = JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'ImageGallery',
+          name: 'Weekend Crew Rajasthan Adventure Gallery',
+          url: location.href,
+          image: rows.map(item => ({
+            '@type': 'ImageObject',
+            contentUrl: new URL(asset(item.image_path), location.href).href,
+            caption: item.caption,
+            description: item.alt_text
+          }))
+        });
+        document.head.appendChild(schema);
+      }
+      if (config.seo_title) document.title = config.seo_title;
+      if (config.seo_description) setMeta('meta[name="description"]', config.seo_description);
+    } catch (error) {
+      console.warn('Weekend Crew content could not be loaded', error);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) startVideos();
+  });
+  document.addEventListener('click', startVideos, { once: true });
+})();
