@@ -1,1 +1,115 @@
-<!doctype html><html lang="en-IN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Weekend Crew Admin | Call4All</title><meta name="robots" content="noindex,nofollow"><link rel="stylesheet" href="assets/css/style.css"><style>.wca{max-width:1220px;margin:auto;padding:28px 18px}.wca-grid{display:grid;grid-template-columns:410px 1fr;gap:18px}.wca-card{background:#fff;border:1px solid #dce5df;border-radius:15px;padding:22px}.wca label{display:block;font-weight:750;margin:11px 0 5px}.wca input,.wca textarea,.wca select{width:100%;box-sizing:border-box}.wca textarea{min-height:85px}.wca-actions{display:flex;gap:8px;margin-top:16px}.wca-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}.wca-item{border:1px solid #dce5df;border-radius:11px;overflow:hidden}.wca-item img{width:100%;height:130px;object-fit:cover}.wca-item>div{padding:12px}.wca-muted{font-size:12px;color:#66746c}@media(max-width:850px){.wca-grid{grid-template-columns:1fr}}</style></head><body style="background:#f2f5f2"><header class="pa-top"><div><strong>🥾 Weekend Crew Manager</strong><div style="font-size:12px;opacity:.78">Vendor content, video, gallery and Rajasthan SEO</div></div><div><a class="btn btn-outline btn-sm" href="weekend-treks-jaipur-rajasthan.html" target="_blank" style="color:#fff;border-color:#fff">View Page</a> <a class="btn btn-outline btn-sm" href="admin.html" style="color:#fff;border-color:#fff">Dashboard</a></div></header><main class="wca"><div class="wca-grid"><section class="wca-card"><h2>Page Content</h2><form id="weekendConfigForm"><label>Brand name</label><input name="brand_name" required><label>Eyebrow</label><input name="eyebrow"><label>Hero title</label><textarea name="hero_title" required></textarea><label>Hero subtitle</label><textarea name="hero_subtitle" required></textarea><label>About</label><textarea name="about" required style="min-height:150px"></textarea><label>Google Drive video URL</label><input name="video_url" type="url" required><label>WhatsApp number</label><input name="whatsapp" inputmode="numeric"><label>Instagram URL</label><input name="instagram" type="url"><label>Service area</label><input name="service_area"><label>OG image path</label><input name="og_image"><label>SEO title</label><input name="seo_title" maxlength="65"><label>SEO description</label><textarea name="seo_description" maxlength="165"></textarea><label><input name="enabled" type="checkbox" style="width:auto"> Public page active</label><div id="configStatus" class="wca-muted"></div><div class="wca-actions"><button class="pa-btn gold" type="submit">Save Page Content</button></div></form><hr style="margin:28px 0"><h2 id="galleryFormTitle">Add Gallery Image</h2><form id="weekendGalleryForm"><input type="hidden" name="image_path"><label>Upload image</label><input id="weekendImage" type="file" accept="image/*"><label>Alt text *</label><input name="alt_text" required maxlength="180"><label>Caption</label><textarea name="caption" maxlength="260"></textarea><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label>Status</label><select name="status"><option>Active</option><option>Inactive</option></select></div><div><label>Featured</label><select name="featured"><option>No</option><option>Yes</option></select></div></div><label>Sort order</label><input name="sort_order" type="number" min="0" value="50"><div id="galleryStatus" class="wca-muted"></div><div class="wca-actions"><button class="pa-btn gold" type="submit">Save Image</button><button class="pa-btn" id="cancelGallery" type="button" hidden>Cancel</button></div></form></section><section class="wca-card"><h2>Adventure Gallery</h2><p class="wca-muted">Active images automatically appear on the public page. Featured images are used in the large editorial section.</p><div class="wca-gallery" id="weekendAdminGallery"><p>Loading…</p></div></section></div></main><script src="assets/js/site.js"></script><script src="assets/js/booking.js"></script><script src="assets/js/weekend-crew-admin.js"></script></body></html>
+<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Weekend Crew Admin | Call4All</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>.wca{max-width:1220px;margin:auto;padding:28px 18px}.wca-grid{display:grid;grid-template-columns:410px 1fr;gap:18px}.wca-card{background:#fff;border:1px solid #dce5df;border-radius:15px;padding:22px}.wca label{display:block;font-weight:750;margin:11px 0 5px}.wca input,.wca textarea,.wca select{width:100%;box-sizing:border-box}.wca textarea{min-height:85px}.wca-actions{display:flex;gap:8px;margin-top:16px}.wca-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}.wca-item{border:1px solid #dce5df;border-radius:11px;overflow:hidden}.wca-item img{width:100%;height:130px;object-fit:cover}.wca-item>div{padding:12px}.wca-muted{font-size:12px;color:#66746c}@media(max-width:850px){.wca-grid{grid-template-columns:1fr}}</style>
+</head>
+<body style="background:#f2f5f2">
+<header class="pa-top">
+<div>
+<strong>🥾 Weekend Crew Manager</strong>
+<div style="font-size:12px;opacity:.78">Vendor content, video, gallery and Rajasthan SEO</div>
+</div>
+<div>
+<a class="btn btn-outline btn-sm" href="weekend-treks-jaipur-rajasthan.html" target="_blank" style="color:#fff;border-color:#fff">View Page</a> <a class="btn btn-outline btn-sm" href="admin.html" style="color:#fff;border-color:#fff">Dashboard</a>
+</div>
+</header>
+<main class="wca">
+<div class="wca-grid">
+<section class="wca-card">
+<h2>Page Content</h2>
+<form id="weekendConfigForm">
+<label>Brand name</label>
+<input name="brand_name" required>
+<label>Eyebrow</label>
+<input name="eyebrow">
+<label>Hero title</label>
+<textarea name="hero_title" required>
+</textarea>
+<label>Hero subtitle</label>
+<textarea name="hero_subtitle" required>
+</textarea>
+<label>About</label>
+<textarea name="about" required style="min-height:150px">
+</textarea>
+<label>Video URL or website asset path</label>
+<input name="video_url" type="text" required>
+<label>WhatsApp number</label>
+<input name="whatsapp" inputmode="numeric">
+<label>Instagram URL</label>
+<input name="instagram" type="url">
+<label>Service area</label>
+<input name="service_area">
+<label>OG image path</label>
+<input name="og_image">
+<label>SEO title</label>
+<input name="seo_title" maxlength="65">
+<label>SEO description</label>
+<textarea name="seo_description" maxlength="165">
+</textarea>
+<label>
+<input name="enabled" type="checkbox" style="width:auto"> Public page active</label>
+<div id="configStatus" class="wca-muted">
+</div>
+<div class="wca-actions">
+<button class="pa-btn gold" type="submit">Save Page Content</button>
+</div>
+</form>
+<hr style="margin:28px 0">
+<h2 id="galleryFormTitle">Add Gallery Image</h2>
+<form id="weekendGalleryForm">
+<input type="hidden" name="image_path">
+<label>Upload image</label>
+<input id="weekendImage" type="file" accept="image/*">
+<label>Alt text *</label>
+<input name="alt_text" required maxlength="180">
+<label>Caption</label>
+<textarea name="caption" maxlength="260">
+</textarea>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div>
+<label>Status</label>
+<select name="status">
+<option>Active</option>
+<option>Inactive</option>
+</select>
+</div>
+<div>
+<label>Featured</label>
+<select name="featured">
+<option>No</option>
+<option>Yes</option>
+</select>
+</div>
+</div>
+<label>Sort order</label>
+<input name="sort_order" type="number" min="0" value="50">
+<div id="galleryStatus" class="wca-muted">
+</div>
+<div class="wca-actions">
+<button class="pa-btn gold" type="submit">Save Image</button>
+<button class="pa-btn" id="cancelGallery" type="button" hidden>Cancel</button>
+</div>
+</form>
+</section>
+<section class="wca-card">
+<h2>Adventure Gallery</h2>
+<p class="wca-muted">Active images automatically appear on the public page. Featured images are used in the large editorial section.</p>
+<div class="wca-gallery" id="weekendAdminGallery">
+<p>Loading…</p>
+</div>
+</section>
+</div>
+</main>
+<script src="assets/js/site.js">
+</script>
+<script src="assets/js/booking.js">
+</script>
+<script src="assets/js/weekend-crew-admin.js">
+</script>
+</body>
+</html>

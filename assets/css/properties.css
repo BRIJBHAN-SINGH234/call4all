@@ -27,3 +27,14 @@
 body.video-open{overflow:hidden}
 .type-rent{background:#eee9ff;color:#5538c7}.property-kicker{color:#b9a8ff!important}
 @media(max-width:600px){.video-modal{padding:0;background:rgba(8,17,13,.5)}.video-modal-box{width:100vw;border-radius:0;box-shadow:none}.video-frame{border-radius:0}.video-close{right:10px;top:-52px;width:40px;height:40px}}
+
+/* Correct desktop/mobile Call4Thali promotion proportions. */
+.property-thali-ad{grid-template-columns:minmax(260px,39%) 1fr;max-width:1050px;margin:28px auto 38px;background:#fff;border:1px solid #e5e2f1;border-radius:18px;box-shadow:0 14px 42px rgba(15,15,15,.1)}
+.property-thali-image-link{min-height:220px}
+.property-thali-image-link img{min-height:220px;object-fit:cover}
+.property-thali-copy{display:flex;flex-direction:column;justify-content:center;padding:28px clamp(24px,4vw,44px)}
+.property-thali-copy h2{margin:6px 0 8px;color:#181818;font-size:clamp(24px,3vw,34px);line-height:1.2}
+.property-thali-copy p{margin:0 0 16px;color:#666;font-size:14px;line-height:1.55}
+.property-thali-actions{gap:10px}
+.property-thali-actions .btn{padding:10px 15px;font-size:13px;flex:0 1 auto}
+@media(max-width:600px){.property-thali-ad{width:calc(100% - 24px);grid-template-columns:1fr;margin:24px auto 30px;border-radius:14px}.property-thali-image-link{min-height:0;aspect-ratio:16/5.3}.property-thali-image-link img{min-height:0;height:100%}.property-thali-copy{padding:17px 15px 19px}.property-thali-copy h2{font-size:21px}.property-thali-copy p{font-size:12px}.property-thali-actions{display:grid;grid-template-columns:1fr 1fr}.property-thali-actions .btn{width:100%;padding:10px 6px;font-size:11px;text-align:center}}

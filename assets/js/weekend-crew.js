@@ -25,7 +25,36 @@
       video.muted = true;
       video.defaultMuted = true;
       const playback = video.play();
-      if (playback && typeof playback.catch === 'function') playback.catch(() => {});
+      if (playback && typeof playback.catch === 'function') playback.catch(error => {
+        video.dataset.playError = error && error.name ? error.name : 'PlaybackError';
+      });
+    });
+  };
+  const setupVideoFallbacks = () => {
+    document.querySelectorAll('[data-weekend-video]').forEach(video => {
+      const container = video.parentElement;
+      const button = container && container.querySelector('[data-video-start]');
+      if (!button) return;
+      const hide = () => {
+        video.dataset.playing = 'true';
+        button.classList.remove('is-visible');
+      };
+      const offerPlay = () => {
+        video.dataset.playing = 'false';
+        video.dataset.readyState = String(video.readyState);
+        if (video.paused || video.readyState < 2) button.classList.add('is-visible');
+      };
+      video.addEventListener('playing', hide);
+      video.addEventListener('error', offerPlay);
+      video.addEventListener('canplay', () => {
+        video.muted = true;
+        video.play().then(hide).catch(() => {});
+      }, { once: true });
+      button.addEventListener('click', () => {
+        video.muted = true;
+        video.play().then(hide).catch(offerPlay);
+      });
+      setTimeout(offerPlay, 8000);
     });
   };
 
@@ -51,15 +80,22 @@
       document.getElementById('weekendAbout').textContent = config.about || '';
 
       const id = driveId(config.video_url);
-      if (id) {
-        const streamUrl = `https://drive.usercontent.google.com/download?id=${encodeURIComponent(id)}&export=download&confirm=t`;
+      /* Drive's original 1440p/60fps file is intentionally not attached here:
+         it is too heavy for reliable mobile autoplay. The optimized WebM/MP4
+         sources in HTML are derived from that file. A custom non-Drive asset
+         path can still be supplied from admin when needed. */
+      const configuredVideo = !id && config.video_url && !/weekend-crew-film\.(?:mp4|webm)$/i.test(config.video_url)
+        ? asset(config.video_url)
+        : '';
+      if (configuredVideo) {
         document.querySelectorAll('[data-weekend-video]').forEach(video => {
-          video.src = streamUrl;
+          video.src = configuredVideo;
           video.load();
           video.addEventListener('loadeddata', startVideos, { once: true });
         });
         startVideos();
       }
+      setupVideoFallbacks();
 
       const message = encodeURIComponent('Hello Call4All, I want details about the next Weekend Crew trek/adventure in Rajasthan.');
       const whatsapp = `https://wa.me/${String(config.whatsapp || '917737353588').replace(/\D/g, '')}?text=${message}`;
@@ -99,7 +135,10 @@
     }
   }
 
-  document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('DOMContentLoaded', () => {
+    setupVideoFallbacks();
+    init();
+  });
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) startVideos();
   });

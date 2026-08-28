@@ -31,6 +31,7 @@ window.SITE_CONFIG = {
     branch: 'main'
   },
   services: [
+    { id: 'property',         name: 'Property Sale & Rent',        icon: '🏠', iconName: 'home',      desc: 'Verified property listings for sale, rent and lease in Jaipur.',     page: 'properties.html',              image: 'assets/uploads/property-1786284906619-indraj_palace.png' },
     { id: 'rental-cars',      name: 'Rental Cars',                 icon: '🚗', iconName: 'car',       desc: 'Comfortable cars for travel, transfers and events.',               page: 'car-rental-kukas.html',       image: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=900&q=80&auto=format&fit=crop' },
     { id: 'rooms-flats',      name: 'Rooms & Flats',               icon: '🏠', iconName: 'home',      desc: 'Explore rooms, flats, PGs and properties.',                          page: 'rooms-flats-kukas.html',       image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=900&q=80&auto=format&fit=crop' },
     { id: 'manpower-supply',  name: 'Manpower Supply',             icon: '👷', iconName: 'hard-hat',  desc: 'Workforce solutions for businesses and events.',                    page: 'manpower-supply-kukas.html',   image: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=900&q=80&auto=format&fit=crop' },
@@ -54,14 +55,12 @@ window.SITE_CONFIG = {
       { id: 'thali', enabled: true, title: 'Call4Thali', subtitle: 'Fresh vegetarian meals from Rs 49', background_url: 'assets/uploads/tiffin-center-kukas-banner.png', link: 'tiffin-center-kukas.html', image_only: true, order: 2 },
       { id: 'second-hand', enabled: true, icon: '♻️', iconName: 'shopping-bag', title: 'Second-Hand Marketplace', subtitle: 'Approved used furniture, electronics and everyday items', background_url: 'assets/uploads/second-hand-1787819094199-WhatsApp_Image_2026-08-27_at_10.29.42_AM.jpg', link: 'second-hand-items.html', order: 3 },
       { id: 'weekend-crew', enabled: true, icon: '🥾', iconName: 'pin', title: 'Weekend Treks & Adventures', subtitle: 'Hidden trails, sunrise hikes and group experiences across Rajasthan', background_url: 'assets/uploads/weekend-crew/weekend-crew-05.jpeg', link: 'weekend-treks-jaipur-rajasthan.html', order: 4 },
-      { id: 's1', enabled: true, icon: '🚗', iconName: 'car', title: 'Rental Cars', subtitle: 'Premium & budget cars for travel and events', background_url: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1900&q=80&auto=format&fit=crop', link: 'car-rental-kukas.html', order: 5 },
-      { id: 's2', enabled: true, icon: '🏠', iconName: 'home', title: 'Rooms & Flats', subtitle: 'Quick rentals — rooms, flats, PG, properties', background_url: 'https://images.unsplash.com/photo-1501183638710-841dd1904471?w=1900&q=80&auto=format&fit=crop', link: 'rooms-flats-kukas.html', order: 6 },
-      { id: 's3', enabled: true, icon: '🧱', iconName: 'bricks', title: 'Construction Labor', subtitle: 'Mistri, mazdoor, thekedar — all just one call away', background_url: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=1900&q=80&auto=format&fit=crop', link: 'construction-labor-kukas.html', order: 7 },
-      { id: 's4', enabled: true, icon: '📚', iconName: 'book', title: 'Home Tutors', subtitle: 'Qualified tutors for every class & subject', background_url: 'https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=1900&q=80&auto=format&fit=crop', link: 'home-tutor-kukas.html', order: 8 },
-      { id: 's5', enabled: true, icon: '👷', iconName: 'hard-hat', title: 'Manpower Supply', subtitle: 'Skilled & unskilled manpower on demand', background_url: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1900&q=80&auto=format&fit=crop', link: 'manpower-supply-kukas.html', order: 9 },
-      { id: 's6', enabled: true, icon: '💍', iconName: 'ring', title: 'Marriage Services', subtitle: 'Decoration, catering, rentals — A to Z', background_url: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=1900&q=80&auto=format&fit=crop', link: 'wedding-services-kukas.html', order: 10 },
-      { id: 's7', enabled: true, icon: '🌸', iconName: 'flower', title: 'Hotel Flower Bouquet', subtitle: 'Luxury floral arrangements for hotels & events', background_url: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=1900&q=80&auto=format&fit=crop', link: 'flower-bouquet-kukas.html', order: 11 },
-      { id: 's8', enabled: true, icon: '🎀', iconName: 'bow', title: 'Car Decoration', subtitle: 'Wedding & event car decoration', background_url: 'https://images.unsplash.com/photo-1606013519235-f4f8b3ee5ae5?w=1900&q=80&auto=format&fit=crop', link: 'car-decoration-kukas.html', order: 12 }
+      { id: 'building-materials', enabled: true, icon: '🏗️', iconName: 'bricks', title: 'Building Materials', subtitle: 'Live rodi, M-Sand and P-Sand prices in Jaipur', background_url: 'assets/uploads/building-material-msand.png', link: 'building-materials-jaipur.html', order: 5 },
+      { id: 's1', enabled: true, icon: '🚗', iconName: 'car', title: 'Rental Cars', subtitle: 'Premium & budget cars for travel and events', background_url: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1900&q=80&auto=format&fit=crop', link: 'car-rental-kukas.html', order: 6 },
+      { id: 's2', enabled: true, icon: '🏠', iconName: 'home', title: 'Rooms & Flats', subtitle: 'Quick rentals — rooms, flats, PG, properties', background_url: 'https://images.unsplash.com/photo-1501183638710-841dd1904471?w=1900&q=80&auto=format&fit=crop', link: 'rooms-flats-kukas.html', order: 7 },
+      { id: 's3', enabled: true, icon: '🧱', iconName: 'bricks', title: 'Construction Labor', subtitle: 'Mistri, mazdoor, thekedar — all just one call away', background_url: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=1900&q=80&auto=format&fit=crop', link: 'construction-labor-kukas.html', order: 8 },
+      { id: 's4', enabled: true, icon: '📚', iconName: 'book', title: 'Home Tutors', subtitle: 'Qualified tutors for every class & subject', background_url: 'https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=1900&q=80&auto=format&fit=crop', link: 'home-tutor-kukas.html', order: 9 },
+      { id: 's5', enabled: true, icon: '👷', iconName: 'hard-hat', title: 'Manpower Supply', subtitle: 'Skilled & unskilled manpower on demand', background_url: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1900&q=80&auto=format&fit=crop', link: 'manpower-supply-kukas.html', order: 10 }
     ]
   },
   pages: []
@@ -300,6 +299,21 @@ function optimizeImageUrl(url, kind) {
 window.assetUrl = assetUrl;
 window.optimizeImageUrl = optimizeImageUrl;
 
+/* One canonical category order for homepage cards, banners and footer. */
+const HOME_HIDDEN_SERVICE_IDS = new Set(['marriage-services', 'flower-bouquet', 'car-decoration']);
+const HOME_SERVICE_ORDER = [
+  'property', 'tiffin-center', 'second-hand', 'weekend-crew', 'building-materials',
+  'rental-cars', 'rooms-flats', 'construction', 'home-tutor', 'manpower-supply',
+  'handmade', 'other'
+];
+function orderedHomeServices(includeOther) {
+  const rank = new Map(HOME_SERVICE_ORDER.map((id, index) => [id, index]));
+  return (window.SITE_CONFIG.services || [])
+    .filter(service => !HOME_HIDDEN_SERVICE_IDS.has(service.id) && (includeOther || service.id !== 'other'))
+    .slice()
+    .sort((a, b) => (rank.get(a.id) ?? 999) - (rank.get(b.id) ?? 999));
+}
+
 /* ===== Hero Slider (admin-managed via site-config.json) ===== */
 let _sliderState = { idx: 0, timer: null, slides: [] };
 
@@ -321,7 +335,7 @@ function renderSlider() {
   if (cfg.enabled === false) { mount.innerHTML = ''; return; }
 
   const slides = (cfg.slides || [])
-    .filter(s => s.enabled !== false)
+    .filter(s => s.enabled !== false && !['weddings', 'flowers', 'car-decoration', 's6', 's7', 's8'].includes(s.id))
     .slice()
     .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
 
@@ -894,6 +908,8 @@ function renderHeader(activePage) {
     { href: 'properties.html', label: 'Properties', key: 'properties' },
     { href: 'tiffin-center-kukas.html', label: 'Tiffin', key: 'tiffin' },
     { href: 'second-hand-items.html', label: 'Second Hand', key: 'second-hand' },
+    { href: 'weekend-treks-jaipur-rajasthan.html', label: 'Weekend Trips', key: 'weekend-crew' },
+    { href: 'building-materials-jaipur.html', label: 'Materials', key: 'building-materials' },
     { href: 'handmade-items.html', label: 'Handmade', key: 'handmade' },
     { href: 'gallery.html', label: 'Gallery', key: 'gallery' },
     { href: 'about.html', label: 'About Us', key: 'about' },
@@ -943,8 +959,7 @@ function renderFooter() {
   const ico = (name, size) => (typeof window.c4aIcon === 'function')
     ? window.c4aIcon(name, { size: size || 16 })
     : '';
-  const serviceLinks = cfg.services
-    .filter(s => s.id !== 'other')
+  const serviceLinks = orderedHomeServices(false)
     .map(s => `<li><a href="${s.page}">${s.name}</a></li>`)
     .join('');
   return `
@@ -1015,7 +1030,7 @@ function renderHomeServiceGrid() {
   const ico = (name) => (typeof window.c4aIcon === 'function' && name)
     ? window.c4aIcon(name, { size: 30 })
     : '';
-  grid.innerHTML = window.SITE_CONFIG.services.map(s => {
+  grid.innerHTML = orderedHomeServices(true).map(s => {
     const img = optimizeImageUrl(s.image || '', 'service');
     return `
     <div class="service-card">
@@ -1031,6 +1046,41 @@ function renderHomeServiceGrid() {
   `;
   }).join('');
   if (typeof window.c4aHydrateIcons === 'function') window.c4aHydrateIcons(grid);
+}
+
+function renderGlobalThaliAd() {
+  if (document.querySelector('.c4a-thali-ad, .property-thali-ad')) return;
+  const path = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+  const serviceDetailPages = [
+    'car-rental-kukas.html', 'rooms-flats-kukas.html', 'construction-labor-kukas.html',
+    'home-tutor-kukas.html', 'manpower-supply-kukas.html', 'building-materials-jaipur.html',
+    'weekend-treks-jaipur-rajasthan.html', 'flat-rent-kukas-jaipur.html', 'room-rent-kukas-jaipur.html'
+  ];
+  const catalogueDetail = /^(?:second-hand-used-|property-prop-).+\.html$/.test(path) ||
+    ['second-hand-item.html', 'handmade-item.html', 'property.html'].includes(path);
+  if (!serviceDetailPages.includes(path) && !catalogueDetail) return;
+  /* Property renderer already supplies its own equivalent advertisement. */
+  if (/^(?:property-prop-).+\.html$/.test(path) || path === 'property.html') return;
+  const footer = document.querySelector('footer.site-footer');
+  if (!footer) return;
+  const ad = document.createElement('aside');
+  ad.id = 'call4ThaliAd';
+  ad.className = 'c4a-thali-ad';
+  ad.setAttribute('aria-label', 'Call4Thali meal advertisement');
+  ad.innerHTML = `
+    <a class="c4a-thali-ad-image" href="tiffin-center-kukas.html" aria-label="View Call4Thali menu">
+      <img src="assets/uploads/tiffin-center-kukas-banner.png" alt="Call4Thali fresh vegetarian meals from Rs 49" loading="lazy" width="1968" height="544">
+    </a>
+    <div class="c4a-thali-ad-copy">
+      <span>Call4All recommends</span>
+      <h2>Fresh vegetarian Call4Thali from Rs 49</h2>
+      <p>Basic, regular and special thali options in Kukas, Jaipur. View today's menu or order directly.</p>
+      <div class="c4a-thali-ad-actions">
+        <a class="btn btn-primary btn-sm" href="tiffin-center-kukas.html">View Menu</a>
+        <a class="btn btn-whatsapp btn-sm" href="https://wa.me/${window.SITE_CONFIG.whatsappNumber}?text=${encodeURIComponent('Hello Call4Thali, I would like to order a vegetarian thali.')}" target="_blank" rel="noopener">Order on WhatsApp</a>
+      </div>
+    </div>`;
+  footer.parentNode.insertBefore(ad, document.getElementById('publicContentGuide') || footer);
 }
 
 function paintSiteShellOnce() {
@@ -1079,6 +1129,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   setupPwaInstall();
+  setTimeout(renderGlobalThaliAd, 900);
 
   // Fetch latest config in background and re-render shell
   fetchAndApplySiteConfig();
