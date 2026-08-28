@@ -84,7 +84,7 @@ body[data-page="weekend-crew"]{margin:0;background:var(--wc-sand);color:var(--wc
 .wc-video-shade{background:linear-gradient(90deg,rgba(4,16,11,.88) 0%,rgba(4,16,11,.64) 42%,rgba(4,16,11,.2) 75%),linear-gradient(0deg,rgba(4,16,11,.78),transparent 65%)}
 .wc-hero-content{width:min(100%,1120px);box-sizing:border-box}
 .wc-hero-copy{width:min(760px,100%);padding:clamp(24px,3.5vw,45px);border:1px solid rgba(255,255,255,.2);border-radius:24px;background:linear-gradient(135deg,rgba(8,29,21,.72),rgba(8,29,21,.38));box-shadow:0 28px 80px rgba(0,0,0,.3);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.wc-hero h1{font-size:clamp(3.1rem,7vw,7.2rem);text-wrap:balance;text-shadow:0 4px 32px rgba(0,0,0,.35)}
+.wc-hero h1,.wc-hero #weekendTitle{color:#fff!important;font-size:clamp(3.1rem,7vw,7.2rem);text-wrap:balance;text-shadow:0 4px 32px rgba(0,0,0,.55)}
 .wc-hero p{text-shadow:0 2px 14px rgba(0,0,0,.6)}
 .wc-video-story{padding:clamp(85px,10vw,150px) clamp(18px,6vw,90px);background:#091b14;color:#fff}
 .wc-video-story-head{display:grid;grid-template-columns:minmax(240px,.85fr) 1.5fr;gap:clamp(30px,7vw,100px);align-items:end;margin:0 auto 48px;max-width:1380px}
