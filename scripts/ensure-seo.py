@@ -14,7 +14,17 @@ PAGES = [
     "construction-labor-kukas.html", "flower-bouquet-kukas.html",
     "home-tutor-kukas.html", "manpower-supply-kukas.html", "rooms-flats-kukas.html",
     "contact.html", "gallery.html", "about.html", "handmade-items.html", "handmade-item.html",
+    "tiffin-center-kukas.html", "building-materials-jaipur.html",
 ]
+for pattern in ("property-prop-*.html", "second-hand-used-*.html"):
+    for generated in sorted(ROOT.glob(pattern)):
+        source = generated.read_text()
+        if not re.search(r'<meta\s+[^>]*name=["\']robots["\'][^>]*content=["\'][^"\']*noindex', source, re.I):
+            PAGES.append(generated.name)
+if "legal-policies.html" not in PAGES:
+    PAGES.append("legal-policies.html")
+if "menu-item.html" not in PAGES:
+    PAGES.append("menu-item.html")
 
 OVERRIDES = {
     "index.html": ("Call4All Jaipur | Property, Rentals & Local Services", "Find property, rental cars, rooms, second-hand items and trusted local services in Jaipur. Call or WhatsApp Call4All for quick assistance."),
@@ -62,6 +72,7 @@ def set_link(source, rel, href, hreflang=None):
     return re.sub(pattern, tag, source, count=1, flags=re.I) if re.search(pattern, source, re.I) else source.replace("</head>", f"{tag}\n</head>")
 
 
+seen_titles = {}
 for filename in PAGES:
     path = ROOT / filename
     source = path.read_text()
@@ -72,6 +83,18 @@ for filename in PAGES:
         title, description = OVERRIDES[filename]
         source = re.sub(r'<title>.*?</title>', f"<title>{escape(title)}</title>", source, count=1, flags=re.I | re.S)
         source = set_meta(source, "description", description)
+    if len(title) > 65:
+        title = title[:62].rstrip(" ,|-") + "…"
+        source = re.sub(r'<title>.*?</title>', f"<title>{escape(title)}</title>", source, count=1, flags=re.I | re.S)
+    if title in seen_titles:
+        suffix = re.search(r'(\d{6,})', filename)
+        marker = suffix.group(1)[-6:] if suffix else Path(filename).stem[-6:]
+        title = (title[:55].rstrip(" ,|-") + f" #{marker}")[:65]
+        source = re.sub(r'<title>.*?</title>', f"<title>{escape(title)}</title>", source, count=1, flags=re.I | re.S)
+    seen_titles[title] = filename
+    if len(description) > 165:
+        description = description[:162].rsplit(" ", 1)[0].rstrip(" ,;:-") + "…"
+        source = set_meta(source, "description", description)
     if not description:
         raise ValueError(f"{filename}: meta description is required")
     url = f"{ORIGIN}/" if filename == "index.html" else f"{ORIGIN}/{filename}"
@@ -81,11 +104,12 @@ for filename in PAGES:
     image_alt = f"{social_title} — Call4All"
 
     source = re.sub(r'<html(?:\s+lang=["\'][^"\']*["\'])?', '<html lang="en-IN"', source, count=1, flags=re.I)
+    existing_robots = meta_value(source, "robots")
     standard = {
         "description": description,
-        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
-        "googlebot": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
-        "bingbot": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "robots": existing_robots if "noindex" in existing_robots.lower() else "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "googlebot": "noindex, follow, max-image-preview:large" if "noindex" in existing_robots.lower() else "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "bingbot": "noindex, follow, max-image-preview:large" if "noindex" in existing_robots.lower() else "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
         "author": "Call4All", "theme-color": "#1e3c72", "format-detection": "telephone=yes",
     }
     for key, value in standard.items():

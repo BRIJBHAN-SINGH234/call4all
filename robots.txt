@@ -19,6 +19,7 @@ Disallow: /manpower-admin.html
 Disallow: /car-rental-admin.html
 Disallow: /second-hand-admin.html
 Disallow: /handmade-admin.html
+Disallow: /building-materials-admin.html
 Disallow: /logo-preview.html
 Disallow: /home-classic.html
 Disallow: /llms.txt

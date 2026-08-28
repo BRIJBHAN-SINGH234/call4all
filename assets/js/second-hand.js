@@ -5,6 +5,8 @@
   const money = value => value ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Number(value)) : 'Price on request';
   const image = item => item.image_path || 'assets/icons/icon-512.png';
   const detailUrl = item => 'second-hand-item.html?id=' + encodeURIComponent(String(item.id || ''));
+  const absolute = path => new URL(path, location.href).href;
+  function setMeta(selector, content, property) { let tag=document.querySelector(selector);if(!tag){tag=document.createElement('meta');tag.setAttribute(property?'property':'name',selector.match(/["']([^"']+)/)?.[1]||'description');document.head.appendChild(tag)}tag.content=content; }
 
   async function load() {
     try {
@@ -40,7 +42,7 @@
   function addListSchema(items) {
     const script = document.createElement('script');
     script.type = 'application/ld+json';
-    script.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'ItemList', name: 'Second Hand Items in Jaipur', numberOfItems: items.length, itemListElement: items.map((item, index) => ({ '@type': 'ListItem', position: index + 1, name: item.title, url: new URL(detailUrl(item), location.href).href })) });
+    script.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'ItemList', name: 'Second Hand Items in Jaipur', numberOfItems: items.length, itemListElement: items.map((item, index) => ({ '@type': 'ListItem', position: index + 1, item:{'@type':'Product',name:item.title,image:[absolute(image(item))],description:item.description,sku:item.id,category:item.category,itemCondition:'https://schema.org/UsedCondition',url:absolute(detailUrl(item)),offers:{'@type':'Offer',price:String(item.price),priceCurrency:'INR',availability:'https://schema.org/InStock',url:absolute(detailUrl(item)),seller:{'@id':'https://call4all.co.in/#localbusiness'}}} })) });
     document.head.appendChild(script);
   }
 
@@ -61,6 +63,7 @@
     search.addEventListener('input', render);
     category.addEventListener('change', render);
     addListSchema(items);
+    if(items.length){const social=absolute(image(items[0]));setMeta('meta[property="og:image"]',social,true);setMeta('meta[property="og:image:secure_url"]',social,true);setMeta('meta[name="twitter:image"]',social);}
     render();
   }
 
@@ -78,8 +81,11 @@
     let canonicalLink = document.querySelector('link[rel="canonical"]');
     if (!canonicalLink) { canonicalLink = document.createElement('link'); canonicalLink.rel = 'canonical'; document.head.appendChild(canonicalLink); }
     canonicalLink.href = canonical;
+    const socialTitle=item.og_title||document.title,socialDescription=item.og_description||description,socialImage=absolute(item.og_image||image(item)),imageAlt=item.image_alt||`${item.title} second-hand ${item.category||'item'} in ${item.city||'Jaipur'}`;
+    [['og:type','product'],['og:site_name','Call4All'],['og:locale','en_IN'],['og:title',socialTitle],['og:description',socialDescription],['og:url',canonical],['og:image',socialImage],['og:image:secure_url',socialImage],['og:image:alt',imageAlt],['product:price:amount',String(item.price||'')],['product:price:currency','INR']].forEach(([key,value])=>setMeta(`meta[property="${key}"]`,value,true));
+    [['twitter:card','summary_large_image'],['twitter:title',socialTitle],['twitter:description',socialDescription],['twitter:image',socialImage],['twitter:image:alt',imageAlt]].forEach(([key,value])=>setMeta(`meta[name="${key}"]`,value));
     mount.innerHTML = `<article class="market-detail"><img src="${safe(image(item))}" alt="${safe(item.title)} second-hand item"><div class="market-detail-content"><a href="second-hand-items.html">← Back to all items</a><span class="market-badge">${safe(item.category)}</span><h1>${safe(item.title)}</h1><div class="market-detail-price">${money(item.price)}</div><dl class="market-specs"><div><dt>Brand</dt><dd>${safe(item.brand || 'Not specified')}</dd></div><div><dt>Condition</dt><dd>${safe(item.condition || 'Not specified')}</dd></div><div><dt>Location</dt><dd>${safe([item.area, item.city].filter(Boolean).join(', ') || 'Jaipur')}</dd></div><div><dt>Listing ID</dt><dd>${safe(item.id)}</dd></div></dl><p>${safe(item.description || 'Contact Call4All for complete item details.')}</p><a class="btn btn-whatsapp btn-lg" href="${whatsappUrl(item)}" target="_blank" rel="noopener">Book on WhatsApp</a></div></article>`;
-    const schema = document.createElement('script'); schema.type = 'application/ld+json'; schema.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'Product', name: item.title, image: new URL(image(item), location.href).href, description: item.description || description, brand: item.brand ? { '@type': 'Brand', name: item.brand } : undefined, itemCondition: 'https://schema.org/UsedCondition', offers: { '@type': 'Offer', price: item.price, priceCurrency: 'INR', availability: 'https://schema.org/InStock', url: canonical } }); document.head.appendChild(schema);
+    const schema = document.createElement('script'); schema.type = 'application/ld+json'; schema.textContent = JSON.stringify({ '@context':'https://schema.org','@graph':[{ '@type': 'Product','@id':canonical+'#product',name:item.title,image:[socialImage],description:item.description || description,sku:item.id,category:item.category,brand:item.brand ? { '@type': 'Brand', name: item.brand } : undefined,itemCondition:'https://schema.org/UsedCondition',offers:{'@type':'Offer',price:String(item.price),priceCurrency:'INR',availability:'https://schema.org/InStock',url:canonical,seller:{'@id':'https://call4all.co.in/#localbusiness'},availableAtOrFrom:{'@type':'Place',name:[item.area,item.city].filter(Boolean).join(', ')||'Jaipur'}}},{'@type':'BreadcrumbList',itemListElement:[{'@type':'ListItem',position:1,name:'Home',item:'https://call4all.co.in/'},{'@type':'ListItem',position:2,name:'Second-Hand Items',item:'https://call4all.co.in/second-hand-items.html'},{'@type':'ListItem',position:3,name:item.title,item:canonical}]},{'@type':'LocalBusiness','@id':'https://call4all.co.in/#localbusiness',name:'Call4All',url:'https://call4all.co.in/',telephone:'+91-7737353588'}]}); document.head.appendChild(schema);
   }
 
   window.SecondHandCatalog = { load, card, whatsappUrl };

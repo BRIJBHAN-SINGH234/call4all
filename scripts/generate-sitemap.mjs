@@ -145,7 +145,11 @@ function parseCsv(text) {
 }
 
 function listRootHtmlFiles() {
-  return fs.readdirSync(ROOT).filter((f) => f.endsWith('.html'));
+  return fs.readdirSync(ROOT).filter((f) => {
+    if (!f.endsWith('.html')) return false;
+    try { return !/<meta\s+[^>]*name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(fs.readFileSync(path.join(ROOT, f), 'utf8')); }
+    catch (_) { return false; }
+  });
 }
 
 function main() {
