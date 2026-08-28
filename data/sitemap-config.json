@@ -10,6 +10,7 @@
     "second-hand-item.html",
     "handmade-admin.html",
     "building-materials-admin.html",
+    "weekend-crew-admin.html",
     "handmade-item.html",
     "menu-item.html",
     "logo-preview.html",
@@ -34,6 +35,7 @@
     "changefreq": "weekly"
   },
   "rules": [
+    { "pattern": "^weekend-treks-jaipur-rajasthan\\.html$", "priority": 0.95, "changefreq": "weekly" },
     { "pattern": "^building-materials-jaipur\\.html$", "priority": 0.96, "changefreq": "daily" },
     { "pattern": "^properties\\.html$", "priority": 0.98, "changefreq": "daily" },
     { "pattern": "^second-hand-items\\.html$", "priority": 0.95, "changefreq": "daily" },

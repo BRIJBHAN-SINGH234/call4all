@@ -11,6 +11,8 @@ Allow: /data/rental-cars.csv
 Allow: /data/second-hand-items.csv
 Allow: /data/handmade-items.csv
 Allow: /data/building-materials.csv
+Allow: /data/weekend-crew.json
+Allow: /data/weekend-crew-gallery.csv
 Disallow: /data/
 Disallow: /admin.html
 Disallow: /staff.html
@@ -20,6 +22,7 @@ Disallow: /car-rental-admin.html
 Disallow: /second-hand-admin.html
 Disallow: /handmade-admin.html
 Disallow: /building-materials-admin.html
+Disallow: /weekend-crew-admin.html
 Disallow: /logo-preview.html
 Disallow: /home-classic.html
 Disallow: /llms.txt
