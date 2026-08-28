@@ -1024,6 +1024,48 @@ function toggleMenu() {
   if (nav) nav.classList.toggle('open');
 }
 
+function initImageLightbox() {
+  if (document.getElementById('c4aImageLightbox')) return;
+  const lightbox = document.createElement('div');
+  lightbox.id = 'c4aImageLightbox';
+  lightbox.className = 'c4a-image-lightbox';
+  lightbox.hidden = true;
+  lightbox.setAttribute('role', 'dialog');
+  lightbox.setAttribute('aria-modal', 'true');
+  lightbox.setAttribute('aria-label', 'Full image preview');
+  lightbox.innerHTML = `<button type="button" class="c4a-lightbox-close" aria-label="Close image preview">×</button><div class="c4a-lightbox-stage"><img alt=""><p></p></div>`;
+  document.body.appendChild(lightbox);
+  const fullImage = lightbox.querySelector('img');
+  const caption = lightbox.querySelector('p');
+  const close = () => {
+    lightbox.hidden = true;
+    document.body.classList.remove('c4a-lightbox-open');
+    fullImage.removeAttribute('src');
+  };
+  const open = image => {
+    fullImage.src = image.currentSrc || image.src;
+    fullImage.alt = image.alt || 'Full image preview';
+    caption.textContent = image.alt || '';
+    caption.hidden = !caption.textContent;
+    lightbox.hidden = false;
+    document.body.classList.add('c4a-lightbox-open');
+    lightbox.querySelector('.c4a-lightbox-close').focus();
+  };
+  lightbox.addEventListener('click', event => {
+    if (event.target === lightbox || event.target.closest('.c4a-lightbox-close')) close();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !lightbox.hidden) close();
+  });
+  document.addEventListener('click', event => {
+    const image = event.target.closest('img');
+    if (!image || image.closest('.site-header,.site-footer,.floating-buttons,.c4a-image-lightbox') || image.matches('.no-lightbox,[data-no-lightbox]')) return;
+    if (!image.src || image.naturalWidth < 120 || image.naturalHeight < 120) return;
+    event.preventDefault();
+    open(image);
+  });
+}
+
 function renderHomeServiceGrid() {
   const grid = document.getElementById('serviceGrid');
   if (!grid || grid.children.length) return;
@@ -1117,6 +1159,7 @@ function paintSiteShellOnce() {
 /* ===== Auto-render on DOMContentLoaded ===== */
 document.addEventListener('DOMContentLoaded', function () {
   paintSiteShellOnce();
+  initImageLightbox();
   renderPublicContentGuide();
 
   if (typeof initBookingForm === 'function') initBookingForm();

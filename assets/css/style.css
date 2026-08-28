@@ -53,6 +53,17 @@ h1, h2, h3, h4, h5, .brand-name, .section-title, .hero h1 {
 a { color: var(--primary); text-decoration: none; transition: var(--transition); }
 img { max-width: 100%; display: block; height: auto; }
 
+/* Site-wide full-image viewer for product, property and gallery photos. */
+.c4a-image-lightbox[hidden] { display: none; }
+.c4a-image-lightbox { position: fixed; z-index: 100000; inset: 0; display: grid; place-items: center; padding: 58px 24px 24px; background: rgba(7,7,9,.94); backdrop-filter: blur(8px); }
+.c4a-lightbox-stage { width: 100%; height: 100%; display: grid; grid-template-rows: minmax(0,1fr) auto; place-items: center; gap: 12px; }
+.c4a-lightbox-stage img { width: auto; height: auto; max-width: 100%; max-height: calc(100vh - 110px); object-fit: contain; border-radius: 6px; box-shadow: 0 20px 70px rgba(0,0,0,.45); }
+.c4a-lightbox-stage p { max-width: 800px; margin: 0; color: rgba(255,255,255,.82); font-size: 13px; text-align: center; }
+.c4a-lightbox-close { position: absolute; z-index: 2; top: 12px; right: 14px; width: 42px; height: 42px; border: 1px solid rgba(255,255,255,.5); border-radius: 50%; background: rgba(20,20,22,.8); color: #fff; font-size: 30px; line-height: 1; cursor: pointer; }
+body.c4a-lightbox-open { overflow: hidden; }
+main img:not(.no-lightbox):not([data-no-lightbox]),.gallery-grid img,.wc-gallery img,.wc-featured img { cursor: zoom-in; }
+@media(max-width:600px){.c4a-image-lightbox{padding:54px 10px 14px}.c4a-lightbox-stage img{max-height:calc(100vh - 92px);border-radius:3px}.c4a-lightbox-close{top:8px;right:9px}}
+
 /* ===== Layout stability (prevents CLS from JS-injected header/slider/gallery) ===== */
 #site-header { min-height: 79px; contain: layout style; }
 #site-footer { min-height: 200px; contain: layout style; }

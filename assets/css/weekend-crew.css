@@ -85,6 +85,7 @@ body[data-page="weekend-crew"]{margin:0;background:var(--wc-sand);color:var(--wc
 .wc-hero-content{width:min(100%,1120px);box-sizing:border-box}
 .wc-hero-copy{width:min(760px,100%);min-width:0;box-sizing:border-box;padding:clamp(24px,3.5vw,45px);border:1px solid rgba(255,255,255,.2);border-radius:24px;background:linear-gradient(135deg,rgba(8,8,8,.78),rgba(18,18,18,.52));box-shadow:0 28px 80px rgba(0,0,0,.3);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .wc-hero h1,.wc-hero #weekendTitle{color:#fff!important;font-size:clamp(3.1rem,7vw,7.2rem);text-wrap:balance;text-shadow:0 4px 32px rgba(0,0,0,.55)}
+.wc-mobile-title{display:none}
 .wc-hero p{text-shadow:0 2px 14px rgba(0,0,0,.6)}
 .wc-video-story{padding:clamp(85px,10vw,150px) clamp(18px,6vw,90px);background:var(--primary-dark,#0f0f0f);color:#fff}
 .wc-video-story-head{display:grid;grid-template-columns:minmax(240px,.85fr) 1.5fr;gap:clamp(30px,7vw,100px);align-items:end;margin:0 auto 48px;max-width:1380px}
@@ -97,14 +98,21 @@ body[data-page="weekend-crew"]{margin:0;background:var(--wc-sand);color:var(--wc
 .wc-video-start{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);display:none;align-items:center;gap:8px;padding:12px 16px;border:1px solid rgba(255,255,255,.65);border-radius:999px;background:rgba(15,15,15,.76);color:#fff;font:700 13px var(--font-body);cursor:pointer;backdrop-filter:blur(7px)}
 .wc-video-start.is-visible{display:flex}
 @media(max-width:700px){
-.wc-hero{min-height:760px}
-.wc-hero-content{padding:115px 16px 55px}
-.wc-hero-copy{padding:24px 19px;border-radius:18px}
-.wc-hero h1,.wc-hero #weekendTitle{max-width:100%;font-size:clamp(2.45rem,12vw,3.55rem);line-height:.98;letter-spacing:-.055em;overflow-wrap:anywhere}
-.wc-hero p{font-size:.96rem;line-height:1.55}
+.wc-hero{display:block;min-height:0;background:var(--primary-dark,#0f0f0f)}
+.wc-video-wrap{position:relative;inset:auto;width:100%;height:auto;aspect-ratio:16/9;background:#000}
+.wc-video-wrap .wc-video{object-fit:contain;object-position:center;filter:saturate(1.06) contrast(1.03) brightness(1.04)}
+.wc-video-shade{display:none}
+.wc-hero-content{position:relative;width:100%;max-width:none;padding:14px 14px 24px;overflow:hidden}
+.wc-hero-copy{width:auto;max-width:none;margin:0;padding:18px 17px;border-radius:16px;background:#171717;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+.wc-hero #weekendTitle{display:none}
+.wc-hero .wc-mobile-title{display:block;max-width:100%;margin:12px 0 16px;color:#fff!important;font:800 clamp(2rem,9vw,2.5rem)/1.02 var(--font-heading,"Manrope",sans-serif);letter-spacing:-.04em;overflow-wrap:anywhere}
+.wc-hero #weekendSubtitle{display:none}
+.wc-eyebrow{font-size:.62rem;letter-spacing:.14em}
 .wc-hero-copy p{max-width:100%;overflow-wrap:anywhere}
 .wc-actions{display:grid;grid-template-columns:1fr;margin-top:22px}
 .wc-actions .wc-btn{width:100%;box-sizing:border-box;padding:13px 12px;white-space:normal;text-align:center}
+.wc-actions .wc-btn.ghost{display:none}
+.wc-scroll{display:none}
 .wc-video-story-head{grid-template-columns:1fr}
 .wc-video-frame{aspect-ratio:9/14;border-radius:16px}
 .wc-video-frame>span{left:12px;bottom:12px}
