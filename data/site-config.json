@@ -31,97 +31,127 @@
   },
   "slider": {
     "enabled": true,
-    "interval_ms": 5000,
+    "interval_ms": 2000,
     "slides": [
       {
-        "id": "s1",
+        "id": "property",
         "enabled": true,
-        "icon": "🚗",
-        "title": "Rental Cars",
-        "subtitle": "Comfortable cars for travel, transfers and events",
-        "background_url": "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=960&q=75&auto=format&fit=crop",
-        "link": "car-rental-kukas.html",
+        "icon": "🏠",
+        "title": "Property in Jaipur",
+        "subtitle": "Explore verified property for sale, rent and lease",
+        "background_url": "assets/uploads/property-1786284906619-indraj_palace.png",
+        "link": "properties.html",
         "order": 1
       },
       {
-        "id": "s2",
-        "enabled": true,
-        "icon": "🏠",
-        "title": "Rooms & Flats",
-        "subtitle": "Explore rooms, flats, PGs and properties",
-        "background_url": "https://images.unsplash.com/photo-1501183638710-841dd1904471?w=960&q=75&auto=format&fit=crop",
-        "link": "rooms-flats-kukas.html",
-        "order": 2
-      },
-      {
-        "id": "s3",
-        "enabled": true,
-        "icon": "🧱",
-        "title": "Construction Labor",
-        "subtitle": "Skilled teams and contractors for your project",
-        "background_url": "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=960&q=75&auto=format&fit=crop",
-        "link": "construction-labor-kukas.html",
-        "order": 3
-      },
-      {
-        "id": "s4",
-        "enabled": true,
-        "icon": "📚",
-        "title": "Home Tutors",
-        "subtitle": "Find tutors for school, college and entrance exams",
-        "background_url": "https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=960&q=75&auto=format&fit=crop",
-        "link": "home-tutor-kukas.html",
-        "order": 4
-      },
-      {
-        "id": "s5",
-        "enabled": true,
-        "icon": "👷",
-        "title": "Manpower Supply",
-        "subtitle": "Workforce solutions for businesses and events",
-        "background_url": "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=960&q=75&auto=format&fit=crop",
-        "link": "manpower-supply-kukas.html",
-        "order": 5
-      },
-      {
-        "id": "s6",
-        "enabled": true,
-        "icon": "💍",
-        "title": "Marriage Services",
-        "subtitle": "Plan memorable weddings with trusted specialists",
-        "background_url": "https://images.unsplash.com/photo-1519741497674-611481863552?w=960&q=75&auto=format&fit=crop",
-        "link": "wedding-services-kukas.html",
-        "order": 6
-      },
-      {
-        "id": "s7",
-        "enabled": true,
-        "icon": "🌸",
-        "title": "Hotel Flower Bouquet",
-        "subtitle": "Flowers and arrangements for meaningful occasions",
-        "background_url": "https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=960&q=75&auto=format&fit=crop",
-        "link": "flower-bouquet-kukas.html",
-        "order": 7
-      },
-      {
-        "id": "s8",
-        "enabled": true,
-        "icon": "🎀",
-        "title": "Car Decoration",
-        "subtitle": "Beautiful car decoration for weddings and events",
-        "background_url": "https://images.unsplash.com/photo-1606013519235-f4f8b3ee5ae5?w=960&q=75&auto=format&fit=crop",
-        "link": "car-decoration-kukas.html",
-        "order": 8
-      },
-      {
-        "id": "s9",
+        "id": "thali",
         "enabled": true,
         "title": "Call4Thali",
         "subtitle": "Fresh vegetarian meals from Rs 49",
         "background_url": "assets/uploads/tiffin-center-kukas-banner.png",
         "link": "tiffin-center-kukas.html",
         "image_only": true,
+        "order": 2
+      },
+      {
+        "id": "second-hand",
+        "enabled": true,
+        "icon": "♻️",
+        "title": "Second-Hand Marketplace",
+        "subtitle": "Approved used furniture, electronics and everyday items",
+        "background_url": "assets/uploads/second-hand-1787819094199-WhatsApp_Image_2026-08-27_at_10.29.42_AM.jpg",
+        "link": "second-hand-items.html",
+        "order": 3
+      },
+      {
+        "id": "weekend-crew",
+        "enabled": true,
+        "icon": "🥾",
+        "title": "Weekend Treks & Adventures",
+        "subtitle": "Hidden trails, sunrise hikes and group experiences across Rajasthan",
+        "background_url": "assets/uploads/weekend-crew/weekend-crew-05.jpeg",
+        "link": "weekend-treks-jaipur-rajasthan.html",
+        "order": 4
+      },
+      {
+        "id": "rental-cars",
+        "enabled": true,
+        "icon": "🚗",
+        "title": "Rental Cars",
+        "subtitle": "Comfortable cars for travel, transfers and events",
+        "background_url": "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=960&q=75&auto=format&fit=crop",
+        "link": "car-rental-kukas.html",
+        "order": 5
+      },
+      {
+        "id": "rooms",
+        "enabled": true,
+        "icon": "🏠",
+        "title": "Rooms & Flats",
+        "subtitle": "Explore rooms, flats and PG accommodation",
+        "background_url": "https://images.unsplash.com/photo-1501183638710-841dd1904471?w=960&q=75&auto=format&fit=crop",
+        "link": "rooms-flats-kukas.html",
+        "order": 6
+      },
+      {
+        "id": "construction",
+        "enabled": true,
+        "icon": "🧱",
+        "title": "Construction Labor",
+        "subtitle": "Skilled teams and contractors for your project",
+        "background_url": "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=960&q=75&auto=format&fit=crop",
+        "link": "construction-labor-kukas.html",
+        "order": 7
+      },
+      {
+        "id": "tutors",
+        "enabled": true,
+        "icon": "📚",
+        "title": "Home Tutors",
+        "subtitle": "Find tutors for school, college and entrance exams",
+        "background_url": "https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=960&q=75&auto=format&fit=crop",
+        "link": "home-tutor-kukas.html",
+        "order": 8
+      },
+      {
+        "id": "manpower",
+        "enabled": true,
+        "icon": "👷",
+        "title": "Manpower Supply",
+        "subtitle": "Workforce solutions for businesses and events",
+        "background_url": "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=960&q=75&auto=format&fit=crop",
+        "link": "manpower-supply-kukas.html",
         "order": 9
+      },
+      {
+        "id": "weddings",
+        "enabled": true,
+        "icon": "💍",
+        "title": "Marriage Services",
+        "subtitle": "Plan memorable weddings with trusted specialists",
+        "background_url": "https://images.unsplash.com/photo-1519741497674-611481863552?w=960&q=75&auto=format&fit=crop",
+        "link": "wedding-services-kukas.html",
+        "order": 10
+      },
+      {
+        "id": "flowers",
+        "enabled": true,
+        "icon": "🌸",
+        "title": "Hotel Flower Bouquet",
+        "subtitle": "Flowers and arrangements for meaningful occasions",
+        "background_url": "https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=960&q=75&auto=format&fit=crop",
+        "link": "flower-bouquet-kukas.html",
+        "order": 11
+      },
+      {
+        "id": "car-decoration",
+        "enabled": true,
+        "icon": "🎀",
+        "title": "Car Decoration",
+        "subtitle": "Beautiful car decoration for weddings and events",
+        "background_url": "https://images.unsplash.com/photo-1606013519235-f4f8b3ee5ae5?w=960&q=75&auto=format&fit=crop",
+        "link": "car-decoration-kukas.html",
+        "order": 12
       }
     ]
   },
