@@ -32,6 +32,7 @@
     "changefreq": "weekly"
   },
   "rules": [
+    { "pattern": "^building-materials-jaipur\\.html$", "priority": 0.96, "changefreq": "daily" },
     { "pattern": "^properties\\.html$", "priority": 0.98, "changefreq": "daily" },
     { "pattern": "^second-hand-items\\.html$", "priority": 0.95, "changefreq": "daily" },
     { "pattern": "^handmade-items\\.html$", "priority": 0.95, "changefreq": "daily" },

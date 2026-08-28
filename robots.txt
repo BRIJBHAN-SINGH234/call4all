@@ -10,6 +10,7 @@ Allow: /data/properties.csv
 Allow: /data/rental-cars.csv
 Allow: /data/second-hand-items.csv
 Allow: /data/handmade-items.csv
+Allow: /data/building-materials.csv
 Disallow: /data/
 Disallow: /admin.html
 Disallow: /staff.html

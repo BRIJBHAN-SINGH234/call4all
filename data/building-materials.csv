@@ -1,0 +1,5 @@
+id,name,category,price,unit,city,area,description,status,featured,updated_at
+bm-20mm-rodi,20 MM Rodi,Stone Aggregate,680,Ton,Jaipur,Kukas,"Strong, uniformly graded 20 mm stone aggregate for RCC, foundations, slabs and general concrete work.",Active,Yes,2026-08-28
+bm-10mm-rodi,10 MM Rodi,Stone Aggregate,600,Ton,Jaipur,Kukas,"Clean 10 mm stone aggregate suitable for RCC, precast work, flooring base and detailed concrete applications.",Active,Yes,2026-08-28
+bm-msand,M-Sand,Construction Sand,780,Ton,Jaipur,Kukas,"Machine-made construction sand with consistent grading for concrete, masonry and structural work.",Active,Yes,2026-08-28
+bm-psand,P-Sand,Plaster Sand,980,Ton,Jaipur,Kukas,"Fine plaster sand prepared for smooth wall plastering, finishing and masonry applications.",Active,Yes,2026-08-28
