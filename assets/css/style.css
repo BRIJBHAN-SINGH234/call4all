@@ -120,9 +120,22 @@ main img:not(.no-lightbox):not([data-no-lightbox]),.gallery-grid img,.wc-gallery
 .site-nav ul {
   display: flex;
   list-style: none;
-  gap: 28px;
+  gap: 8px;
   align-items: center;
 }
+.site-nav > ul > li > a,
+.site-nav summary {
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 12px;
+  position: relative;
+  cursor: pointer;
+  list-style: none;
+  white-space: nowrap;
+}
+.site-nav summary::-webkit-details-marker { display: none; }
+.site-nav summary span { margin-left: 6px; color: var(--accent-dark); font-size: 13px; }
 .site-nav a {
   color: var(--primary);
   font-weight: 600;
@@ -141,6 +154,37 @@ main img:not(.no-lightbox):not([data-no-lightbox]),.gallery-grid img,.wc-gallery
   background: var(--accent);
   border-radius: 3px;
 }
+.nav-group { position: relative; }
+.nav-group details { position: relative; }
+.nav-group details[open] > summary,
+.site-nav summary:hover,
+.site-nav > ul > li > a:hover { color: var(--accent-dark); }
+.nav-group details > ul {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  padding: 8px;
+  gap: 2px;
+  align-items: stretch;
+  flex-direction: column;
+  background: var(--white);
+  border: 1px solid #e8e9ed;
+  border-radius: 10px;
+  box-shadow: 0 16px 36px rgba(0,0,0,.14);
+  z-index: 20;
+}
+.nav-group details[open] > ul { display: flex; }
+.nav-group details > ul li { width: 100%; }
+.nav-group details > ul a {
+  display: block;
+  padding: 9px 11px;
+  border-radius: 6px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.nav-group details > ul a:hover { background: var(--bg-light); padding-left: 14px; }
 .menu-toggle {
   display: none;
   background: none;
@@ -1118,6 +1162,8 @@ main img:not(.no-lightbox):not([data-no-lightbox]),.gallery-grid img,.wc-gallery
 .footer-section a { color: rgba(255,255,255,0.78); line-height: 2.2; font-size: 14px; transition: var(--transition); }
 .footer-section a:hover { color: var(--accent); padding-left: 4px; }
 .footer-section p { color: rgba(255,255,255,0.78); line-height: 1.85; font-size: 14px; }
+.footer-area-link { margin-top: 12px; }
+.footer-area-link a { color: var(--accent); font-weight: 700; }
 .footer-bottom {
   text-align: center;
   padding-top: 24px;
@@ -1849,6 +1895,8 @@ body.festival-independence {
     gap: 0;
     align-items: stretch;
   }
+  .site-nav > ul > li > a,
+  .site-nav summary { display: flex; justify-content: space-between; padding: 12px 4px; }
   .site-nav li {
     border-bottom: 1px solid #eef0f4;
   }
@@ -1856,6 +1904,17 @@ body.festival-independence {
     display: block;
     padding: 12px 4px;
   }
+  .nav-group details[open] > ul {
+    position: static;
+    display: flex;
+    min-width: 0;
+    padding: 0 0 8px 12px;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+  }
+  .nav-group details > ul a { padding: 9px 4px; font-size: 14px; }
 
   .hero {
     padding: 64px 22px 48px;

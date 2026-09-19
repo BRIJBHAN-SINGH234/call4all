@@ -907,19 +907,7 @@ loadCachedConfig();
 
 function renderHeader(activePage) {
   const cfg = window.SITE_CONFIG;
-  const links = [
-    { href: 'index.html', label: 'Home', key: 'home' },
-    { href: 'index.html#services', label: 'Services', key: 'services' },
-    { href: 'properties.html', label: 'Properties', key: 'properties' },
-    { href: 'tiffin-center-kukas.html', label: 'Tiffin', key: 'tiffin' },
-    { href: 'second-hand-items.html', label: 'Second Hand', key: 'second-hand' },
-    { href: 'weekend-treks-jaipur-rajasthan.html', label: 'Weekend Trips', key: 'weekend-crew' },
-    { href: 'building-materials-jaipur.html', label: 'Materials', key: 'building-materials' },
-    { href: 'handmade-items.html', label: 'Handmade', key: 'handmade' },
-    { href: 'gallery.html', label: 'Gallery', key: 'gallery' },
-    { href: 'about.html', label: 'About Us', key: 'about' },
-    { href: 'contact.html', label: 'Contact Us', key: 'contact' }
-  ];
+  const links = [];
   // Append admin-managed dynamic pages flagged "show_in_menu"
   const dynamicPages = (cfg.pages || [])
     .filter(p => p.enabled !== false && p.show_in_menu === true && p.slug)
@@ -932,9 +920,31 @@ function renderHeader(activePage) {
       key: 'page-' + p.slug
     });
   });
-  const linkHtml = links.map(l =>
-    `<li><a href="${l.href}" ${activePage === l.key ? 'class="active"' : ''}>${escapeHtml(l.label)}</a></li>`
-  ).join('');
+  const link = (href, label, key) => `<li><a href="${href}" ${activePage === key ? 'class="active"' : ''}>${escapeHtml(label)}</a></li>`;
+  const group = (label, items, key) => `<li class="nav-group"><details><summary>${escapeHtml(label)}<span aria-hidden="true">⌄</span></summary><ul>${items.join('')}</ul></details></li>`;
+  const serviceItems = [
+    link('index.html#services', 'All Services', 'services'),
+    link('call4plumber-jaipur.html', 'Call4Plumber', 'call4plumber'),
+    link('call4carpenter-jaipur.html', 'Call4Carpenter', 'call4carpenter'),
+    link('call4painter-jaipur.html', 'Call4Painter', 'call4painter'),
+    link('call4repair-jaipur.html', 'Call4Repair', 'call4repair'),
+    link('rooms-pg-flats-thali-kukas-jaipur.html', 'Rooms, PG & Flats', 'rooms-flats'),
+    link('tiffin-center-kukas.html', 'Call4Thali', 'tiffin')
+  ];
+  const productItems = [
+    link('properties.html', 'Property Sale & Rent', 'properties'),
+    link('second-hand-items.html', 'Second-Hand Items', 'second-hand'),
+    link('handmade-items.html', 'Handmade Products', 'handmade'),
+    link('building-materials-jaipur.html', 'Building Materials', 'building-materials'),
+    link('weekend-treks-jaipur-rajasthan.html', 'Weekend Trips', 'weekend-crew')
+  ];
+  const exploreItems = [
+    link('jaipur-repair-areas.html', 'Jaipur Repair Areas', 'repair-areas'),
+    link('gallery.html', 'Gallery', 'gallery'),
+    link('about.html', 'About Us', 'about'),
+    link('contact.html', 'Contact Us', 'contact')
+  ];
+  const dynamicItems = links.map(l => link(l.href, l.label, l.key));
   const logoHeight = cfg.logoHeight || 55;
   const brandName = escapeHtml(cfg.businessName || 'Call4All');
   const tagline = cfg.tagline ? `<span class="brand-tagline">${escapeHtml(cfg.tagline)}</span>` : '';
@@ -953,7 +963,13 @@ function renderHeader(activePage) {
       </a>
       <button class="menu-toggle" aria-label="Toggle menu" onclick="toggleMenu()">☰</button>
       <nav class="site-nav" id="siteNav">
-        <ul>${linkHtml}</ul>
+        <ul>
+          <li class="nav-home"><a href="index.html" ${activePage === 'home' ? 'class="active"' : ''}>Home</a></li>
+          ${group('Services', serviceItems, 'services')}
+          ${group('Products & Materials', productItems, 'products')}
+          ${group('Explore', exploreItems, 'explore')}
+          ${dynamicItems.length ? group('More', dynamicItems, 'more') : ''}
+        </ul>
       </nav>
     </header>
   `;
@@ -964,9 +980,21 @@ function renderFooter() {
   const ico = (name, size) => (typeof window.c4aIcon === 'function')
     ? window.c4aIcon(name, { size: size || 16 })
     : '';
-  const serviceLinks = orderedHomeServices(false)
-    .map(s => `<li><a href="${s.page}">${s.name}</a></li>`)
-    .join('');
+  const serviceLinks = [
+    ['call4plumber-jaipur.html', 'Call4Plumber'],
+    ['call4carpenter-jaipur.html', 'Call4Carpenter'],
+    ['call4painter-jaipur.html', 'Call4Painter'],
+    ['call4repair-jaipur.html', 'Call4Repair'],
+    ['rooms-pg-flats-thali-kukas-jaipur.html', 'Rooms, PG & Flats'],
+    ['tiffin-center-kukas.html', 'Call4Thali']
+  ].map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join('');
+  const productLinks = [
+    ['properties.html', 'Property Sale & Rent'],
+    ['building-materials-jaipur.html', 'Building Materials'],
+    ['second-hand-items.html', 'Second-Hand Items'],
+    ['handmade-items.html', 'Handmade Products'],
+    ['weekend-treks-jaipur-rajasthan.html', 'Weekend Trips']
+  ].map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join('');
   return `
     <footer class="site-footer">
       <div class="footer-content">
@@ -988,8 +1016,13 @@ function renderFooter() {
           </ul>
         </div>
         <div class="footer-section no-icon-list">
-          <h3>Our Services</h3>
+          <h3>Call4 Services</h3>
           <ul class="flat">${serviceLinks}</ul>
+        </div>
+        <div class="footer-section no-icon-list">
+          <h3>Products &amp; Explore</h3>
+          <ul class="flat">${productLinks}</ul>
+          <p class="footer-area-link"><a href="jaipur-repair-areas.html">Browse Jaipur repair areas →</a></p>
         </div>
         <div class="footer-section">
           <h3>Contact Info</h3>
