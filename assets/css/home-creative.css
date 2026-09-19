@@ -73,6 +73,15 @@
 .home-creative .site-header .site-nav a:hover {
   color: var(--accent);
 }
+.home-creative .site-header .nav-group details > ul a,
+.home-creative .site-header.scrolled .nav-group details > ul a {
+  color: #171717;
+}
+.home-creative .site-header .nav-group details > ul a:hover,
+.home-creative .site-header.scrolled .nav-group details > ul a:hover {
+  color: var(--accent-dark);
+  background: #f1f2f5;
+}
 .home-creative .site-header .menu-toggle {
   color: #fff;
 }
@@ -531,6 +540,8 @@
     background: rgba(18,35,24,0.98);
   }
   .home-creative .site-nav.open a { color: #fff; }
+  .home-creative .site-nav.open .nav-group details > ul a { color: #fff; }
+  .home-creative .site-nav.open .nav-group details > ul a:hover { color: var(--accent); background: rgba(255,255,255,.08); }
 }
 
 /* Clean, high-contrast marketplace finish for the public homepage. */
