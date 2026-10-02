@@ -52,6 +52,10 @@ canvas{display:block;width:min(100%,470px);height:auto;aspect-ratio:1;touch-acti
 .memory-cell.flash{background:var(--lime);border-color:var(--green);transform:scale(.96)}
 .memory-cell.selected{background:#dcefe4;border-color:var(--green)}
 .answer-status{min-height:22px;margin:13px 0 0;font-size:13px;font-weight:800;color:var(--green)}
+.next-quiz{max-width:570px;margin:auto;padding:35px 10px;text-align:center}
+.next-quiz .quiz-question{margin-left:auto;margin-right:auto}
+.next-quiz .action{min-width:220px;margin-top:8px}
+.next-countdown{min-height:20px;margin:12px 0 0;color:var(--muted);font-size:12px}
 .logic-statements{display:grid;gap:7px;max-width:560px;margin:15px 0}
 .logic-statement{padding:10px 12px;background:#fff;border-left:3px solid var(--coral);font-size:13px}
 .board-wrap:has(.quiz-prompt:not([hidden])) .canvas-frame{display:none}
@@ -155,7 +159,7 @@ canvas{display:block;width:min(100%,470px);height:auto;aspect-ratio:1;touch-acti
   const wheelDialog=document.getElementById('wheelDialog'),wheel=document.getElementById('wheel'),spinButton=document.getElementById('spinButton'),reward=document.getElementById('reward');
   const failureDialog=document.getElementById('failureDialog');
   const DIRS=[{x:0,y:-1,wall:0,opposite:2},{x:1,y:0,wall:1,opposite:3},{x:0,y:1,wall:2,opposite:0},{x:-1,y:0,wall:3,opposite:1}];
-  let state=loadState(),tickHandle=0;
+  let state=loadState(),tickHandle=0,nextRoundHandle=0;
 
   function randomInt(max){const values=new Uint32Array(1);crypto.getRandomValues(values);return values[0]%max}
   function loadState(){try{const saved=JSON.parse(localStorage.getItem(STORE_KEY));if(saved&&Array.isArray(saved.wins)&&saved.wins.length<=ROUND_COUNT&&Array.isArray(saved.roundTypes)&&saved.quiz&&(!saved.startedAt||Date.now()-saved.startedAt<24*60*60*1000))return saved}catch{}return null}
@@ -274,7 +278,28 @@ canvas{display:block;width:min(100%,470px);height:auto;aspect-ratio:1;touch-acti
     state.quiz.puzzle.solved=true;
     state.wins.push(state.quiz.type);announcer.textContent=`${state.quiz.type} round complete`;
     if(state.wins.length===ROUND_COUNT){state.finishedAt=Date.now();renderComplete();saveState();updateProgress();checkUnlock();return}
-    saveState();updateProgress();setTimeout(makeNewRound,650);
+    state.nextRoundAt=Date.now()+10000;saveState();updateProgress();renderNextRound();scheduleNextRound();
+  }
+  function renderNextRound(){
+    const nextNumber=state.wins.length+1;
+    mazeFrame.hidden=true;quizPrompt.hidden=false;dpad.hidden=true;
+    quizPrompt.innerHTML=`<div class="next-quiz"><span class="quiz-kicker">Round ${nextNumber} taiyaar hai</span><h2 class="quiz-question">Agla quiz khelein?</h2><p class="quiz-copy">Button dabate hi naya challenge shuru hoga. 10 second mein nahi dabaya to apne aap start ho jayega.</p><button type="button" class="action" id="playNextButton">Agla quiz khelein</button><p class="next-countdown" id="nextCountdown" aria-live="polite"></p></div>`;
+    roundLabel.textContent=`Round ${nextNumber} / ${ROUND_COUNT} · Ready`;
+    document.getElementById('playNextButton').addEventListener('click',startNextRound);
+    updateNextCountdown();
+  }
+  function updateNextCountdown(){
+    const countdown=document.getElementById('nextCountdown');if(!countdown||!state?.nextRoundAt)return;
+    const seconds=Math.max(0,Math.ceil((state.nextRoundAt-Date.now())/1000));
+    countdown.textContent=seconds?`Auto-start ${seconds} second mein`:'Quiz shuru ho raha hai...';
+  }
+  function scheduleNextRound(){
+    clearTimeout(nextRoundHandle);if(!state?.nextRoundAt)return;
+    nextRoundHandle=setTimeout(startNextRound,Math.max(0,state.nextRoundAt-Date.now()));
+  }
+  function startNextRound(){
+    if(!state?.nextRoundAt||state.failed||state.wins.length>=ROUND_COUNT)return;
+    clearTimeout(nextRoundHandle);state.nextRoundAt=null;makeNewRound();
   }
   function renderComplete(){mazeFrame.hidden=true;quizPrompt.hidden=false;dpad.hidden=true;quizPrompt.innerHTML='<span class="quiz-kicker">5 / 5 complete</span><h2 class="quiz-question">Saare challenges solve ho gaye!</h2><p class="quiz-copy">6 minute poore hote hi discount wheel unlock ho jayega.</p>';roundLabel.textContent='Paanchon challenges complete!'}
   function move(direction){
@@ -292,6 +317,7 @@ canvas{display:block;width:min(100%,470px);height:auto;aspect-ratio:1;touch-acti
     if(!state?.startedAt)return;
     const remaining=Math.max(0,CHALLENGE_MS-(Date.now()-state.startedAt)),seconds=Math.ceil(remaining/1000);
     timerText.textContent=`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')} ${state.wins.length===ROUND_COUNT?'spin tak':'baaki'}`;
+    updateNextCountdown();
     if(remaining===0){
       if(state.wins.length===ROUND_COUNT){timerText.textContent='Spin khul gaya';checkUnlock()}
       else{state.failed=true;saveState();failureDialog.classList.add('open')}
@@ -306,6 +332,7 @@ canvas{display:block;width:min(100%,470px);height:auto;aspect-ratio:1;touch-acti
     if(state.failed){failureDialog.classList.add('open');return}
     if(state.prize){wheelDialog.classList.add('open');showReward(state.prize)}
     if(state.wins.length>=ROUND_COUNT)renderComplete();
+    else if(state.quiz?.puzzle?.solved&&state.nextRoundAt){renderNextRound();scheduleNextRound()}
     else if(!state.quiz?.type)makeNewRound();
     else if(state.quiz?.type==='maze')drawMaze();
     else if(state.quiz?.type)renderPuzzle();
@@ -323,7 +350,7 @@ canvas{display:block;width:min(100%,470px);height:auto;aspect-ratio:1;touch-acti
   document.getElementById('tableNumber').textContent=String(randomInt(99)+1).padStart(2,'0');
   if(state){startButton.textContent='Challenge jaari rakhein';if(state.prize)startButton.textContent='Apna discount dekhein'}
   else state=newGameState();
-  if(state?.startedAt){refreshTimer();if(state.wins.length===ROUND_COUNT&&Date.now()-state.startedAt>=CHALLENGE_MS)setTimeout(checkUnlock,0)}
+  if(state?.startedAt){refreshTimer();if(state.wins.length===ROUND_COUNT&&Date.now()-state.startedAt>=CHALLENGE_MS)setTimeout(checkUnlock,0);else if(state.nextRoundAt)scheduleNextRound()}
 })();
 </script>
 </body>
