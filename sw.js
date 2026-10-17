@@ -8,7 +8,7 @@
  *   - GitHub API calls:  network-only (sensitive, never cache)
  */
 
-const CACHE_VERSION = 'v29-2026-10-17-food-billing-menu';
+const CACHE_VERSION = 'v30-2026-10-17-food-billing-pwa';
 const STATIC_CACHE = 'c4a-static-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'c4a-runtime-' + CACHE_VERSION;
 
@@ -44,6 +44,12 @@ const PRECACHE_URLS = [
   '/staff.html',
   '/admin-manifest.json',
   '/staff-manifest.json'
+  ,'/food-billing.html'
+  ,'/food-billing-manifest.json'
+  ,'/assets/css/food-billing.css'
+  ,'/assets/js/food-billing.js'
+  ,'/data/food-menu.csv'
+  ,'/data/billing-users.csv'
 ];
 
 self.addEventListener('install', event => {
