@@ -1,0 +1,127 @@
+id,category,name,half_price,full_price,status,sort_order
+veg-01,Vegetable,Aalo Tamatar,85,130,active,1
+veg-02,Vegetable,Aalo Matar,85,130,active,2
+veg-03,Vegetable,Aalo Chhola,90,140,active,3
+veg-04,Vegetable,Dum Aalo,100,160,active,4
+veg-05,Vegetable,Jeera Aalo,100,160,active,5
+veg-06,Vegetable,Aalo Gobhi,95,140,active,6
+veg-07,Vegetable,Aalo Bhindi,95,140,active,7
+veg-08,Vegetable,Bhindi Masala,100,150,active,8
+veg-09,Vegetable,Bhindi Fry,80,120,active,9
+veg-10,Vegetable,Bhindi Kurkuri,95,140,active,10
+veg-11,Vegetable,Mix Veg,100,160,active,11
+veg-12,Vegetable,Veg Jaipuri,110,170,active,12
+veg-13,Vegetable,Veg Kolhapuri,110,170,active,13
+veg-14,Vegetable,Veg Deewani Handi,130,200,active,14
+veg-15,Vegetable,Besan Gatta,120,180,active,15
+veg-16,Vegetable,Malai Kofta,120,180,active,16
+veg-17,Vegetable,Malai Pyaj,120,180,active,17
+veg-18,Vegetable,Sev Bhaji,80,130,active,18
+veg-19,Vegetable,Sev Tamatar,80,130,active,19
+veg-20,Vegetable,Palak Tamatar,80,120,active,20
+veg-21,Vegetable,Lahsun Methi,100,160,active,21
+veg-22,Vegetable,Sarso Da Saag,130,200,active,22
+veg-23,Vegetable,Haldi Sabji,180,280,active,23
+dal-01,Dal,Dal Tadka,85,140,active,1
+dal-02,Dal,Dal Fry,90,140,active,2
+dal-03,Dal,Dal Jeera,90,160,active,3
+dal-04,Dal,Dal Makhani,80,150,active,4
+dal-05,Dal,Dal Tamatar,80,160,active,5
+paneer-01,Paneer,Shahi Paneer,140,220,active,1
+paneer-02,Paneer,Sahi Paneer Special,120,180,active,2
+paneer-03,Paneer,Kadhai Paneer,110,200,active,3
+paneer-04,Paneer,Handi Paneer,120,190,active,4
+paneer-05,Paneer,Mutter Paneer,110,190,active,5
+paneer-06,Paneer,Palak Paneer,120,180,active,6
+paneer-07,Paneer,Paneer Angara,100,160,active,7
+paneer-08,Paneer,Paneer Tufani,160,220,active,8
+paneer-09,Paneer,Paneer Dilkhush,150,210,active,9
+paneer-10,Paneer,Paneer Special,130,190,active,10
+paneer-11,Paneer,Paneer Pasanda,120,180,active,11
+paneer-12,Paneer,Paneer Lavabdar,120,190,active,12
+paneer-13,Paneer,Paneer 2 Pyaja,125,200,active,13
+paneer-14,Paneer,Paneer Punjabi,125,200,active,14
+paneer-15,Paneer,Paneer Masala,125,200,active,15
+paneer-16,Paneer,Paneer Kaleji,130,210,active,16
+paneer-17,Paneer,Mushroom Paneer,125,200,active,17
+paneer-18,Paneer,Kaju Paneer,140,230,active,18
+paneer-19,Paneer,Khoya Paneer,150,250,active,19
+paneer-20,Paneer,Paneer Tikka Masala,120,200,active,20
+paneer-21,Paneer,Paneer Butter Masala,130,200,active,21
+special-01,Mushroom & Kaju,Kaju Kari,140,230,active,1
+special-02,Mushroom & Kaju,Mushroom Kari,130,210,active,2
+special-03,Mushroom & Kaju,Mushroom Kadhai,130,210,active,3
+special-04,Mushroom & Kaju,Khoya Kaju,170,250,active,4
+rice-01,Rice,Plain Rice,60,100,active,1
+rice-02,Rice,Jeera Rice,70,110,active,2
+rice-03,Rice,Pulav,80,140,active,3
+rice-04,Rice,Special Pulav,90,150,active,4
+rice-05,Rice,Fried Rice,80,140,active,5
+paratha-01,Parantha,Aalo Sada Parantha,,50,active,1
+paratha-02,Parantha,Aalo Butter Parantha,,60,active,2
+paratha-03,Parantha,Aalo Pyaj Parantha,,55,active,3
+paratha-04,Parantha,Pyaj Parantha,,60,active,4
+paratha-05,Parantha,Gobhi Parantha,,70,active,5
+paratha-06,Parantha,Paneer Parantha,,90,active,6
+paratha-07,Parantha,Methi Parantha,,80,active,7
+paratha-08,Parantha,Mooli Parantha,,70,active,8
+paratha-09,Parantha,Normal Parantha,,30,active,9
+roti-01,Roti / Naan / Kulcha,Tandoori Plain Roti,,15,active,1
+roti-02,Roti / Naan / Kulcha,Tandoori Butter Roti,,20,active,2
+roti-03,Roti / Naan / Kulcha,Butter Naan,,70,active,3
+roti-04,Roti / Naan / Kulcha,Tava Roti Plain,,10,active,4
+roti-05,Roti / Naan / Kulcha,Tava Roti Butter,,13,active,5
+roti-06,Roti / Naan / Kulcha,Lachha Parantha,,70,active,6
+roti-07,Roti / Naan / Kulcha,Kulcha,,80,active,7
+roti-08,Roti / Naan / Kulcha,Bajre Ki Roti,,50,active,8
+roti-09,Roti / Naan / Kulcha,Missi Roti,,50,active,9
+chinese-01,Chinese,Chowmein,,80,active,1
+chinese-02,Chinese,Hakka Noodles,,130,active,2
+chinese-03,Chinese,Fried Rice,80,140,active,3
+chinese-04,Chinese,Manchurian,,100,active,4
+chinese-05,Chinese,Paneer Chilli,,140,active,5
+chinese-06,Chinese,Paneer Chilli Dry,,180,active,6
+snack-01,Starters / Snacks,Paneer Pakoda,,150,active,1
+snack-02,Starters / Snacks,Paneer Tikka,,200,active,2
+snack-03,Starters / Snacks,Paneer Fry,,200,active,3
+snack-04,Starters / Snacks,Dahi Bada,,80,active,4
+snack-05,Starters / Snacks,Kaju Fry,,220,active,5
+snack-06,Starters / Snacks,Peanut Masala,,80,active,6
+snack-07,Starters / Snacks,Navratna,,180,active,7
+roll-01,Roll,Rasiyan Roll,,120,active,1
+roll-02,Roll,Veg Roll,,100,active,2
+roll-03,Roll,Cheese Roll,,140,active,3
+chutney-01,Chutney,Lahsun Chutney,,100,active,1
+chutney-02,Chutney,Tamatar Chutney,,80,active,2
+chutney-03,Chutney,Hari Chutney,,80,active,3
+chutney-04,Chutney,Hari Mirch Chutney,,80,active,4
+raita-01,Raita,Boondi Raita,,90,active,1
+raita-02,Raita,Veg Raita,,90,active,2
+raita-03,Raita,Fry Raita,,100,active,3
+raita-04,Raita,Special Raita,,140,active,4
+raita-05,Raita,Pineapple Raita,,140,active,5
+salad-01,Salad & Papad,Green Salad,,50,active,1
+salad-02,Salad & Papad,Papad,,20,active,2
+salad-03,Salad & Papad,Masala Papad,,40,active,3
+salad-04,Salad & Papad,Special Papad,,60,active,4
+salad-05,Salad & Papad,Papad Choori,,80,active,5
+chhach-01,Chhach,Masala Chhach,,30,active,1
+chhach-02,Chhach,Normal Chhach,,20,active,2
+tea-01,Tea / Coffee,Kulhad Tea,,30,active,1
+tea-02,Tea / Coffee,Normal Tea,,20,active,2
+tea-03,Tea / Coffee,Kesar Tea,,50,active,3
+tea-04,Tea / Coffee,Special Tea,,30,active,4
+tea-05,Tea / Coffee,Coffee,,40,active,5
+tea-06,Tea / Coffee,Cold Coffee,,80,active,6
+lassi-01,Lassi,Lassi,,50,active,1
+shake-01,Shake,Pineapple Shake,,90,active,1
+shake-02,Shake,Strawberry Shake,,80,active,2
+shake-03,Shake,Mango Shake,,100,active,3
+shake-04,Shake,Chocolate Shake,,120,active,4
+shake-05,Shake,Vanilla Shake,,110,active,5
+shake-06,Shake,Special Shake,,140,active,6
+dbc-01,Dal Baati Churma,Dal Baati Churma,,200,active,1
+dbc-02,Dal Baati Churma,Dal Baati Churma + Besan Gatta + Mirchi Piece,,250,active,2
+thali-01,Thali,Mini Thali (Dal Sabji 5 Roti),,80,active,1
+thali-02,Thali,Normal Thali (Dal Sabji 5 Roti Rice Onion Salad),,100,active,2
+thali-03,Thali,Call4Food Special Thali,,199,active,3
