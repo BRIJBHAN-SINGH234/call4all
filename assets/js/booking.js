@@ -403,6 +403,8 @@ window.CsvAPI = (function () {
     'data/rental-cars.csv': ['id', 'timestamp', 'brand', 'model', 'image_path', 'service_types', 'price', 'city', 'seats', 'fuel', 'transmission', 'description', 'status', 'added_by'],
     'data/car-rental-types.csv': ['id', 'group', 'name', 'status', 'created_at', 'created_by']
     ,'data/tiffin-menu.csv': ['id', 'name', 'price', 'description', 'seo_title', 'seo_description', 'seo_keywords', 'slug', 'status', 'sort_order', 'updated_at']
+    ,'data/food-menu.csv': ['id', 'category', 'name', 'half_price', 'full_price', 'status', 'sort_order']
+    ,'data/billing-users.csv': ['id', 'mobile', 'password_hash', 'password_salt', 'name', 'status', 'created_at', 'created_by']
   };
 
   async function getFile(path, token) {
