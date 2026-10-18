@@ -11,6 +11,8 @@ Allow: /data/rental-cars.csv
 Allow: /data/second-hand-items.csv
 Allow: /data/handmade-items.csv
 Allow: /data/building-materials.csv
+Allow: /data/tiffin-menu.csv
+Allow: /data/food-menu.csv
 Allow: /data/weekend-crew.json
 Allow: /data/weekend-crew-gallery.csv
 Disallow: /data/

@@ -63,7 +63,8 @@ function buildEntries(config, htmlFiles, dynamicPages, properties, secondHandIte
     const html = fs.readFileSync(full, 'utf8');
     if (isNoindexHtml(html)) continue;
 
-    add(base + '/' + name, today, metaForFile(name, config));
+    const modified = fs.statSync(full).mtime.toISOString().slice(0, 10);
+    add(base + '/' + name, modified, metaForFile(name, config));
   }
 
   for (const p of config.extraPaths || []) {
@@ -89,7 +90,7 @@ function buildEntries(config, htmlFiles, dynamicPages, properties, secondHandIte
   for (const item of secondHandItems || []) {
     if (!item.id || String(item.status).toLowerCase() !== 'active' || String(item.approval_status).toLowerCase() !== 'approved') continue;
     const lm = (item.reviewed_at || item.timestamp || '').slice(0, 10) || today;
-    add(base + '/second-hand-item.html?id=' + encodeURIComponent(item.id), lm, { priority: 0.85, changefreq: 'daily' });
+    add(base + '/second-hand-' + encodeURIComponent(item.id) + '.html', lm, { priority: 0.85, changefreq: 'weekly' });
   }
 
   for (const item of handmadeItems || []) {

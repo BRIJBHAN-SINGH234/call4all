@@ -78,7 +78,7 @@
     (secondHandItems || []).forEach((item) => {
       if (!item.id || String(item.status).toLowerCase() !== 'active' || String(item.approval_status).toLowerCase() !== 'approved') return;
       const lm = (item.reviewed_at || item.timestamp || '').slice(0, 10) || today;
-      add(base + '/second-hand-item.html?id=' + encodeURIComponent(item.id), lm, { priority: 0.85, changefreq: 'daily' });
+      add(base + '/second-hand-' + encodeURIComponent(item.id) + '.html', lm, { priority: 0.85, changefreq: 'weekly' });
     });
 
     (handmadeItems || []).forEach((item) => {

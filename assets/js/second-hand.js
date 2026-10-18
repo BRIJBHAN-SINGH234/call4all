@@ -4,7 +4,7 @@
   const safe = value => String(value || '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
   const money = value => value ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Number(value)) : 'Price on request';
   const image = item => item.image_path || 'assets/icons/icon-512.png';
-  const detailUrl = item => 'second-hand-item.html?id=' + encodeURIComponent(String(item.id || ''));
+  const detailUrl = item => 'second-hand-' + encodeURIComponent(String(item.id || '')) + '.html';
   const absolute = path => new URL(path, location.href).href;
   function setMeta(selector, content, property) { let tag=document.querySelector(selector);if(!tag){tag=document.createElement('meta');tag.setAttribute(property?'property':'name',selector.match(/["']([^"']+)/)?.[1]||'description');document.head.appendChild(tag)}tag.content=content; }
 
