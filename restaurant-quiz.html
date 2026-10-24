@@ -48,7 +48,7 @@ canvas{display:block;width:min(100%,470px);height:auto;aspect-ratio:1;touch-acti
 .answer-button.wrong{border-color:var(--coral);background:#ffe3db}
 .memory-grid{display:grid;grid-template-columns:repeat(4,minmax(44px,64px));gap:8px;margin:15px 0}
 .memory-cell{aspect-ratio:1;border:1px solid var(--line);border-radius:4px;background:#fff;font-size:18px;font-weight:900;cursor:pointer}
-.memory-cell:disabled{cursor:default}
+.memory-cell{touch-action:manipulation}.memory-cell:disabled{cursor:default}
 .memory-cell.flash{background:var(--lime);border-color:var(--green);transform:scale(.96)}
 .memory-cell.selected{background:#dcefe4;border-color:var(--green)}
 .memory-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
@@ -116,7 +116,7 @@ canvas{display:block;width:min(100%,470px);height:auto;aspect-ratio:1;touch-acti
 </header>
 <main>
   <section class="intro" aria-labelledby="pageTitle">
-    <div><span class="eyebrow">Table par dimaag ka khel</span><h1 id="pageTitle">5 khel.<br>5 alag challenges.</h1><p>Maze, memory, pattern, logic, maths aur menu/Kukas mein se paanch alag quiz solve karo.</p></div>
+    <div><span class="eyebrow">Table par dimaag ka khel</span><h1 id="pageTitle">5 khel.<br>5 alag challenges.</h1><p>Random maze, memory, moving target, colour focus aur cup tracking — paanch skill rounds.</p></div>
     <div class="timer" aria-live="polite"><span class="timer-dot"></span><span id="timerText">06:00 baaki</span></div>
   </section>
   <section class="game-layout" aria-label="Five different brain challenges">
@@ -131,291 +131,121 @@ canvas{display:block;width:min(100%,470px);height:auto;aspect-ratio:1;touch-acti
       </div>
     </div>
     <aside class="side" aria-label="Challenge details">
-      <section class="side-block"><h2>5 alag khel.<br>Ek spin.</h2><p>Maze, number pattern, memory, logic, mental maths aur menu/Kukas quiz mein se paanch.</p><div class="progress-copy"><span>Progress</span><strong id="progressText">0 / 5</strong></div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div></section>
-      <section class="side-block"><h2>Wheel par kya hai?</h2><p>Paanch rounds clear karne par inmein se ek discount milega. Har option ka chance barabar hai.</p><div class="prize-list"><div class="prize-row"><span>Table bill par</span><strong>20%</strong></div><div class="prize-row"><span>Table bill par</span><strong>30%</strong></div><div class="prize-row"><span>Table bill par</span><strong>40%</strong></div><div class="prize-row"><span>Table bill par</span><strong>50%</strong></div></div></section>
+      <section class="side-block"><h2>5 alag khel.<br>Ek spin.</h2><p>Har round ki alag time limit hai. Kul 3 galtiyon par challenge khatam. Reload se active round dobara shuru hoga; timer chalta rahega.</p><div class="progress-copy"><span>Progress</span><strong id="progressText">0 / 5</strong></div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div></section>
+      <section class="side-block"><h2>Wheel par kya hai?</h2><p>Paanch rounds clear karne par inmein se ek discount milega. Har option ka chance barabar hai.</p><div class="prize-list"><div class="prize-row"><span>Table bill par</span><strong>5%</strong></div><div class="prize-row"><span>Table bill par</span><strong>10%</strong></div><div class="prize-row"><span>Table bill par</span><strong>15%</strong></div><div class="prize-row"><span>Table bill par</span><strong>20%</strong></div></div></section>
       <section class="side-block"><h2>Bas maze ka maza lo.</h2><p>Discount ek bill par, ek baar. Spin ka result staff ko dikhayein; offers combine nahi honge.</p></section>
     </aside>
   </section>
 </main>
 <section class="start-screen" id="startScreen" aria-modal="true" role="dialog" aria-labelledby="startTitle">
-  <div class="start-panel"><div class="start-symbol" aria-hidden="true">↗</div><span class="eyebrow">5 different games · 6 minute challenge</span><h2 id="startTitle">Table set hai?</h2><p>Maze, pattern, memory, logic, maths aur menu/Kukas quiz mein se paanch alag challenges 6 minute mein solve karo.</p><button class="action" id="startButton">Challenge shuru karein</button></div>
+  <div class="start-panel"><div class="start-symbol" aria-hidden="true">↗</div><span class="eyebrow">5 different games · 6 minute challenge</span><h2 id="startTitle">Table set hai?</h2><p>Paanch random skill rounds 6 minute mein clear karo. Har round timed hai; kul 3 galtiyon par game over. Memory aur tracking sirf ek baar dikhte hain. Tab badalne par bhi timer chalta rahega.</p><button class="action" id="startButton">Challenge shuru karein</button></div>
 </section>
 <section class="wheel-dialog" id="wheelDialog" aria-modal="true" role="dialog" aria-labelledby="wheelTitle">
-  <div class="wheel-panel"><span class="eyebrow">Paanch mazes complete</span><h2 id="wheelTitle">Ab kismat ki baari.</h2><p>Wheel ghumao aur apna table-bill discount dekho.</p>
-    <div class="wheel-pointer" aria-hidden="true"></div><div class="wheel" id="wheel" aria-label="Discount prize wheel"><span class="wheel-label">20%</span><span class="wheel-label">30%</span><span class="wheel-label">40%</span><span class="wheel-label">50%</span></div>
+  <div class="wheel-panel"><span class="eyebrow">Paanch skill rounds complete</span><h2 id="wheelTitle">Ab kismat ki baari.</h2><p>Wheel ghumao aur apna table-bill discount dekho.</p>
+    <div class="wheel-pointer" aria-hidden="true"></div><div class="wheel" id="wheel" aria-label="Discount prize wheel"><span class="wheel-label">5%</span><span class="wheel-label">10%</span><span class="wheel-label">15%</span><span class="wheel-label">20%</span></div>
     <button class="action" id="spinButton">Wheel ghumayein</button><div class="reward" id="reward" aria-live="polite"></div><p class="terms">Discount ek table bill par valid hai. Bill banwane se pehle staff ko result dikhayein. Ek table par ek discount; offers combine nahi honge.</p>
   </div>
 </section>
 <section class="failure-dialog" id="failureDialog" aria-modal="true" role="dialog" aria-labelledby="failureTitle">
-  <div class="start-panel"><div class="start-symbol" aria-hidden="true">↻</div><span class="eyebrow">Challenge time up</span><h2 id="failureTitle">Is baar nahi hua.</h2><p>6 minute mein paanchon challenges solve nahi hue. Agli baar phir koshish karna.</p><a class="action" href="tiffin-center-kukas.html" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none">Menu dekhein</a></div>
+  <div class="start-panel"><div class="start-symbol" aria-hidden="true">↻</div><span class="eyebrow">Challenge time up</span><h2 id="failureTitle">Is baar nahi hua.</h2><p>Time limit ya 3 galtiyon ki wajah se challenge khatam hua. Is attempt par discount unlock nahi hua.</p><a class="action" href="tiffin-center-kukas.html" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none">Menu dekhein</a></div>
 </section>
 <div class="sr-only" id="announcer" aria-live="assertive"></div>
 <script>
 (()=>{
   'use strict';
-  const SIZE=13, ROUND_COUNT=5, CHALLENGE_MS=6*60*1000, STORE_KEY='call4thali-brain-game-v2', HISTORY_KEY='call4all-quiz-history-v2';
-  const canvas=document.getElementById('mazeCanvas'),ctx=canvas.getContext('2d');
-  const startScreen=document.getElementById('startScreen'),startButton=document.getElementById('startButton'),timerText=document.getElementById('timerText');
-  const roundLabel=document.getElementById('roundLabel'),progressText=document.getElementById('progressText'),progressFill=document.getElementById('progressFill');
-  const roundDots=document.getElementById('roundDots'),announcer=document.getElementById('announcer');
-  const mazeFrame=document.getElementById('mazeFrame'),quizPrompt=document.getElementById('quizPrompt'),dpad=document.getElementById('dpad'),gameHint=document.getElementById('gameHint');
-  const wheelDialog=document.getElementById('wheelDialog'),wheel=document.getElementById('wheel'),spinButton=document.getElementById('spinButton'),reward=document.getElementById('reward');
-  const failureDialog=document.getElementById('failureDialog');
-  const DIRS=[{x:0,y:-1,wall:0,opposite:2},{x:1,y:0,wall:1,opposite:3},{x:0,y:1,wall:2,opposite:0},{x:-1,y:0,wall:3,opposite:1}];
-  let state=loadState(),tickHandle=0,nextRoundHandle=0;
-
-  function randomInt(max){const values=new Uint32Array(1);crypto.getRandomValues(values);return values[0]%max}
-  function loadState(){try{const saved=JSON.parse(localStorage.getItem(STORE_KEY));if(saved&&Array.isArray(saved.wins)&&saved.wins.length<=ROUND_COUNT&&Array.isArray(saved.roundTypes)&&saved.quiz&&(!saved.startedAt||Date.now()-saved.startedAt<24*60*60*1000))return saved}catch{}return null}
-  function saveState(){localStorage.setItem(STORE_KEY,JSON.stringify(state))}
-  function shuffled(items){const result=[...items];for(let index=result.length-1;index>0;index--){const pick=randomInt(index+1);[result[index],result[pick]]=[result[pick],result[index]]}return result}
-  function choose(items){return items[randomInt(items.length)]}
-  function newGameState(){
-    const otherTypes=shuffled(['maze','pattern','memory','logic','math']).slice(0,4);
-    return {startedAt:0,wins:[],roundTypes:shuffled([...otherTypes,'menu']),quiz:{type:null,puzzle:null},player:0,moves:0,prize:null};
+  const SIZE=17, COUNT=5, TOTAL_MS=360000, KEY='call4thali-skill-v3', PRIZES=[5,10,15,20];
+  const LIMITS={maze:100000,memory:35000,target:30000,focus:40000,tracking:55000};
+  const $=id=>document.getElementById(id), canvas=$('mazeCanvas'),ctx=canvas.getContext('2d');
+  const dirs=[[0,-1],[1,0],[0,1],[-1,0]];
+  const colours=[{name:'Laal',hex:'#b12c22'},{name:'Neela',hex:'#204faa'},{name:'Hara',hex:'#176b50'},{name:'Baingani',hex:'#873da2'}];
+  let state=load(),timers=[],clock,live=null,spinning=false;
+  function rand(n){const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]%n}
+  function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=rand(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+  function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&x.version===3&&Array.isArray(x.types)&&x.types.length===COUNT&&new Set(x.types).size===COUNT&&x.types.every(t=>Object.hasOwn(LIMITS,t))&&Number.isInteger(x.round)&&x.round>=0&&x.round<=COUNT&&Number.isInteger(x.errors)&&x.errors>=0&&x.errors<=3&&Number.isFinite(x.startedAt)&&Number.isFinite(x.deadline)&&(!x.prize||PRIZES.includes(x.prize)))return x}catch{}return null}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch{}}
+  function later(fn,ms){const t=setTimeout(()=>{if(!state.failed)fn()},ms);timers.push(t);return t}
+  function clearTasks(){timers.forEach(clearTimeout);timers=[];live=null}
+  function progress(){
+    $('progressText').textContent=`${state.round} / ${COUNT} · Galti ${state.errors} / 3`;
+    $('progressFill').style.width=`${state.round/COUNT*100}%`;
+    $('roundDots').replaceChildren();for(let i=0;i<COUNT;i++){const d=document.createElement('span');d.className='round-dot'+(i<state.round?' done':i===state.round?' current':'');$('roundDots').append(d)}
   }
-  function makeMaze(){
-    const history=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');
-    for(let attempt=0;attempt<40;attempt++){
-      const cells=Array.from({length:SIZE*SIZE},()=>({walls:[true,true,true,true],seen:false}));
-      const stack=[0];cells[0].seen=true;
-      while(stack.length){
-        const current=stack[stack.length-1],x=current%SIZE,y=Math.floor(current/SIZE),choices=[];
-        for(const dir of DIRS){const nx=x+dir.x,ny=y+dir.y;if(nx>=0&&nx<SIZE&&ny>=0&&ny<SIZE&&!cells[ny*SIZE+nx].seen)choices.push({dir,index:ny*SIZE+nx})}
-        if(!choices.length){stack.pop();continue}
-        const next=choices[randomInt(choices.length)],cell=cells[current],neighbor=cells[next.index];
-        cell.walls[next.dir.wall]=false;neighbor.walls[next.dir.opposite]=false;neighbor.seen=true;stack.push(next.index);
-      }
-      const signature=cells.map(cell=>cell.walls.map(wall=>wall?'1':'0').join('')).join('');
-      if(!history.includes(signature)){
-        history.push(signature);localStorage.setItem(HISTORY_KEY,JSON.stringify(history.slice(-500)));
-        return {cells,signature};
-      }
-    }
-    throw new Error('Could not create a fresh maze');
+  function fail(reason){if(state.failed)return;state.failed=true;save();clearTasks();$('failureDialog').classList.add('open');$('failureDialog').querySelector('p').textContent=reason+' Is attempt par discount unlock nahi hua.';clearInterval(clock)}
+  function active(){if(!state||state.failed||!state.startedAt||state.round>=COUNT)return false;if(Date.now()>=state.startedAt+TOTAL_MS||Date.now()>=state.deadline){fail('Challenge ki time limit khatam ho gayi.');return false}return true}
+  function error(message){if(!active())return false;state.errors++;save();progress();if(state.errors>=3){fail('Teen galtiyan ho gayin.');return false}const status=$('answerStatus');if(status)status.textContent=message+` Galti ${state.errors} / 3.`;return true}
+  function tick(){
+    if(!state?.startedAt||state.failed)return;
+    if(state.round===COUNT){$('timerText').textContent='Challenge complete';return}
+    if(!active())return;
+    const ms=Math.max(0,Math.min(state.startedAt+TOTAL_MS,state.deadline)-Date.now()),sec=Math.ceil(ms/1000);
+    $('timerText').textContent=`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')} round baaki`;
   }
-  function makeLogicPuzzle(){
-    const people=['Asha','Bunty','Charu'],claims=[];
-    for(const speaker of people)for(const subject of people)for(const negated of [false,true])claims.push({speaker,subject,negated});
-    const possibilities=[];
-    for(const first of claims)for(const second of claims)for(const third of claims){
-      const statements=[first,second,third],valid=people.filter(culprit=>statements.filter(claim=>claim.negated?claim.subject!==culprit:claim.subject===culprit).length===1);
-      if(valid.length===1)possibilities.push({statements,answer:valid[0]});
-    }
-    const puzzle=choose(possibilities),renamed=shuffled(people),mapping=Object.fromEntries(people.map((person,index)=>[person,renamed[index]]));
-    puzzle.statements=puzzle.statements.map(claim=>({...claim,speaker:mapping[claim.speaker],subject:mapping[claim.subject]}));
-    puzzle.answer=mapping[puzzle.answer];puzzle.options=shuffled(renamed);return puzzle;
+  function panel(name,copy){$('mazeFrame').hidden=true;$('quizPrompt').hidden=false;$('dpad').hidden=true;$('quizPrompt').innerHTML=`<span class="quiz-kicker">${name}</span><h2 class="quiz-question">${copy}</h2><div id="playArea"></div><p class="answer-status" id="answerStatus" role="status"></p>`}
+  function buttons(labels,handler){const box=document.createElement('div');box.className='answer-list';labels.forEach((label,i)=>{const b=document.createElement('button');b.type='button';b.className='answer-button';b.textContent=label;b.addEventListener('click',()=>{if(active())handler(i)});box.append(b)});$('playArea').append(box);return box}
+  function grid(handler){const g=document.createElement('div');g.className='memory-grid';for(let i=0;i<16;i++){const b=document.createElement('button');b.type='button';b.className='memory-cell';b.setAttribute('aria-label',`Square ${i+1}`);b.addEventListener('click',()=>{if(active())handler(i)});g.append(b)}$('playArea').append(g);return g}
+  function finish(){if(!active())return;clearTasks();state.round++;state.deadline=0;save();progress();$('announcer').textContent='Round complete';if(state.round===COUNT){$('timerText').textContent='Challenge complete';$('wheelDialog').classList.add('open');return}startRound()}
+  function startRound(resume=false){
+    clearTasks();if(state.failed||state.round>=COUNT)return;
+    const type=state.types[state.round];if(!resume){state.deadline=Math.min(Date.now()+LIMITS[type],state.startedAt+TOTAL_MS);save()}
+    if(!active())return;
+    const names={maze:'Random maze',memory:'Memory sequence',target:'Moving target',focus:'Colour focus',tracking:'Cup tracking'};
+    $('roundLabel').textContent=`Round ${state.round+1} / ${COUNT} · ${names[type]}`;progress();
+    ({maze:mazeRound,memory:memoryRound,target:targetRound,focus:focusRound,tracking:trackingRound})[type]();tick();
   }
-  function makeMenuPuzzle(){
-    const dishes=[
-      {id:'thali-49',name:'Mini Thali',price:49,contents:'Dal, sabji, 2 roti aur chawal'},
-      {id:'thali-59',name:'Mini Plus',price:59,contents:'Dal, sabji, 4 roti aur chawal'},
-      {id:'thali-89',name:'Special Thali',price:89,contents:'4 roti, chawal, raita, achar aur salad ke saath'},
-      {id:'thali-139',name:'Premium Thali',price:139,contents:'Paneer sabji, assorted roti, chawal aur sweet ke saath'},
-      {id:'thali-179',name:'Royal Thali',price:179,contents:'Paneer sabji, dal fry, jeera rice ya pulao aur premium sweet ke saath'}
-    ];
-    const requested=new URLSearchParams(location.search).get('dish');
-    const orderedDish=dishes.find(dish=>dish.id===requested||dish.name.toLowerCase()===String(requested||'').toLowerCase());
-    if(orderedDish){
-      const options=shuffled([orderedDish,...dishes.filter(dish=>dish.id!==orderedDish.id).slice(0,3)].map(dish=>dish.contents));
-      return {question:`Aapki ${orderedDish.name} ke saath kya milta hai?`,answer:orderedDish.contents,options,topic:'dish'};
-    }
-    const questionType=randomInt(3);
-    if(questionType===0){
-      const dish=choose(dishes),prices=shuffled([...new Set([dish.price,49,59,89,139,179])].slice(0,4));
-      return {question:`${dish.name} menu mein kitne rupaye ki hai?`,answer:dish.price,options:prices,topic:'menu'};
-    }
-    if(questionType===1){
-      const dish=choose(dishes);
-      const options=shuffled([dish.contents,'Paneer sabji aur premium sweet','Raita, achar aur salad','Sirf dal aur chawal']);
-      return {question:`${dish.name} ke saath menu mein kya diya hai?`,answer:dish.contents,options,topic:'menu'};
-    }
-    return {question:'Call4Thali kis area mein hai?',answer:'Kukas, Jaipur',options:shuffled(['Kukas, Jaipur','Vaishali Nagar, Jaipur','C-Scheme, Jaipur','Amer, Jaipur']),topic:'Kukas'};
+  function mazeRound(){
+    const cells=Array.from({length:SIZE*SIZE},()=>({walls:[true,true,true,true],seen:false})),stack=[0];cells[0].seen=true;
+    while(stack.length){const current=stack[stack.length-1],x=current%SIZE,y=Math.floor(current/SIZE),choices=[];dirs.forEach(([dx,dy],d)=>{const nx=x+dx,ny=y+dy;if(nx>=0&&ny>=0&&nx<SIZE&&ny<SIZE&&!cells[ny*SIZE+nx].seen)choices.push([ny*SIZE+nx,d])});if(!choices.length){stack.pop();continue}const [next,d]=choices[rand(choices.length)];cells[current].walls[d]=false;cells[next].walls[(d+2)%4]=false;cells[next].seen=true;stack.push(next)}
+    live={cells,player:0};$('mazeFrame').hidden=false;$('quizPrompt').hidden=true;$('dpad').hidden=false;
+    $('gameHint').textContent='Arrow keys / WASD ya buttons. Sirf paas ka raasta dikhega. Coral exit neeche daayein hai.';drawMaze();
   }
-  function makePuzzle(type){
-    if(type==='maze')return {maze:makeMaze()};
-    if(type==='pattern'){
-      const base=choose([2,3,4,5,6]),slope=choose([1,2,3,4]);
-      const sequence=Array.from({length:5},(_,index)=>base+(index+1)*(index+1)+slope*(index+1));
-      const answer=sequence.pop(),options=shuffled([answer,answer+2,answer-3,answer+5]);
-      return {sequence,answer,options};
-    }
-    if(type==='memory')return {sequence:Array.from({length:6},()=>randomInt(16)),input:[],ready:false,shownOnce:false,replayUsed:false,showing:false};
-    if(type==='logic')return makeLogicPuzzle();
-    if(type==='menu')return makeMenuPuzzle();
-    const a=choose([6,7,8,9,11,12]),b=choose([3,4,5,6,7]),c=choose([2,3,4,5,6]);
-    const answer=a*b+c,distractors=[...new Set([answer+a,answer-b,answer+7,answer+9,answer+11])].slice(0,3),options=shuffled([answer,...distractors]);
-    return {a,b,c,answer,options};
-  }
-  function makeNewRound(){
-    const type=state.roundTypes[state.wins.length];state.quiz={type,puzzle:makePuzzle(type)};state.player=0;state.moves=0;
-    if(type==='maze')drawMaze();else renderPuzzle();saveState();
-  }
-  function setupDots(){roundDots.replaceChildren();for(let i=0;i<ROUND_COUNT;i++){const dot=document.createElement('span');dot.className='round-dot'+(i<state.wins.length?' done':i===state.wins.length?' current':'');roundDots.append(dot)}}
   function drawMaze(){
-    if(!state?.quiz?.puzzle?.maze?.cells)return;
-    const scale=canvas.width/SIZE,cell=state.quiz.puzzle.maze.cells;
-    ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.lineWidth=3;ctx.lineCap='round';ctx.strokeStyle='#24463a';
-    for(let i=0;i<cell.length;i++){
-      const x=(i%SIZE)*scale,y=Math.floor(i/SIZE)*scale,w=cell[i].walls;
-      ctx.beginPath();if(w[0]){ctx.moveTo(x,y);ctx.lineTo(x+scale,y)}if(w[1]){ctx.moveTo(x+scale,y);ctx.lineTo(x+scale,y+scale)}if(w[2]){ctx.moveTo(x+scale,y+scale);ctx.lineTo(x,y+scale)}if(w[3]){ctx.moveTo(x,y+scale);ctx.lineTo(x,y)}ctx.stroke();
-    }
-    ctx.fillStyle='#d6f16c';ctx.fillRect(scale+3,scale+3,scale-6,scale-6);
-    ctx.fillStyle='#f06f52';ctx.fillRect((SIZE-1)*scale+3,(SIZE-1)*scale+3,scale-6,scale-6);
-    const px=(state.player%SIZE)*scale+scale/2,py=Math.floor(state.player/SIZE)*scale+scale/2;
-    ctx.beginPath();ctx.arc(px,py,scale*.29,0,Math.PI*2);ctx.fillStyle='#176b50';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#fff';ctx.stroke();
-    mazeFrame.hidden=false;quizPrompt.hidden=true;dpad.hidden=false;gameHint.innerHTML='Keyboard: arrow keys ya WASD.<br>Mobile: neeche ke buttons dabayein.';
-    roundLabel.textContent=`Round ${state.wins.length+1} / ${ROUND_COUNT} · Maze`;updateProgress();
+    const scale=canvas.width/SIZE,px=live.player%SIZE,py=Math.floor(live.player/SIZE);
+    ctx.fillStyle='#dce3d9';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.lineWidth=2;ctx.strokeStyle='#24463a';
+    live.cells.forEach((c,i)=>{const x=i%SIZE,y=Math.floor(i/SIZE);if(Math.abs(x-px)>3||Math.abs(y-py)>3)return;ctx.fillStyle='#fff';ctx.fillRect(x*scale,y*scale,scale,scale);c.walls.forEach((wall,d)=>{if(!wall)return;const corners=[[[0,0],[1,0]],[[1,0],[1,1]],[[1,1],[0,1]],[[0,1],[0,0]]][d];ctx.beginPath();ctx.moveTo((x+corners[0][0])*scale,(y+corners[0][1])*scale);ctx.lineTo((x+corners[1][0])*scale,(y+corners[1][1])*scale);ctx.stroke()})});
+    ctx.fillStyle='#f06f52';ctx.fillRect((SIZE-1)*scale+5,(SIZE-1)*scale+5,scale-10,scale-10);ctx.beginPath();ctx.arc((px+.5)*scale,(py+.5)*scale,scale*.28,0,Math.PI*2);ctx.fillStyle='#176b50';ctx.fill();
   }
-  function updateProgress(){progressText.textContent=`${state.wins.length} / ${ROUND_COUNT}`;progressFill.style.width=`${state.wins.length/ROUND_COUNT*100}%`;setupDots()}
-  function renderPuzzle(){
-    const {type,puzzle}=state.quiz;mazeFrame.hidden=true;quizPrompt.hidden=false;dpad.hidden=true;
-    const names={pattern:'Number pattern',memory:'Memory sequence',logic:'Logic deduction',math:'Mental maths',menu:'Menu & Kukas'};
-    roundLabel.textContent=`Round ${state.wins.length+1} / ${ROUND_COUNT} · ${names[type]}`;updateProgress();
-    if(type==='pattern'){
-      quizPrompt.innerHTML=`<span class="quiz-kicker">Number pattern</span><h2 class="quiz-question">Agla number kya hoga?</h2><p class="quiz-copy">Pattern samjho aur khaali jagah bharo.</p><p class="quiz-question">${puzzle.sequence.join(' &nbsp; · &nbsp; ')} &nbsp; · &nbsp; ?</p>${choiceMarkup(puzzle.options)}`;
-    }else if(type==='memory'){
-      const resumePlayback=puzzle.showing;
-      if(resumePlayback){puzzle.showing=false;puzzle.ready=false}
-      quizPrompt.innerHTML='<span class="quiz-kicker">Memory sequence</span><h2 class="quiz-question">Sequence yaad rakho</h2><p class="quiz-copy">Jab taiyaar ho, sequence dekho. Ek baar replay ka mauka bhi milega.</p><div class="memory-grid" id="memoryGrid"></div><div class="memory-actions"><button type="button" class="action" id="showSequenceButton">Sequence dikhayein</button><button type="button" class="action" id="replaySequenceButton" hidden disabled>Replay sequence</button><p class="answer-status" id="answerStatus" aria-live="polite">Pehle sequence dekhne ke liye button dabayein.</p></div>';
-      const grid=document.getElementById('memoryGrid');for(let index=0;index<16;index++){const button=document.createElement('button');button.className='memory-cell';button.type='button';button.disabled=true;button.setAttribute('aria-label',`Square ${index+1}`);button.addEventListener('click',()=>memoryPick(index));grid.append(button)}
-      const showButton=document.getElementById('showSequenceButton'),replayButton=document.getElementById('replaySequenceButton');
-      showButton.addEventListener('click',()=>playSequence(false));replayButton.addEventListener('click',()=>playSequence(true));
-      if(puzzle.shownOnce){showButton.hidden=true;replayButton.hidden=false;replayButton.disabled=puzzle.replayUsed||puzzle.input.length>0||puzzle.showing;Array.from(grid.children).forEach((button,index)=>{button.disabled=!puzzle.ready||puzzle.showing;if(puzzle.input.includes(index))button.classList.add('selected')});document.getElementById('answerStatus').textContent=puzzle.input.length?`${puzzle.input.length} / ${puzzle.sequence.length} · Replay answer shuru hone ke baad available nahi hai.`:puzzle.ready?'Ab sequence repeat karo. Replay sirf ek baar milega.':'Sequence chal raha hai...'}
-      else{puzzle.input=[];puzzle.ready=false;puzzle.replayUsed=false;puzzle.showing=false}
-      if(resumePlayback)setTimeout(()=>playSequence('resume'),0);
-    }else if(type==='logic'){
-      const statements=puzzle.statements.map(claim=>`<div class="logic-statement"><strong>${claim.speaker}:</strong> ${claim.subject} ne dessert liya${claim.negated?' nahi':''}.</div>`).join('');
-      quizPrompt.innerHTML=`<span class="quiz-kicker">Logic deduction</span><h2 class="quiz-question">Dessert kisne liya?</h2><p class="quiz-copy">Sirf ek statement sach hai. Clues padho aur culprit chuno.</p><div class="logic-statements">${statements}</div>${choiceMarkup(puzzle.options)}`;
-    }else if(type==='menu'){
-      const kicker=puzzle.topic==='Kukas'?'Kukas & Call4Thali':puzzle.topic==='dish'?'Aapke order se':'Call4Thali menu';
-      quizPrompt.innerHTML=`<span class="quiz-kicker">${kicker}</span><h2 class="quiz-question">${puzzle.question}</h2><p class="quiz-copy">Menu aur Kukas ke baare mein socho.</p>${choiceMarkup(puzzle.options)}`;
-    }else{
-      quizPrompt.innerHTML=`<span class="quiz-kicker">Mental maths</span><h2 class="quiz-question">Dimag mein solve karo</h2><p class="quiz-copy">Pehle multiply, phir add: <strong>${puzzle.a} × ${puzzle.b} + ${puzzle.c}</strong> = ?</p>${choiceMarkup(puzzle.options)}`;
-    }
-    quizPrompt.querySelectorAll('[data-answer]').forEach(button=>button.addEventListener('click',()=>checkAnswer(Number(button.dataset.answer))));
+  function move(d){if(!active()||state.types[state.round]!=='maze'||!live||live.cells[live.player].walls[d])return;live.player+=dirs[d][0]+dirs[d][1]*SIZE;if(live.player===SIZE*SIZE-1)finish();else drawMaze()}
+  function memoryRound(){
+    panel('Memory · 35 second','8 flashes ko usi order mein repeat karo');
+    const sequence=Array.from({length:8},()=>rand(16));let ready=false,index=0;
+    const g=grid(i=>{if(!ready)return;if(i!==sequence[index]){if(error('Order galat. Naya sequence aayega.'))memoryRound();return}g.children[i].classList.add('selected');later(()=>g.children[i].classList.remove('selected'),130);if(++index===sequence.length){ready=false;finish()}else $('answerStatus').textContent=`${index} / 8 sahi`});
+    Array.from(g.children).forEach(b=>b.disabled=true);
+    const start=document.createElement('button');start.className='action';start.textContent='Sequence ek baar dekhein';$('playArea').append(start);
+    start.onclick=()=>{if(!active())return;start.remove();$('answerStatus').textContent='Dhyaan se dekho. Replay nahi milega.';sequence.forEach((cell,i)=>later(()=>{g.children[cell].classList.add('flash');later(()=>g.children[cell].classList.remove('flash'),260)},500+i*480));later(()=>{ready=true;Array.from(g.children).forEach(b=>b.disabled=false);$('answerStatus').textContent='Ab order repeat karo.'},500+sequence.length*480)};
   }
-  function playSequence(isReplay){
-    const resumePlayback=isReplay==='resume';
-    if(!state||state.quiz?.type!=='memory')return;
-    const puzzle=state.quiz.puzzle;if(puzzle.showing)return;
-    if(isReplay===true){if(!puzzle.shownOnce||puzzle.replayUsed||puzzle.input.length)return;puzzle.replayUsed=true}
-    else if(!resumePlayback&&puzzle.shownOnce)return;
-    puzzle.showing=true;puzzle.ready=false;
-    const grid=document.getElementById('memoryGrid'),showButton=document.getElementById('showSequenceButton'),replayButton=document.getElementById('replaySequenceButton'),status=document.getElementById('answerStatus');
-    showButton.disabled=true;replayButton.disabled=true;status.textContent=isReplay?'Ek replay chal raha hai...':'Sequence dekho aur yaad rakho...';
-    if(isReplay){Array.from(grid.children).forEach(button=>button.classList.remove('selected'))}
-    const interval=650;
-    puzzle.sequence.forEach((cell,index)=>setTimeout(()=>{
-      if(!state||state.quiz.type!=='memory')return;
-      grid.children[cell].classList.add('flash');setTimeout(()=>grid.children[cell]?.classList.remove('flash'),380);
-      if(index===puzzle.sequence.length-1)setTimeout(()=>{
-        puzzle.showing=false;puzzle.ready=true;puzzle.shownOnce=true;
-        Array.from(grid.children).forEach(button=>button.disabled=false);
-        showButton.hidden=true;replayButton.hidden=false;replayButton.disabled=puzzle.replayUsed;
-        status.textContent=puzzle.replayUsed?'Ab sequence repeat karo. Replay use ho chuka hai.':'Ab sequence repeat karo. Replay sirf ek baar milega.';
-        saveState();
-      },420);
-    },250+index*interval));
-    saveState();
+  function targetRound(){
+    panel('Moving target · 30 second','14 green targets tap karo');
+    let target=-1,hits=0,token=0,previous=-1;
+    const g=grid(i=>{if(i!==target){error('Sirf green target tap karo.');return}if(Date.now()>live.until)return;hits++;if(hits===14){finish();return}next()});
+    function next(){const thisToken=++token;Array.from(g.children).forEach(b=>{b.classList.remove('flash');b.textContent=''});do{target=rand(16)}while(target===previous);previous=target;live={until:Date.now()+1150};g.children[target].classList.add('flash');g.children[target].textContent='●';$('answerStatus').textContent=`${hits} / 14 targets`;later(()=>{if(token!==thisToken)return;if(error('Target miss hua.'))next()},1150)}next();
   }
-  function choiceMarkup(options){return `<div class="answer-list">${options.map((value,index)=>`<button type="button" class="answer-button" data-answer="${index}">${value}</button>`).join('')}</div><p class="answer-status" id="answerStatus" aria-live="polite"></p>`}
-  function memoryPick(index){
-    const puzzle=state.quiz.puzzle;if(!puzzle.ready||puzzle.solved)return;
-    puzzle.input.push(index);document.getElementById('replaySequenceButton').disabled=true;const grid=document.getElementById('memoryGrid');grid.children[index].classList.add('selected');saveState();
-    const status=document.getElementById('answerStatus');status.textContent=`${puzzle.input.length} / ${puzzle.sequence.length}`;
-    if(puzzle.input.length===puzzle.sequence.length){
-      if(puzzle.input.every((value,position)=>value===puzzle.sequence[position]))completeRound();
-      else{puzzle.input=[];saveState();setTimeout(()=>{if(!state||state.quiz?.type!=='memory')return;Array.from(grid.children).forEach(button=>button.classList.remove('selected'));status.textContent='Order galat tha. Phir se yaad karke try karo.'},250)}
-    }
+  function focusRound(){
+    panel('Colour focus · 40 second','Shabd nahi, ink ka rang chuno');
+    let solved=0,token=0;
+    function next(){const t=++token,ink=rand(4),word=(ink+1+rand(3))%4;$('playArea').replaceChildren();const prompt=document.createElement('p');prompt.textContent=colours[word].name;prompt.style.cssText=`font-size:42px;font-weight:900;color:${colours[ink].hex}`;$('playArea').append(prompt);const options=shuffle([0,1,2,3]);let answered=false;buttons(options.map(i=>colours[i].name),i=>{if(answered)return;answered=true;if(options[i]!==ink){if(error('Ink ka rang galat tha.'))next();return}if(++solved===12)finish();else next()});$('answerStatus').textContent=`${solved} / 12 sahi · har jawab 2.4 second`;later(()=>{if(token===t&&!answered){answered=true;if(error('Rang chunne ka waqt khatam.'))next()}},2400)}next();
   }
-  function checkAnswer(index){
-    if(state.quiz.puzzle.solved)return;
-    const puzzle=state.quiz.puzzle,type=state.quiz.type;
-    const right=puzzle.options[index]===puzzle.answer;
-    const buttons=quizPrompt.querySelectorAll('[data-answer]');buttons.forEach((button,buttonIndex)=>{button.disabled=true;if(buttonIndex===index)button.classList.add(right?'correct':'wrong')});
-    if(right){completeRound();return}
-    const status=document.getElementById('answerStatus');status.textContent='Yeh jawab nahi. Dobara socho aur agla option try karo.';
-    buttons.forEach(button=>{button.disabled=false;button.classList.remove('wrong')});
+  function trackingRound(){
+    panel('Cup tracking · 55 second','Ball wale cup ko track karo · 3 stages');let stage=0;
+    function next(){let ball=rand(4),step=0,ready=false;$('playArea').replaceChildren();const cups=buttons(['Cup 1','Cup 2','Cup 3','Cup 4'],i=>{if(!ready)return;ready=false;if(i!==ball){if(error('Galat cup. Naya shuffle dekho.'))next();return}if(++stage===3)finish();else next()});Array.from(cups.children).forEach(b=>b.disabled=true);cups.children[ball].textContent='● Ball';$('answerStatus').textContent=`Stage ${stage+1} / 3 · Ball ki jagah yaad rakho.`;
+      later(()=>{cups.children[ball].textContent=`Cup ${ball+1}`;swap()},1000);
+      function swap(){if(!active())return;if(step===9){ready=true;Array.from(cups.children).forEach(b=>b.disabled=false);$('answerStatus').textContent='Ball ab kis cup mein hai?';return}const a=rand(4),b=(a+1+rand(3))%4;[a,b].forEach(i=>{cups.children[i].classList.add('correct');cups.children[i].textContent=`${a+1} ↔ ${b+1}`});if(ball===a)ball=b;else if(ball===b)ball=a;step++;later(()=>{[a,b].forEach(i=>{cups.children[i].classList.remove('correct');cups.children[i].textContent=`Cup ${i+1}`});later(swap,180)},480)}
+    }next();
   }
-  function completeRound(){
-    if(state.quiz.puzzle.solved)return;
-    state.quiz.puzzle.solved=true;
-    state.wins.push(state.quiz.type);announcer.textContent=`${state.quiz.type} round complete`;
-    if(state.wins.length===ROUND_COUNT){state.finishedAt=Date.now();renderComplete();saveState();updateProgress();checkUnlock();return}
-    state.nextRoundAt=Date.now()+10000;saveState();updateProgress();renderNextRound();scheduleNextRound();
-  }
-  function renderNextRound(){
-    const nextNumber=state.wins.length+1;
-    mazeFrame.hidden=true;quizPrompt.hidden=false;dpad.hidden=true;
-    quizPrompt.innerHTML=`<div class="next-quiz"><span class="quiz-kicker">Round ${nextNumber} taiyaar hai</span><h2 class="quiz-question">Agla quiz khelein?</h2><p class="quiz-copy">Button dabate hi naya challenge shuru hoga. 10 second mein nahi dabaya to apne aap start ho jayega.</p><button type="button" class="action" id="playNextButton">Agla quiz khelein</button><p class="next-countdown" id="nextCountdown" aria-live="polite"></p></div>`;
-    roundLabel.textContent=`Round ${nextNumber} / ${ROUND_COUNT} · Ready`;
-    document.getElementById('playNextButton').addEventListener('click',startNextRound);
-    updateNextCountdown();
-  }
-  function updateNextCountdown(){
-    const countdown=document.getElementById('nextCountdown');if(!countdown||!state?.nextRoundAt)return;
-    const seconds=Math.max(0,Math.ceil((state.nextRoundAt-Date.now())/1000));
-    countdown.textContent=seconds?`Auto-start ${seconds} second mein`:'Quiz shuru ho raha hai...';
-  }
-  function scheduleNextRound(){
-    clearTimeout(nextRoundHandle);if(!state?.nextRoundAt)return;
-    nextRoundHandle=setTimeout(startNextRound,Math.max(0,state.nextRoundAt-Date.now()));
-  }
-  function startNextRound(){
-    if(!state?.nextRoundAt||state.failed||state.wins.length>=ROUND_COUNT)return;
-    clearTimeout(nextRoundHandle);state.nextRoundAt=null;makeNewRound();
-  }
-  function renderComplete(){mazeFrame.hidden=true;quizPrompt.hidden=false;dpad.hidden=true;quizPrompt.innerHTML='<span class="quiz-kicker">5 / 5 complete</span><h2 class="quiz-question">Saare challenges solve ho gaye!</h2><p class="quiz-copy">6 minute poore hote hi discount wheel unlock ho jayega.</p>';roundLabel.textContent='Paanchon challenges complete!'}
-  function move(direction){
-    if(!state||state.quiz?.type!=='maze'||state.quiz.puzzle.solved||state.wins.length>=ROUND_COUNT||state.failed||!state.startedAt||wheelDialog.classList.contains('open'))return;
-    const cell=state.quiz.puzzle.maze.cells[state.player],dir=DIRS[direction];
-    if(cell.walls[dir.wall])return;
-    const next=state.player+dir.x+dir.y*SIZE;
-    if(next<0||next>=SIZE*SIZE)return;
-    state.player=next;state.moves++;
-    if(next===SIZE*SIZE-1){completeRound();return;
-    }
-    saveState();drawMaze();
-  }
-  function refreshTimer(){
-    if(!state?.startedAt)return;
-    const remaining=Math.max(0,CHALLENGE_MS-(Date.now()-state.startedAt)),seconds=Math.ceil(remaining/1000);
-    timerText.textContent=`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')} ${state.wins.length===ROUND_COUNT?'spin tak':'baaki'}`;
-    updateNextCountdown();
-    if(remaining===0){
-      if(state.wins.length===ROUND_COUNT){timerText.textContent='Spin khul gaya';checkUnlock()}
-      else{state.failed=true;saveState();failureDialog.classList.add('open')}
-    }
-  }
-  function checkUnlock(){if(state?.wins.length===ROUND_COUNT&&!state.failed&&Date.now()-state.startedAt>=CHALLENGE_MS){wheelDialog.classList.add('open');spinButton.disabled=Boolean(state.prize);if(state.prize)showReward(state.prize)}}
-  function showReward(amount){reward.style.display='block';reward.innerHTML=`<strong>${amount}% OFF</strong>Apne table ka bill dikhayein`;spinButton.textContent='Discount mil gaya';spinButton.disabled=true}
+  function showReward(){const amount=PRIZES.includes(state.prize)?state.prize:5;$('reward').style.display='block';$('reward').textContent=`${amount}% OFF — Apne table ka bill staff ko dikhayein`;$('spinButton').disabled=true;$('spinButton').textContent='Discount mil gaya'}
   function begin(){
-    startScreen.style.display='none';
-    if(!state)state=newGameState();
-    if(!state.startedAt){state.startedAt=Date.now();saveState()}
-    if(state.failed){failureDialog.classList.add('open');return}
-    if(state.prize){wheelDialog.classList.add('open');showReward(state.prize)}
-    if(state.wins.length>=ROUND_COUNT)renderComplete();
-    else if(state.quiz?.puzzle?.solved&&state.nextRoundAt){renderNextRound();scheduleNextRound()}
-    else if(!state.quiz?.type)makeNewRound();
-    else if(state.quiz?.type==='maze')drawMaze();
-    else if(state.quiz?.type)renderPuzzle();
-    refreshTimer();clearInterval(tickHandle);tickHandle=setInterval(refreshTimer,1000);
+    $('startScreen').style.display='none';
+    if(!state){state={version:3,types:shuffle(['maze','memory','target','focus','tracking']),round:0,errors:0,startedAt:Date.now(),deadline:0,prize:null,failed:false};save()}
+    if(state.failed){$('failureDialog').classList.add('open');return}
+    progress();if(state.round===COUNT){$('wheelDialog').classList.add('open');if(state.prize)showReward();return}
+    startRound(Boolean(state.deadline));clearInterval(clock);clock=setInterval(tick,200);
   }
-  function spin(){
-    if(!state||state.failed||state.wins.length!==ROUND_COUNT||Date.now()-state.startedAt<CHALLENGE_MS||state.prize)return;
-    const index=randomInt(4),prizes=[20,30,40,50],rotation=(360-index*90)%360;
-    spinButton.disabled=true;wheel.style.transform=`rotate(${5*360+rotation}deg)`;
-    setTimeout(()=>{state.prize=prizes[index];saveState();showReward(state.prize)},4100);
-  }
-  startButton.addEventListener('click',begin);spinButton.addEventListener('click',spin);
-  document.querySelectorAll('[data-move]').forEach(button=>button.addEventListener('click',()=>move(Number(button.dataset.move))));
-  document.addEventListener('keydown',event=>{const keys={ArrowUp:0,w:0,ArrowRight:1,d:1,ArrowDown:2,s:2,ArrowLeft:3,a:3};const key=event.key.length===1?event.key.toLowerCase():event.key;if(key in keys){event.preventDefault();move(keys[key])}});
-  document.getElementById('tableNumber').textContent=String(randomInt(99)+1).padStart(2,'0');
-  if(state){startButton.textContent='Challenge jaari rakhein';if(state.prize)startButton.textContent='Apna discount dekhein'}
-  else state=newGameState();
-  if(state?.startedAt){refreshTimer();if(state.wins.length===ROUND_COUNT&&Date.now()-state.startedAt>=CHALLENGE_MS)setTimeout(checkUnlock,0);else if(state.nextRoundAt)scheduleNextRound()}
+  $('startButton').addEventListener('click',begin);
+  $('spinButton').addEventListener('click',()=>{if(!state||state.failed||state.round!==COUNT||state.prize||spinning)return;spinning=true;const i=rand(PRIZES.length);state.prize=PRIZES[i];save();$('spinButton').disabled=true;$('wheel').style.transform=`rotate(${1800+(360-i*90)%360}deg)`;later(showReward,4100)});
+  document.querySelectorAll('[data-move]').forEach(b=>b.addEventListener('click',()=>move(Number(b.dataset.move))));
+  document.addEventListener('keydown',e=>{if($('startScreen').style.display!=='none')return;const map={ArrowUp:0,w:0,ArrowRight:1,d:1,ArrowDown:2,s:2,ArrowLeft:3,a:3},key=e.key.length===1?e.key.toLowerCase():e.key;if(key in map){e.preventDefault();move(map[key])}});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state?.startedAt)tick()});
+  $('tableNumber').textContent=String(rand(99)+1).padStart(2,'0');
+  if(state)$('startButton').textContent=state.prize?'Apna discount dekhein':'Challenge jaari rakhein';
 })();
 </script>
 </body>
