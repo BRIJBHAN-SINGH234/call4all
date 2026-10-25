@@ -1,0 +1,7 @@
+{
+  "storage": "github-csv",
+  "repository": "BRIJBHAN-SINGH234/call4all",
+  "branch": "main",
+  "recordsPath": "data/billing-records.csv",
+  "apiBase": ""
+}

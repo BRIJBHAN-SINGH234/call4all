@@ -320,3 +320,40 @@ PeerJS source: https://github.com/peers/peerjs — license at `assets/vendor/pee
 Open `tests/team-room-engine.html` for game-engine regression checks and `tests/team-members.html` for captain creation, team codes, four-member limits, reconnection and pause/resume checks.
 
 Open `tests/team-catalog.html` for all 50 games (1,500 generated puzzles), custom team/member limits, chosen game order, dynamic scoring, configured tie-breakers and recovery checks.
+
+## Shared CSV billing workspace and beverage stock
+
+`food-billing.html` now opens `billing-workspace.html`. The workspace has billing-specific navigation, multiple pending tables, food and beverage bills, all-user history, creator/updater attribution, item click feedback, print/WhatsApp bills and attributed comments. User-scoped drafts and the selected table survive refresh and navigation. Existing device-only legacy history is shown separately; previously expired/deleted legacy bills cannot be recovered.
+
+### GitHub CSV storage (default, no separate hosting)
+
+`data/billing-config.json` selects `storage: "github-csv"`, repository `BRIJBHAN-SINGH234/call4all`, branch `main`, and `data/billing-records.csv`. Food items remain in `data/food-menu.csv` and billing accounts in `data/billing-users.csv`. Admin-created users use the existing compatible salted PBKDF2 password format. No password or access token is shipped in the code.
+
+The shared records CSV contains typed rows for bills (including item/price snapshots), inventory, stock movements, comments, activity and retry identities. Human-readable ID, actor, bill, item and timestamp columns accompany a `data_json` column, quoted using standard CSV rules. Bill generation, stock changes and their movement records are saved in **one conditional GitHub Contents API write**. On a competing write, the app reloads the latest CSV and revalidates quantities and versions. Insufficient stock rejects the whole operation. Retrying a committed request after a lost response reuses its identity and does not deduct or add stock twice. A stale bill edit remains a local draft/conflict rather than replacing another user's work.
+
+Setup on each trusted billing device:
+
+1. Open `billing-stock-admin.html` and enter a GitHub token with **Contents: read/write** access to the configured data repository. The existing dashboard token can also be used. Keep tokens out of source code, CSVs, messages and screenshots.
+2. Create/manage active billing accounts and beverage/snack inventory. Enter item name, packet size, separate packet/single prices and opening quantity. Use Add qty for subsequent deliveries.
+3. Open `billing-workspace.html`, sign in with the billing account, and provide GitHub save access on that browser session if it is not already connected. The save credential lives in sessionStorage, not in the shared CSV. Logging out clears that session credential. Every device that writes CSV needs repository access; a billing password alone cannot grant GitHub write permission.
+4. Create as many table drafts as needed. Drafts do not reserve stock. Generate the bill to deduct packet quantities converted to single units. During the next hour, saved bill changes deduct/refund only the difference. After that the app allows comments only.
+
+GitHub CSV mode is for **trusted operators**. All devices with a repository write token can edit files directly, so browser user roles and the one-hour rule are app controls, not tamper-proof server enforcement. The app uses the GitHub response Date when the browser exposes it, otherwise the device clock; someone who can directly change the clock, CSV or code can bypass it. A repository token grants repository-level access, not just bill access. Use a separately configured **private data repository** if customer names, phone numbers, bills or stock must be private; rows and Git history in a public repository are public. Never store a token in public configuration. GitHub API permission/rate-limit/network errors leave device drafts pending and are shown to the operator; syncing needs internet and can take a few seconds. Staff must check the Saved state before closing a device/session.
+
+Admin stock shows current singles, packet equivalents, closing balances for selected dates in Asia/Kolkata, and the actor/date/bill for every opening quantity, restock, sale and edit. Bill exports and stock-ledger exports are available. Existing generated item prices and packet sizes remain historical snapshots when the catalog changes. All active billing users can view shared bill history without the former two-day cutoff. User blocking retains old bill attribution.
+
+Run the isolated real-browser CSV integration test (Chrome/Chromium, Python standard library):
+
+```bash
+python3 tests/run_billing_csv_browser.py
+```
+
+It simulates the GitHub Contents API locally and never contacts the live repository. It tests the actual workspace and stock admin across separate browser sessions, refresh recovery, all-user history, packet/single deductions, simultaneous last-item sales with an actual SHA conflict, retries after a lost commit response, exact one-hour locking, comments, account management and CSV export.
+
+### Optional trusted service mode
+
+The included `billing_service` is an alternative for installations that later need server-enforced permissions and edit deadlines. It is **not required or active in CSV mode**. It uses Python's standard library and SQLite transactions. To use it locally, set the config to `{"apiBase":""}` and run `python3 -m billing_service.server`; open `http://127.0.0.1:8787/billing-workspace.html`. Existing GitHub write-access tokens can log in as admin. Alternatively set `BILLING_ADMIN_USER` and `BILLING_ADMIN_PASSWORD` (at least 12 characters, environment only).
+
+For production service mode, deploy behind HTTPS with a persistent `BILLING_DB` path, `BILLING_BIND=0.0.0.0`, `PORT`, and `BILLING_ALLOWED_ORIGINS` containing the frontend origin. Set `apiBase` to the deployed HTTPS URL and omit `storage`. Optional `BILLING_CSV_BASE_URL` supplies existing food/user CSVs; otherwise the local checkout data is read. API-managed users and bills stay in the database in this optional mode. Back up the database using SQLite's backup API or a consistent volume snapshot. The service does not publish customer data or credentials to GitHub.
+
+Service-mode checks: `python3 -m unittest discover -s tests -p 'test_billing_store.py' -v` and optional `python3 tests/run_billing_browser.py`.
