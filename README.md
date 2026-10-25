@@ -298,18 +298,23 @@ You haven't added any active areas yet. Admin → 📍 Service Areas → ➕ Add
 
 ## Team game rooms (GitHub Pages)
 
-Open `team-games.html` on the live HTTPS domain. The host selects **Admin login** and verifies a GitHub token with write access to this repository. The existing browser's admin password is checked if one was configured in `admin.html`. This reuses the site's GitHub admin identity; there is no new server-side password database.
+Open `team-games.html` on the live HTTPS domain. The host selects **Admin login** and verifies a GitHub token with write access to this repository. The existing browser's admin password is checked if one was configured in `admin.html`.
 
-1. The host adds one named table per team and creates a room. Each team has four players and uses one phone for their table.
-2. Teams select **Room join**, enter the six-digit room number, table number, and four player names. The host approves each table. Teams then mark themselves ready.
-3. The host can start only when every table is connected, approved, and ready. A five-second countdown starts the first player's turn on all participating devices. Each table passes its device between its four players.
-4. After all tables finish a game, the host starts the next game. The four games are Memory Relay, Colour Sprint, Number Hunt, and Reaction Relay. Tied leaders play a host-started Reaction Playoff until one team wins.
-5. The host can download final results or save them to `data/team-game-results.csv` on `main`. CSV saving needs the token's Contents write permission. Repeated saves of the same tournament do not add duplicate rows. Player names and GitHub tokens are not written to the results CSV.
+1. The host creates an empty room and shares its six-digit number with team captains.
+2. Each captain selects **Team create**, enters the room number, team name and their own name. The captain occupies member slot 1. The room generates a code such as `123456-A1B2C3`; the captain shares it with the other three members.
+3. Each member selects **Team code se join**, enters that code and their own name on their own phone. A team has exactly four members. Codes encode the room number, so members do not need a separate table number.
+4. The host approves teams. Each member independently marks themselves ready. Host Start is enabled only when at least one team exists and every team has four approved, connected, ready members.
+5. The host starts each of the four games. All participating teams begin with a five-second countdown. Each team member plays their own turn on their own phone; other members see whose turn it is. Only the next member can start their own turn. The games are Memory Relay, Colour Sprint, Number Hunt and Reaction Relay. Tied leaders play Reaction Playoffs until one team wins.
+6. The host can download final results or save them to `data/team-game-results.csv` on `main`. Saving requires Contents write permission. The same tournament cannot be appended twice. Player names and tokens are not written to the results CSV.
 
-GitHub Pages hosts the files; the vendored PeerJS 1.5.5 client uses PeerJS Cloud for WebRTC signaling. Live room state and scores are controlled by the host browser, not polled from GitHub CSV. Keep that browser tab open and the device awake. Host state and team reconnection tickets survive refreshes in the same tab through session storage; the host logs in again and chooses **Resume room**. Reconnecting teams use their saved table ticket. An occupied table cannot be claimed from another browser without the host resetting it in the lobby. In-game disconnection does not pause turn deadlines.
+### Refresh and recovery
 
-PeerJS Cloud and WebRTC connectivity must be available. Restrictive networks may need a separate TURN relay or a shared Wi-Fi network; this repository does not provide a TURN service. Very large rooms depend on the host device and network capacity. Reaction scores include network transit time, so a shared Wi-Fi connection provides a more consistent game. The host is trusted; this is not a tamper-proof prize or payment system.
+Room state, team codes, membership tickets, answers and scores are saved in browser storage. Host state and member identity are automatically restored on refresh in the same browser. The host's access token remains in session storage, not local storage or peer messages, and is verified again during automatic recovery. Reopening a closed host tab may require admin login; the saved room is retained. Do not clear browser storage or use a different browser if you want automatic identity recovery.
+
+A member or host disconnect pauses the active room. Once the host and all participating members reconnect, turn timestamps move forward by the paused duration. Turn IDs, questions, previous answers, scores, the current game and membership slots are preserved. Joining with an existing ticket never consumes another member slot; retried captain creation never creates a second team. Member refresh is recovered with automatic retries while the host reconnects. The host should keep their device awake and page open during play.
+
+GitHub Pages hosts the files. Vendored PeerJS 1.5.5 uses PeerJS Cloud for WebRTC signaling; live room state is controlled by the host browser rather than polled from CSV. Restrictive networks may require a TURN relay or shared Wi-Fi. Very large rooms depend on host/network capacity. Reaction scores include network transit time. The host is trusted; this is not a tamper-proof prize system.
 
 PeerJS source: https://github.com/peers/peerjs — license at `assets/vendor/peerjs-LICENSE`.
 
-Room-engine regression checks: open `tests/team-room-engine.html` in a browser. It checks all 32 turns of a two-team tournament, approval/readiness gates, score authority, reconnection, timeouts, and tie-breakers.
+Open `tests/team-room-engine.html` for game-engine regression checks and `tests/team-members.html` for captain creation, team codes, four-member limits, reconnection and pause/resume checks.
