@@ -300,12 +300,12 @@ You haven't added any active areas yet. Admin → 📍 Service Areas → ➕ Add
 
 Open `team-games.html` on the live HTTPS domain. The host selects **Admin login** and verifies a GitHub token with write access to this repository. The existing browser's admin password is checked if one was configured in `admin.html`.
 
-1. The host creates an empty room and shares its six-digit number with team captains.
-2. Each captain selects **Team create**, enters the room number, team name and their own name. The captain occupies member slot 1. The room generates a code such as `123456-A1B2C3`; the captain shares it with the other three members.
-3. Each member selects **Team code se join**, enters that code and their own name on their own phone. A team has exactly four members. Codes encode the room number, so members do not need a separate table number.
-4. The host approves teams. Each member independently marks themselves ready. Host Start is enabled only when at least one team exists and every team has four approved, connected, ready members.
-5. The host starts each of the four games. All participating teams begin with a five-second countdown. Each team member plays their own turn on their own phone; other members see whose turn it is. Only the next member can start their own turn. The games are Memory Relay, Colour Sprint, Number Hunt and Reaction Relay. Tied leaders play Reaction Playoffs until one team wins.
-6. The host can download final results or save them to `data/team-game-results.csv` on `main`. Saving requires Contents write permission. The same tournament cannot be appended twice. Player names and tokens are not written to the results CSV.
+1. The host configures total teams (1–100), members per team (1–100), and 1–50 games from the 50-game catalog. Game count, exact selection, order and the reaction tie-breaker are controlled by the host. The host then creates the room and shares its six-digit number with captains.
+2. Each captain selects **Team create**, enters the room number, team name and their own name. The captain occupies member slot 1. The room generates a code such as `123456-A1B2C3`; the captain shares it with the remaining members required by the room settings.
+3. Each member selects **Team code se join**, enters that code and their own name on their own phone. A team has exactly the number of members chosen by the host. Codes encode the room number, so members do not need a separate table number.
+4. The host approves teams. Each member independently marks themselves ready. Host Start is enabled only when at least one team exists and the configured number of teams have all their configured members approved, connected and ready. Extra teams and extra members are rejected; reconnects retain their existing slots.
+5. The host starts each selected game in the configured order. All participating teams begin with a five-second countdown. Each team member plays their own turn on their own phone; other members see whose turn it is. Only the next member can start their own turn. The 50 playable rulesets cover memory, colour, number hunts, reaction, maths, spatial transformations, odd-one-out, number patterns, comparisons and code breaking (five rulesets per category). Each member can earn up to 100 points per game, so the team maximum is members × selected games × 100. Tied leaders play the host-selected reaction tie-breaker until one team wins.
+6. The host can download final results or save them to `data/team-game-results-v2.csv` on `main`. Saving requires Contents write permission. The same tournament cannot be appended twice. The CSV stores the team/member counts, selected game IDs and per-game scores. The original four-game results CSV is left intact. Player names and tokens are not written to the results CSV.
 
 ### Refresh and recovery
 
@@ -318,3 +318,5 @@ GitHub Pages hosts the files. Vendored PeerJS 1.5.5 uses PeerJS Cloud for WebRTC
 PeerJS source: https://github.com/peers/peerjs — license at `assets/vendor/peerjs-LICENSE`.
 
 Open `tests/team-room-engine.html` for game-engine regression checks and `tests/team-members.html` for captain creation, team codes, four-member limits, reconnection and pause/resume checks.
+
+Open `tests/team-catalog.html` for all 50 games (1,500 generated puzzles), custom team/member limits, chosen game order, dynamic scoring, configured tie-breakers and recovery checks.
