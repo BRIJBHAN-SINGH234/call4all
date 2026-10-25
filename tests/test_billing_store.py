@@ -51,6 +51,7 @@ class BillingTests(unittest.TestCase):
         self.assertEqual(updated['creator_name'], 'Alice')
         self.assertEqual(updated['updater_name'], 'Bob')
         self.assertEqual(self.store.get_bill(drink['id'])['lines'][0]['qty'], 3)
+        self.assertEqual((drink['table'], drink['customer'], drink['phone']), ('', '', ''))
         self.assertEqual(self.store.stock()['items'][0]['stock'], 100)  # drafts reserve no stock
         self.assertEqual(self.store.list_bills({})['total'], 2)
         self.now += 10 * 86400

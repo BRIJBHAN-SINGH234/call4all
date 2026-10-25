@@ -76,10 +76,18 @@ def browser_test(browser, directory, url, timeout=75):
         return message if message.startswith(('PASS:', 'FAIL:')) else 'FAIL: test did not finish: '+message, dom
     finally:
         if ws:
-            ws.sock.close()
-        proc.terminate()
+            try:
+                ws.call('Browser.close')
+            except (OSError, RuntimeError, json.JSONDecodeError):
+                pass
+            finally:
+                ws.sock.close()
         try:
             proc.wait(timeout=5)
         except subprocess.TimeoutExpired:
-            proc.kill()
-            proc.wait()
+            proc.terminate()
+            try:
+                proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+                proc.wait()
