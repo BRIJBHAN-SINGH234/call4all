@@ -21,6 +21,15 @@ class BillingTests(unittest.TestCase):
         self.b = self.store.save_user(self.admin, {'name': 'Bob', 'mobile': '9000000002', 'password': 'password-b'})
         self.counter = 0
 
+    def test_login_survives_twelve_hours_and_renews(self):
+        session = self.store.login('9000000001', 'password-a')
+        self.now += 13 * 3600
+        self.assertEqual(self.store.authenticate(session['token'])['id'], self.a['id'])
+        self.now += 364 * 86400
+        self.assertEqual(self.store.authenticate(session['token'])['id'], self.a['id'])
+        self.now += 2 * 86400
+        self.assertEqual(self.store.authenticate(session['token'])['id'], self.a['id'])
+
     def tearDown(self):
         self.tmp.cleanup()
 

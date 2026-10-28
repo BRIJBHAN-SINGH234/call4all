@@ -36,6 +36,9 @@ def run():
                 pass
             def do_GET(self):
                 path = self.path.split('?')[0]
+                # Minimal public page avoids external fonts and unrelated catalog requests.
+                if path == '/index.html':
+                    return self._send(200, '<!doctype html><body><script src="/assets/js/site.js"></script></body>', 'text/html; charset=utf-8')
                 if path == '/__test/billing-ui.html':
                     return self._send(200, (ROOT / 'tests/billing-workspace-ui.html').read_text(), 'text/html; charset=utf-8')
                 if path == '/data/billing-config.json':
@@ -43,7 +46,7 @@ def run():
                 if path in ('/billing-workspace.html', '/billing-stock-admin.html'):
                     # Iframes model separate devices, so isolate their session token stores.
                     html = (ROOT / path.lstrip('/')).read_text()
-                    isolate = "<script>const prefix='test-'+window.name+'-';const actual=sessionStorage;Object.defineProperty(window,'sessionStorage',{value:{getItem:k=>actual.getItem(prefix+k),setItem:(k,v)=>actual.setItem(prefix+k,v),removeItem:k=>actual.removeItem(prefix+k)}});</script>"
+                    isolate = "<script>const prefix='test-'+window.name+'-';for(const kind of ['sessionStorage','localStorage']){const actual=window[kind];Object.defineProperty(window,kind,{value:{getItem:k=>actual.getItem(prefix+k),setItem:(k,v)=>actual.setItem(prefix+k,v),removeItem:k=>actual.removeItem(prefix+k)}});}</script>"
                     return self._send(200, html.replace('<head>', '<head>'+isolate), 'text/html; charset=utf-8')
                 super().do_GET()
         TestHandler.store = store

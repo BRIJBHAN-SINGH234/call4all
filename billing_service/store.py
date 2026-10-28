@@ -139,8 +139,8 @@ class Store:
     def _session(self, user):
         value = secrets.token_urlsafe(32)
         with self.db(True) as db:
-            db.execute('INSERT INTO sessions VALUES(?,?,?)', (hashlib.sha256(value.encode()).hexdigest(), user['id'], self.clock() + 43200))
-        return {'token': value, 'user': self._public_user(user), 'expires_at': iso(self.clock() + 43200)}
+            db.execute('INSERT INTO sessions VALUES(?,?,?)', (hashlib.sha256(value.encode()).hexdigest(), user['id'], self.clock() + 31536000))
+        return {'token': value, 'user': self._public_user(user), 'expires_at': iso(self.clock() + 31536000)}
 
     def login(self, mobile, password):
         self.sync_sources()
@@ -176,6 +176,8 @@ class Store:
             row = db.execute("SELECT u.* FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.hash=? AND s.expires>? AND u.status='active'", (digest, self.clock())).fetchone()
         if not row:
             raise Error('Session expire ho gayi. Login karein.', 401, 'auth')
+        with self.db(True) as db:
+            db.execute('UPDATE sessions SET expires=? WHERE hash=?', (self.clock() + 31536000, digest))
         return self._public_user(row)
 
     def admin(self, actor):

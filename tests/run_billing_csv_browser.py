@@ -22,6 +22,9 @@ def run():
             self.wfile.write(raw)
         def do_GET(self):
             path = self.path.split('?')[0]
+            # Minimal public page avoids external fonts and unrelated catalog requests.
+            if path == '/index.html':
+                return self.html('<!doctype html><body><script src="/assets/js/site.js"></script></body>')
             if path == '/__csv-test.html':
                 html = (ROOT / 'tests/billing-workspace-ui.html').read_text()
                 html = html.replace('<body><script>', '<body><script src="/assets/js/billing-csv.js"></script><script src="/tests/billing-csv-fixture.js"></script><script>')
@@ -33,7 +36,7 @@ def run():
                 return self.html(html.replace('<script>\n(async()=>', '<script>'+extra+'</script><script>\n(async()=>'))
             if path in ('/billing-workspace.html', '/billing-stock-admin.html'):
                 html = (ROOT / path.lstrip('/')).read_text()
-                inject = "<script>const prefix='test-'+window.name+'-';const actual=sessionStorage;Object.defineProperty(window,'sessionStorage',{value:{getItem:k=>actual.getItem(prefix+k),setItem:(k,v)=>actual.setItem(prefix+k,v),removeItem:k=>actual.removeItem(prefix+k)}});window.fetch=(url,opts)=>parent.GithubFixture.fetch(url,opts);</script>"
+                inject = "<script>const prefix='test-'+window.name+'-';for(const kind of ['sessionStorage','localStorage']){const actual=window[kind];Object.defineProperty(window,kind,{value:{getItem:k=>actual.getItem(prefix+k),setItem:(k,v)=>actual.setItem(prefix+k,v),removeItem:k=>actual.removeItem(prefix+k)}});}window.fetch=(url,opts)=>parent.GithubFixture.fetch(url,opts);</script>"
                 return self.html(html.replace('<head>', '<head>'+inject))
             super().do_GET()
     server = ThreadingHTTPServer(('127.0.0.1', 0), lambda *a, **kw: Fixture(*a, directory=str(ROOT), **kw))

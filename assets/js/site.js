@@ -1,3 +1,19 @@
+// Keep the billing workspace within reach while browsing the public website.
+(()=>{
+  const keys=['c4b_staff_session','c4b_admin_session','c4f_billing_user'];
+  function updateBillingLink(){
+    let target='';
+    try{for(const key of keys){const raw=localStorage.getItem(key)||sessionStorage.getItem(key);if(!raw)continue;const s=JSON.parse(raw);if(key==='c4f_billing_user'?s?.id:s?.token&&s?.user){target=key==='c4f_billing_user'?'food-billing.html':'billing-workspace.html';break}}}catch{}
+    let link=document.getElementById('billingReturnLink');
+    if(!target){link?.remove();return}
+    if(!link){link=document.createElement('a');link.id='billingReturnLink';link.textContent='Billing par wapas';link.style.cssText='position:fixed;right:16px;bottom:88px;z-index:1000;background:#101613;color:#fff;padding:12px 18px;border-radius:999px;font:600 14px system-ui;text-decoration:none;box-shadow:0 3px 14px #0003';document.body.appendChild(link)}
+    link.href=target;
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',updateBillingLink);else updateBillingLink();
+  window.addEventListener('pageshow',updateBillingLink);
+  window.addEventListener('storage',updateBillingLink);
+})();
+
 /* ===== Call4All - Site-wide JavaScript ===== */
 
 /* SITE_CONFIG holds runtime branding/contact/theme.
