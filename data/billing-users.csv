@@ -1,3 +1,4 @@
 id,mobile,password_hash,password_salt,name,status,created_at,created_by
 "BU1792253213265","7742265648","b584de1aca9a41bf88ece6c874c87c3e75ec8a2870e0d7c70c8bc28ba56b54f4","e2996868637bfe26199c26bc9cb77ca0","Ajay Singh","Active","2026-10-17T16:06:53.266Z","admin"
 "BU1792259303000","8824525442","be2c4effb3b9c58d2cba5b64c47d2cd0b394a56f53fd0916feba7a43fa477947","b04d9fc9fc515e94d0c1a14f9536fe0a","Abhishek Singh","Active","2026-10-17T17:48:23.000Z","admin"
+"b2bb5b46-67e3-4f09-b707-4c0c6f0a42cc","7737353588","16b853f83c4cf943e609d392c84999ec9de2719363c388ae5f49ca290b506980","b0912037fe0799d09b0235b6aa4ab04b","Surendra","Active","2026-11-05T17:32:48.000Z","BRIJBHAN-SINGH234"
