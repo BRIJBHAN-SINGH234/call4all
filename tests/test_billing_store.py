@@ -84,6 +84,20 @@ class BillingTests(unittest.TestCase):
         self.assertEqual(result['comments'][0]['actor_name'], 'Bob')
         self.assertEqual(result['total_cents'], bill['total_cents'])
 
+    def test_food_gst_default_discount_rounding_and_issued_history(self):
+        draft = self.draft(lines=[{'item_id': 'f1', 'variant': 'Regular', 'qty': 1}])
+        self.assertEqual(draft['tax_bps'], 500)
+        bill = self.store.update_bill(self.a, draft['id'], {**self.payload(draft), 'tax_bps': 0, 'discount_cents': 1}, self.key(), True)
+        self.assertEqual((bill['subtotal_cents'], bill['tax_cents'], bill['total_cents']), (2000, 100, 2099))
+        # Mimic a previously issued tax-free invoice; editing preserves that rate.
+        with self.store.db(True) as db:
+            data = json.loads(db.execute('SELECT data FROM bills WHERE id=?', (bill['id'],)).fetchone()['data'])
+            data.update(tax_bps=0, tax_cents=0, total_cents=1999)
+            db.execute('UPDATE bills SET data=? WHERE id=?', (json.dumps(data), bill['id']))
+        old = self.store.get_bill(bill['id'])
+        edited = self.store.update_bill(self.a, bill['id'], {**self.payload(old), 'tax_bps': 500, 'discount_cents': 1}, self.key())
+        self.assertEqual((edited['tax_bps'], edited['tax_cents'], edited['total_cents']), (0, 0, 1999))
+
     def test_packet_single_stock_edits_and_price_snapshot(self):
         item = self.item()
         draft = self.draft('beverage', [{'item_id': item['id'], 'variant': 'Packet', 'qty': 2}, {'item_id': item['id'], 'variant': 'Single', 'qty': 3}])

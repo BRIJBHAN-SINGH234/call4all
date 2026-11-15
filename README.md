@@ -350,6 +350,16 @@ python3 tests/run_billing_csv_browser.py
 
 It simulates the GitHub Contents API locally and never contacts the live repository. It tests the actual workspace and stock admin across separate browser sessions, refresh recovery, all-user history, packet/single deductions, simultaneous last-item sales with an actual SHA conflict, retries after a lost commit response, exact one-hour locking, comments, account management and CSV export.
 
+### Food bill PDF and GST
+
+New food bills use **5% GST** on the subtotal after discount, rounded to the nearest paise with integer arithmetic. The workspace, shared CSV adapter and optional service apply the same rate and calculation. Pending food drafts are upgraded; generated historical bills retain their issued tax rate and amounts. Beverage billing keeps its existing tax configuration.
+
+Generated, saved food bills offer **Download PDF** and **WhatsApp PDF**. PDFs use selectable vector text with a locally embedded font for the rupee symbol, repeat headers and paginate up to the 300-line bill limit. They show Call4All, sub-brand Call4Food, branch `C4f_RES_001`, GSTIN `08GVGPK0382E1ZL`, the registered legal name/address, bill number/date in IST, customer/table, quantities, rates, discount, taxable amount, GST and total. Seller details are defined in `assets/js/billing-invoice.js`.
+
+On browsers that support PDF file sharing, WhatsApp PDF opens the device share sheet with the actual PDF file; choose WhatsApp, select the customer and send. It does not automatically pick a recipient or confirm delivery. If file sharing is unsupported or fails, the PDF downloads and a customer-chat link appears: attach the downloaded PDF using WhatsApp's Document action. Cancelling the share sheet does not trigger a download. PDF generation stays in the browser and uses no external invoice service. See [Web Share file support](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/canShare).
+
+The PDF dependency is pinned locally to [jsPDF 4.2.1](https://github.com/parallax/jsPDF/releases/tag/v4.2.1); jsPDF and DejaVu font licenses are in `assets/vendor/`. Run `python3 tests/run_billing_csv_browser.py` to verify actual workspace generation, saved GST totals, PDF bytes, simulated native sharing/cancellation/fallback, and 300-line pagination, alongside existing billing/stock checks. Native WhatsApp delivery requires a manual check on a supported device.
+
 ### Optional trusted service mode
 
 The included `billing_service` is an alternative for installations that later need server-enforced permissions and edit deadlines. It is **not required or active in CSV mode**. It uses Python's standard library and SQLite transactions. To use it locally, set the config to `{"apiBase":""}` and run `python3 -m billing_service.server`; open `http://127.0.0.1:8787/billing-workspace.html`. Existing GitHub write-access tokens can log in as admin. Alternatively set `BILLING_ADMIN_USER` and `BILLING_ADMIN_PASSWORD` (at least 12 characters, environment only).

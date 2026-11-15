@@ -20,6 +20,17 @@ def run():
             self.send_header('Content-Length', str(len(raw)))
             self.end_headers()
             self.wfile.write(raw)
+        def do_POST(self):
+            if self.path not in ('/__invoice-sample', '/__invoice-long'):
+                return self.send_error(404)
+            size = int(self.headers.get('Content-Length', 0))
+            if not 0 < size < 2_000_000:
+                return self.send_error(400)
+            raw = self.rfile.read(size)
+            if not raw.startswith(b'%PDF-'):
+                return self.send_error(400)
+            Path('/tmp/call4food-test-' + self.path.rsplit('-', 1)[1] + '.pdf').write_bytes(raw)
+            self.html('OK')
         def do_GET(self):
             path = self.path.split('?')[0]
             # Minimal public page avoids external fonts and unrelated catalog requests.
@@ -31,8 +42,8 @@ def run():
                 html = html.replace('try{\nconst af=', 'try{\nawait GithubFixture.setup();\nconst af=')
                 html = html.replace("f.elements.password.value=password;", "f.elements.password.value=password;f.elements.csv_token.value='test-only-token';")
                 html = html.replace("form.elements.mobile.value='admin';form.elements.password.value='test-only-admin-password';", "form.elements.github_token.value='test-only-token';")
-                html = html.replace("document.body.dataset.tests='PASS:", "await csvExtraTests(a,b,admin);document.body.dataset.tests='PASS: GitHub CSV, concurrency, retry after lost response, no negative stock, exact lock, ")
-                extra = (ROOT / 'tests/billing-csv-extra.js').read_text()
+                html = html.replace("document.body.dataset.tests='PASS:", "await invoiceTests(a);await csvExtraTests(a,b,admin);document.body.dataset.tests='PASS: GST 5%, PDF attachment, sharing fallback/cancel, 300-line pagination,  GitHub CSV, concurrency, retry after lost response, no negative stock, exact lock, ")
+                extra = (ROOT / 'tests/billing-csv-extra.js').read_text() + '\n' + (ROOT / 'tests/billing-invoice-tests.js').read_text()
                 return self.html(html.replace('<script>\n(async()=>', '<script>'+extra+'</script><script>\n(async()=>'))
             if path in ('/billing-workspace.html', '/billing-stock-admin.html'):
                 html = (ROOT / path.lstrip('/')).read_text()

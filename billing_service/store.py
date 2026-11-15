@@ -406,7 +406,11 @@ class Store:
         discount = integer(body.get('discount_cents', 0), 'Discount', 0, 10**15)
         if discount > subtotal:
             raise Error('Discount bill subtotal se zyada nahi ho sakta.')
-        tax_bps = integer(body.get('tax_bps', 0), 'Tax rate', 0, 10000)
+        if kind == 'food':
+            # Keep issued bills at their historical rate; new food bills use 5% GST.
+            tax_bps = integer(existing.get('tax_bps', 0), 'Tax rate', 0, 10000) if existing and existing.get('status') == 'generated' else 500
+        else:
+            tax_bps = integer(body.get('tax_bps', 0), 'Tax rate', 0, 10000)
         tax = ((subtotal - discount) * tax_bps + 5000) // 10000
         return {'table': '' if kind == 'beverage' else text(body.get('table', ''), 'Table', 50), 'customer': '' if kind == 'beverage' else text(body.get('customer', ''), 'Customer', 120), 'phone': '' if kind == 'beverage' else text(body.get('phone', ''), 'Phone', 30),
                 'lines': clean, 'subtotal_cents': subtotal, 'discount_cents': discount, 'tax_bps': tax_bps, 'tax_cents': tax, 'total_cents': subtotal - discount + tax}
