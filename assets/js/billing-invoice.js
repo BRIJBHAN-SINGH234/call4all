@@ -11,35 +11,63 @@ function create(b){
  const doc=new window.jspdf.jsPDF({unit:'mm',format:'a4',compress:true,putOnlyUsedFonts:true});
  doc.addFileToVFS('Invoice.ttf',window.BillingInvoiceFont);doc.addFont('Invoice.ttf','Invoice','normal');
  doc.setProperties({title:business.subBrand+' Bill '+b.bill_no,author:business.brand,subject:'Customer bill • '+business.branch});
- const t=totals(b),left=16,right=194,bottom=271;let y=0;
- const write=(s,x,y,size=9,options={})=>{doc.setFont('Invoice','normal');doc.setFontSize(size);doc.setTextColor(25,39,33);doc.text(String(s??''),x,y,options)};
- const line=y=>{doc.setDrawColor(218,223,217);doc.setLineWidth(.2);doc.line(left,y,right,y)};
- const paragraph=(s,x,width,size=9)=>{doc.setFont('Invoice','normal');doc.setFontSize(size);return doc.splitTextToSize(String(s??''),width)};
- function heading(continued=false){
-  doc.setFillColor(18,38,32);doc.rect(0,0,210,31,'F');doc.setFont('helvetica','bold');doc.setFontSize(21);doc.setTextColor(255,255,255);doc.text(business.brand,left,14);doc.setFontSize(11);doc.setTextColor(245,190,53);doc.text(business.subBrand,left,23);doc.setFontSize(10);doc.text('CUSTOMER BILL',right,14,{align:'right'});doc.setFontSize(8);doc.text('Branch: '+business.branch,right,23,{align:'right'});
-  write('GSTIN: '+business.gstin,left,39,10);write('Legal name: '+business.legalName,left,45,8);
-  const address=paragraph(business.address,0,178,8);write(address,left,51,8);y=51+address.length*4;
-  write('Bill: '+b.bill_no,left,y+4,10);write(date(b.generated_at),right,y+4,8,{align:'right'});y+=12;
-  if(!continued){
-   const info=[b.kind==='food'?'Table: '+(b.table||'—'):null,'Customer: '+(b.customer||'Walk-in customer'),b.phone?'Phone: '+b.phone:null].filter(Boolean);
-   for(const s of info){const parts=paragraph(s,0,178,9);write(parts,left,y,9);y+=parts.length*4.5+2}
-  }else{write('Items continued',left,y,8);y+=7}
-  y+=3;doc.setFillColor(237,241,234);doc.rect(left,y-5,right-left,9,'F');write('Item / Serving',left+2,y,9);write('Qty',128,y,9,{align:'right'});write('Rate',157,y,9,{align:'right'});write('Amount',right-2,y,9,{align:'right'});y+=10;
+ const t=totals(b),left=16,right=194,bottom=266;let y=0;
+ const write=(s,x,y,size=9,options={})=>{doc.setFont('Invoice','normal');doc.setFontSize(size);doc.setTextColor(35,43,39);doc.text(String(s??''),x,y,options)};
+ const muted=(s,x,y,size=8,options={})=>{doc.setFont('Invoice','normal');doc.setFontSize(size);doc.setTextColor(102,108,102);doc.text(String(s??''),x,y,options)};
+ const line=y=>{doc.setDrawColor(224,225,218);doc.setLineWidth(.2);doc.line(left,y,right,y)};
+ const paragraph=(s,width,size=9)=>{doc.setFont('Invoice','normal');doc.setFontSize(size);return doc.splitTextToSize(String(s??''),width)};
+ function heading(section='first'){
+  // White invoice sheet, warm neutral panels and a restrained gold accent.
+  // All decoration stays inside the printable margins.
+  doc.setFillColor(250,249,246);doc.rect(0,0,210,297,'F');
+  doc.setFillColor(255,255,255);doc.setDrawColor(232,230,221);doc.roundedRect(10,10,190,277,2,2,'FD');
+  doc.setFillColor(249,246,237);doc.roundedRect(left,16,right-left,33,2,2,'F');
+  doc.setFillColor(210,163,53);doc.rect(left,20,1.2,25,'F');
+  doc.setFont('helvetica','bold');doc.setTextColor(47,53,45);doc.setFontSize(10);doc.text(business.brand,left+5,25);
+  doc.setFontSize(23);doc.text(business.subBrand,left+5,35);
+  muted('Good Food • Great Mood',left+5,43,8);
+  write('CUSTOMER BILL',right-5,27,12,{align:'right'});
+  muted('Branch: '+business.branch,right-5,35,8,{align:'right'});
+  muted('call4all.co.in  |  '+business.phone,right-5,42,7,{align:'right'});
+  write('GSTIN: '+business.gstin,left,57,9);
+  muted('Legal name: '+business.legalName,right,57,7,{align:'right'});
+  const address=paragraph(business.address,178,8);muted(address,left,63,8);
+  const metaTop=65+address.length*4;line(metaTop);
+  muted('BILL NUMBER',left,metaTop+7,7);muted('BILL DATE',right,metaTop+7,7,{align:'right'});
+  write(b.bill_no,left,metaTop+14,10);write(date(b.generated_at),right,metaTop+14,8,{align:'right'});
+  y=metaTop+23;
+  if(section==='first'){
+   const names=paragraph(b.customer||'Walk-in customer',119,10),table=paragraph(b.table||'—',33,10);
+   const customerHeight=Math.max(names.length,table.length)*4.5;
+   const boxHeight=customerHeight+14+(b.phone?6:0);
+   doc.setFillColor(247,248,245);doc.roundedRect(left,y-4,right-left,boxHeight,2,2,'F');
+   muted('BILL TO',left+4,y+2,7);muted('TABLE',right-4,y+2,7,{align:'right'});
+   write(names,left+4,y+8,10);write(table,right-4,y+8,10,{align:'right'});
+   if(b.phone)muted('Phone: '+b.phone,left+4,y+9+customerHeight,8);
+   y+=boxHeight+5;
+  }else{muted(section==='summary'?'Bill summary':'Items continued',left,y,8);y+=8}
+  if(section!=='summary'){
+   doc.setFillColor(243,233,208);doc.roundedRect(left,y-5,right-left,10,1,1,'F');
+   write('Item / Serving',left+3,y+1,9);write('Qty',128,y+1,9,{align:'right'});write('Rate',157,y+1,9,{align:'right'});write('Amount',right-3,y+1,9,{align:'right'});y+=12;
+  }
  }
- function newPage(){doc.addPage();heading(true)}
+ function newPage(section='items'){doc.addPage();heading(section)}
  heading();
  for(const [i,x] of b.lines.entries()){
-  const name=paragraph((i+1)+'. '+x.name+' ('+x.variant+')',0,99,9),height=Math.max(10,name.length*4.5+4);
+  const name=paragraph((i+1)+'. '+x.name+' ('+x.variant+')',99,9),height=Math.max(11,name.length*4.5+5);
   if(y+height>bottom)newPage();
-  // The input limits keep a single item below one page; split long words too.
-  write(name,left+2,y,9);write(x.qty,128,y,9,{align:'right'});write(money(x.price_cents),157,y,9,{align:'right'});write(money(x.price_cents*x.qty),right-2,y,9,{align:'right'});y+=height;line(y-4);
+  if(i%2===0){doc.setFillColor(251,251,248);doc.rect(left,y-4,right-left,height,'F')}
+  // Item names wrap independently of the aligned quantity and price columns.
+  write(name,left+3,y+1,9);write(x.qty,128,y+1,9,{align:'right'});write(money(x.price_cents),157,y+1,9,{align:'right'});write(money(x.price_cents*x.qty),right-3,y+1,9,{align:'right'});y+=height;line(y-4);
  }
- if(y+65>bottom)newPage();
+ if(y+66>bottom)newPage('summary');
  y+=5;
- for(const [label,amount] of [['Subtotal',t.subtotal],['Discount',t.discount],['Taxable amount',t.base],['GST ('+Number(b.tax_bps||0)/100+'%)',t.tax]]){write(label,112,y,9);write(money(amount),right-2,y,10,{align:'right'});y+=7}
- doc.setFillColor(237,241,234);doc.rect(108,y-5,86,12,'F');write('Total payable',112,y+2,11);write(money(t.total),right-2,y+2,12,{align:'right'});y+=18;
- write('Thank you for choosing '+business.subBrand+'!',left,y,10);
- const pages=doc.getNumberOfPages();for(let i=1;i<=pages;i++){doc.setPage(i);line(281);write('Call4All • Call4Food | '+business.phone+' | call4all.co.in',left,287,8);write(i+' / '+pages,right,287,8,{align:'right'})}
+ const summaryTop=y;
+ doc.setFillColor(248,248,244);doc.roundedRect(108,summaryTop-5,86,48,2,2,'F');
+ for(const [label,amount] of [['Subtotal',t.subtotal],['Discount',t.discount],['Taxable amount',t.base],['GST ('+Number(b.tax_bps||0)/100+'%)',t.tax]]){write(label,112,y,9);write(money(amount),right-3,y,10,{align:'right'});y+=7}
+ doc.setFillColor(243,233,208);doc.roundedRect(108,y-3,86,13,1.5,1.5,'F');write('Total payable',112,y+5,10);write(money(t.total),right-3,y+5,12,{align:'right'});y+=22;
+ write('Thank you for choosing '+business.subBrand+'!',left,y,9);
+ const pages=doc.getNumberOfPages();for(let i=1;i<=pages;i++){doc.setPage(i);line(276);muted('Call4All • Call4Food | '+business.phone+' | call4all.co.in',left,282,7);muted(i+' / '+pages,right,282,7,{align:'right'})}
  const filename='Call4Food-'+String(b.bill_no||b.id).replace(/[^a-zA-Z0-9_-]/g,'-')+'.pdf';
  return{doc,filename,blob:doc.output('blob'),totals:t};
 }
