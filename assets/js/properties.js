@@ -19,7 +19,7 @@
     meta.setAttribute('content',value);
   }
   const newestFirst=(a,b)=>new Date(b.timestamp||0)-new Date(a.timestamp||0);
-  async function load(){try{return(await window.CsvAPI.loadAllPublic('data/properties.csv')).items.filter(p=>String(p.status).toLowerCase()==='active'&&String(p.approval_status).toLowerCase()==='approved').sort(newestFirst)}catch(e){console.warn(e);return[]}}
+  async function load(options={}){try{return(await window.CsvAPI.loadAllPublic('data/properties.csv')).items.filter(p=>String(p.status).toLowerCase()==='active'&&String(p.approval_status).toLowerCase()==='approved').sort(newestFirst)}catch(e){console.warn(e);if(options.throwOnError)throw e;return[]}}
   const whatsappUrl=p=>{const number=(window.SITE_CONFIG&&window.SITE_CONFIG.whatsappNumber)||'917737353588',message=['Hello Call4All, mujhe yeh property book/visit karni hai:','','Property: '+p.title,'Type: '+type(p),'Location: '+locationName(p),'Price: '+money(p.price),'Size: '+p.width_ft+' × '+p.height_ft+' ft','Listing ID: '+p.id,'Link: '+new URL(detailUrl(p),location.href).href].join('\n');return 'https://wa.me/'+number+'?text='+encodeURIComponent(message)};
   const callUrl=()=>{const number=(window.SITE_CONFIG&&window.SITE_CONFIG.phone)||'+917737353588';return 'tel:'+String(number).replace(/[^+\d]/g,'')};
   const thaliAd=()=>`<aside class="property-thali-ad" aria-label="Call4Thali"><a class="property-thali-image-link" href="tiffin-center-kukas.html"><img src="assets/uploads/tiffin-center-kukas-banner.webp" alt="Call4Thali fresh vegetarian meals from Rs 49" loading="lazy"></a><div class="property-thali-copy"><h2>Fresh vegetarian thali from Rs 49</h2><p>Enjoy a tasty meal after your property visit. Delivery available in Kukas, Jaipur.</p><div class="property-thali-actions"><a class="btn btn-accent btn-sm" href="tiffin-center-kukas.html">View Menu</a><a class="btn btn-whatsapp btn-sm" href="https://wa.me/917737353588?text=${encodeURIComponent('Hello Call4Thali, I would like to order a thali.') }" target="_blank" rel="noopener">Order on WhatsApp</a></div></div></aside>`;
@@ -115,9 +115,17 @@
   }
   async function relatedPropertyMounts(){
     const mounts=[...document.querySelectorAll('[data-property-related]')];if(!mounts.length)return;
-    const list=(await load()).filter(p=>type(p)==='Lease/Rent');
-    mounts.forEach(mount=>{const limit=Number(mount.dataset.propertyRelated)||6;mount.innerHTML=list.length?list.slice(0,limit).map(card).join(''):'<p class="empty-map">No approved rental properties are available right now.</p>';bindVideoButtons(mount)});
+    let list;
+    try{list=(await load({throwOnError:true})).filter(p=>p.property_type==='Lease/Rent')}catch(_){return} // Keep the labelled snapshot when the live request fails.
+    mounts.forEach(mount=>{const limit=Number(mount.dataset.propertyRelated)||6,items=list.filter(p=>matchesRental(p,mount.dataset));mount.innerHTML=items.length?items.slice(0,limit).map(card).join(''):'<p class="empty-map">No matching approved rental properties are available right now. Call to check upcoming options.</p>';bindVideoButtons(mount)});
   }
-  window.PropertyCatalog={load,card,whatsappUrl,callUrl,type};
+  function matchesRental(p,filters){
+    if(filters.propertyArea!=='kukas')return true;
+    const title=String(p.title||''),lat=Number(p.latitude),lng=Number(p.longitude);
+    const local=/\bkukas\b/i.test(p.location||'')||(lat>=27.025&&lat<=27.055&&lng>=75.88&&lng<=75.92);
+    const kind=/\b[123]\s*b\s*h?k\b|\bflat\b/i.test(title)?'flat':/\b[12]\s*rk\b|\bpg\b|room|singal/i.test(title)?'room':'';
+    return local&&!!kind&&!/day/i.test(title)&&(!filters.propertyKind||filters.propertyKind==='all'||filters.propertyKind===kind);
+  }
+  window.PropertyCatalog={load,card,whatsappUrl,callUrl,type,matchesRental};
   document.addEventListener('DOMContentLoaded',()=>{mapPage();detailPage();relatedPropertyMounts()});
 })();
