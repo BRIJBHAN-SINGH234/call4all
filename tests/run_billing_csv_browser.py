@@ -42,7 +42,7 @@ def run():
                 html = html.replace('try{\nconst af=', 'try{\nawait GithubFixture.setup();\nconst af=')
                 html = html.replace("f.elements.password.value=password;", "f.elements.password.value=password;f.elements.csv_token.value='test-only-token';")
                 html = html.replace("form.elements.mobile.value='admin';form.elements.password.value='test-only-admin-password';", "form.elements.github_token.value='test-only-token';")
-                html = html.replace("document.body.dataset.tests='PASS:", "await invoiceTests(a);await csvExtraTests(a,b,admin);document.body.dataset.tests='PASS: GST 5%, PDF attachment, sharing fallback/cancel, 300-line pagination,  GitHub CSV, concurrency, retry after lost response, no negative stock, exact lock, ")
+                html = html.replace("document.body.dataset.tests='PASS:", "await invoiceTests(a);await csvExtraTests(a,b,admin);document.body.dataset.tests='PASS: automatic customer text chat, PDF on request, GST 5%, PDF attachment, sharing fallback/cancel, 300-line pagination,  GitHub CSV, concurrency, retry after lost response, no negative stock, exact lock, ")
                 extra = (ROOT / 'tests/billing-csv-extra.js').read_text() + '\n' + (ROOT / 'tests/billing-invoice-tests.js').read_text()
                 return self.html(html.replace('<script>\n(async()=>', '<script>'+extra+'</script><script>\n(async()=>'))
             if path in ('/billing-workspace.html', '/billing-stock-admin.html'):
