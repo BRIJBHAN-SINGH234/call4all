@@ -54,7 +54,7 @@ function buildEntries(config, htmlFiles, dynamicPages, properties, secondHandIte
 
   for (const file of htmlFiles) {
     const name = path.basename(file);
-    if (!name.endsWith('.html')) continue;
+    if (!name.endsWith('.html') || name.startsWith('handmade-')) continue;
     if (exclude.has(name)) continue;
     if (name === 'index.html') continue;
 
@@ -93,11 +93,7 @@ function buildEntries(config, htmlFiles, dynamicPages, properties, secondHandIte
     add(base + '/second-hand-' + encodeURIComponent(item.id) + '.html', lm, { priority: 0.85, changefreq: 'weekly' });
   }
 
-  for (const item of handmadeItems || []) {
-    if (!item.id || String(item.status).toLowerCase() !== 'active' || String(item.approval_status).toLowerCase() !== 'approved' || Number(item.stock || 0) < 1) continue;
-    const lm = (item.reviewed_at || item.timestamp || '').slice(0, 10) || today;
-    add(base + '/handmade-item.html?id=' + encodeURIComponent(item.id), lm, { priority: 0.88, changefreq: 'daily' });
-  }
+  // Handmade marketplace is paused; omit all category and product URLs.
 
   for (const item of menuItems || []) {
     if (!item.slug || String(item.status).toLowerCase() !== 'active') continue;

@@ -8,7 +8,7 @@
  *   - GitHub API calls:  network-only (sensitive, never cache)
  */
 
-const CACHE_VERSION = 'v34-2026-11-16-optimized-images';
+const CACHE_VERSION = 'v35-2026-11-16-handmade-disabled';
 const STATIC_CACHE = 'c4a-static-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'c4a-runtime-' + CACHE_VERSION;
 

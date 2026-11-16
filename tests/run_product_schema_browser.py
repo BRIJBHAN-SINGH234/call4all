@@ -14,8 +14,6 @@ from chrome_driver import browser_test
 ROOT = Path(__file__).resolve().parents[1]
 BROWSER = os.environ.get('CHROME_BIN', '/usr/bin/google-chrome')
 CASES = [
-    ('handmade-items.html', 'handmade.js', 'handmade-items', None),
-    ('handmade-item.html', 'handmade.js', 'handmade-items', 'handmadeDetail'),
     ('second-hand-items.html', 'second-hand.js', 'second-hand-items', None),
     ('second-hand-used-1787813642121.html', 'second-hand.js', 'second-hand-items', 'secondHandDetail'),
     ('building-materials-jaipur.html', 'building-materials.js', 'building-materials', None),
@@ -80,6 +78,14 @@ for(const kind of ['handmade','second-hand','property']){
             Path('/tmp/c4a-product-schema-failure.html').write_text(dom)
             raise AssertionError(f'{page}, invalid={invalid}: {message}')
         print(f'PASS: {page}, '+('malformed prices' if invalid else 'live prices'), flush=True)
+
+# Paused handmade routes must stay unavailable even with a product query string.
+for name in ('handmade-items.html', 'handmade-item.html'):
+    content = (ROOT / name).read_text()
+    assert 'content="noindex,follow"' in content
+    assert 'temporarily unavailable' in content
+    assert 'assets/js/handmade.js' not in content and 'application/ld+json' not in content
+print('PASS: handmade category and product routes are disabled', flush=True)
 
 for case in CASES:
     for invalid in (False, True):

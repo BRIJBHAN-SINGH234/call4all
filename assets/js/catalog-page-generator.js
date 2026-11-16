@@ -38,6 +38,7 @@
 <link rel="stylesheet" href="assets/css/style.css"><link rel="stylesheet" href="assets/css/properties.css">${c.css}<link rel="icon" href="assets/icons/favicon-32.png"></head><body><div id="site-header"></div><header class="${kind === 'property' ? 'property-hero' : 'market-hero'}"><span class="section-eyebrow">Call4All Verified Listing</span><h1>${esc(c.heading)}</h1><p><a href="${c.back}">View all listings</a></p></header><main id="${c.mount}" data-catalog-id="${esc(item.id)}">${staticContent}</main>${kind === 'handmade' ? '<section class="market-shell related-products"><h2>More Handmade Products</h2><div class="market-grid market-scroll" id="handmadeRelated"></div></section>' : ''}<div id="site-footer"></div><div id="site-floating"></div><script src="assets/js/icons.js"></script><script src="assets/js/site.js"></script><script src="assets/js/booking.js"></script><script src="assets/js/${c.script}"></script></body></html>\n`;
   }
   async function generate(kind, item, token) {
+    if (kind === 'handmade') throw new Error('Handmade items are temporarily disabled.');
     const c = config(kind, item), sha = await window.CsvAPI.getFileSha(c.path, token);
     await window.CsvAPI.putFile(c.path, html(kind, item), sha, token, `Generate SEO page ${c.path}`);
     return c.path;

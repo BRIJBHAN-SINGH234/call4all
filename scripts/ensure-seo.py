@@ -13,7 +13,7 @@ PAGES = [
     "room-rent-kukas-jaipur.html", "car-decoration-kukas.html",
     "construction-labor-kukas.html", "flower-bouquet-kukas.html",
     "home-tutor-kukas.html", "manpower-supply-kukas.html", "rooms-flats-kukas.html",
-    "contact.html", "gallery.html", "about.html", "handmade-items.html", "handmade-item.html",
+    "contact.html", "gallery.html", "about.html",
     "tiffin-center-kukas.html", "building-materials-jaipur.html", "weekend-treks-jaipur-rajasthan.html",
 ]
 for pattern in ("property-prop-*.html", "second-hand-used-*.html"):

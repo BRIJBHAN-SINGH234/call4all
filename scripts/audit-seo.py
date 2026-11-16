@@ -7,7 +7,7 @@ import re
 ROOT = Path(__file__).resolve().parent.parent
 SITEMAP = (ROOT / "sitemap.xml").read_text()
 INDEXABLE_DYNAMIC_TEMPLATES = {
-    "property.html", "second-hand-item.html", "handmade-item.html", "menu-item.html"
+    "property.html", "second-hand-item.html", "menu-item.html"
 }
 files = []
 for match in re.finditer(r'<loc>https://call4all\.co\.in/(?:([^?<]+\.html))?(?:\?[^<]*)?</loc>', SITEMAP):

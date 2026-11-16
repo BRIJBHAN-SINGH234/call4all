@@ -59,7 +59,6 @@ window.SITE_CONFIG = {
     { id: 'flower-bouquet',   name: 'Hotel Flower Bouquet',        icon: '🌸', iconName: 'flower',    desc: 'Luxury flower decoration & bouquet service.',                        page: 'flower-bouquet-kukas.html',    image: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=900&q=80&auto=format&fit=crop' },
     { id: 'car-decoration',   name: 'Car Decoration',              icon: '🎀', iconName: 'bow',       desc: 'Luxury car decoration for weddings & events.',                       page: 'car-decoration-kukas.html',    image: 'https://images.unsplash.com/photo-1606013519235-f4f8b3ee5ae5?w=900&q=80&auto=format&fit=crop' },
     { id: 'second-hand',      name: 'Second-Hand Items',           icon: '♻️', iconName: 'shopping-bag', desc: 'Verified used furniture, electronics and more at local prices.',    page: 'second-hand-items.html',       image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=900&q=80&auto=format&fit=crop' },
-    { id: 'handmade',         name: 'Handmade Items',              icon: '🧶', iconName: 'gift', desc: 'Local artisan gifts, decor, jewellery and crafts with live prices.',       page: 'handmade-items.html',          image: 'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=900&q=80&auto=format&fit=crop' },
     { id: 'tiffin-center',    name: 'Call4Thali Meals',           icon: '🍱', desc: 'Fresh vegetarian meals and packed thali from Rs 49.',             page: 'tiffin-center-kukas.html', image: 'assets/uploads/tiffin-center-kukas-banner.webp' },
     { id: 'call4plumber',     name: 'Call4Plumber Jaipur',        icon: '🔧', iconName: 'tool', desc: 'Plumbing help for homes, offices and shops across Jaipur.',          page: 'call4plumber-jaipur.html', image: 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=900&q=80&auto=format&fit=crop' },
     { id: 'call4carpenter',   name: 'Call4Carpenter Jaipur',      icon: '🪚', iconName: 'tool', desc: 'Lakdi ka kaam, furniture repair and carpentry across Jaipur.',       page: 'call4carpenter-jaipur.html', image: 'https://images.unsplash.com/photo-1581539250439-c96689b516dd?w=900&q=80&auto=format&fit=crop' },
@@ -321,11 +320,11 @@ window.assetUrl = assetUrl;
 window.optimizeImageUrl = optimizeImageUrl;
 
 /* One canonical category order for homepage cards, banners and footer. */
-const HOME_HIDDEN_SERVICE_IDS = new Set(['marriage-services', 'flower-bouquet', 'car-decoration']);
+const HOME_HIDDEN_SERVICE_IDS = new Set(['handmade', 'marriage-services', 'flower-bouquet', 'car-decoration']);
 const HOME_SERVICE_ORDER = [
   'property', 'tiffin-center', 'second-hand', 'weekend-crew', 'building-materials',
   'rental-cars', 'rooms-flats', 'construction', 'home-tutor', 'manpower-supply',
-  'handmade', 'other'
+  'other'
 ];
 function orderedHomeServices(includeOther) {
   const rank = new Map(HOME_SERVICE_ORDER.map((id, index) => [id, index]));
@@ -356,7 +355,7 @@ function renderSlider() {
   if (cfg.enabled === false) { mount.innerHTML = ''; return; }
 
   const slides = (cfg.slides || [])
-    .filter(s => s.enabled !== false && !['weddings', 'flowers', 'car-decoration', 's6', 's7', 's8'].includes(s.id))
+    .filter(s => s.enabled !== false && !/handmade/i.test(s.link || '') && !['handmade', 'weddings', 'flowers', 'car-decoration', 's6', 's7', 's8'].includes(s.id))
     .slice()
     .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
 
@@ -951,7 +950,6 @@ function renderHeader(activePage) {
   const productItems = [
     link('properties.html', 'Property Sale & Rent', 'properties'),
     link('second-hand-items.html', 'Second-Hand Items', 'second-hand'),
-    link('handmade-items.html', 'Handmade Products', 'handmade'),
     link('building-materials-jaipur.html', 'Building Materials', 'building-materials'),
     link('weekend-treks-jaipur-rajasthan.html', 'Weekend Trips', 'weekend-crew')
   ];
@@ -1009,7 +1007,6 @@ function renderFooter() {
     ['properties.html', 'Property Sale & Rent'],
     ['building-materials-jaipur.html', 'Building Materials'],
     ['second-hand-items.html', 'Second-Hand Items'],
-    ['handmade-items.html', 'Handmade Products'],
     ['weekend-treks-jaipur-rajasthan.html', 'Weekend Trips']
   ].map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join('');
   return `
@@ -1275,7 +1272,7 @@ function renderPublicContentGuide() {
   <p>Property search works best when you first decide whether you are looking to buy, rent, lease, share or simply compare the market. The <a href="properties.html">property listings page</a> shows currently approved options with their price, dimensions, photos and location details. Use the search box to narrow results by city, state or property name and use the rental filter if you need a room, flat or lease option. Open the individual property page before calling or messaging, because it contains the most complete available description, direct contact actions, directions and other current options. New listings are intentionally displayed first, helping regular visitors see the latest approved inventory immediately.</p>
   <p>Before arranging a property visit, confirm the expected monthly rent or sale price, security deposit, furnishing, utility charges, availability date and who is authorised to show the place. A map pin is helpful for planning travel, but it should be treated as a location guide; ask the owner or Call4All to confirm the exact meeting point. Compare more than one option through the property cards, read the size information in feet and calculate whether the usable space suits your family, work or storage requirement. Visitors seeking a Kukas-area home can also explore the dedicated <a href="rooms-flats-kukas.html">rooms and flats guide</a> and <a href="flat-rent-kukas-jaipur.html">flat-rent information</a>.</p>
   <p>For everyday requirements, the platform also connects visitors with practical local services. You can explore <a href="car-rental-kukas.html">car rental</a> for travel, <a href="home-tutor-kukas.html">home tutor options</a> for learning support, <a href="tiffin-center-kukas.html">tiffin services</a> for regular meals and <a href="manpower-supply-kukas.html">manpower supply</a> for staffing needs. Read the service page before booking so that you understand the local area served, what is normally included and the best way to request a quote. For larger events, the <a href="wedding-services-kukas.html">wedding services</a> and <a href="car-decoration-kukas.html">car decoration</a> pages provide additional starting points.</p>
-  <p>Shopping pages are meant to make discovery easier without hiding the key basics. The <a href="second-hand-items.html">second-hand marketplace</a> is useful when value and availability are more important than buying new, while the <a href="handmade-items.html">handmade products collection</a> highlights crafted items. Read the condition, product images, pricing and seller information before making a decision. Ask sensible questions about pickup, delivery, payment, size, colour, return expectations and current stock. Each product detail page also includes links back to its category so you can compare alternatives rather than making a decision from a single image or a short description.</p>
+  <p>Shopping pages are meant to make discovery easier without hiding the key basics. The <a href="second-hand-items.html">second-hand marketplace</a> is useful when value and availability are more important than buying new and lets you compare available used products. Read the condition, product images, pricing and seller information before making a decision. Ask sensible questions about pickup, delivery, payment, size, colour, return expectations and current stock. Each product detail page also includes links back to its category so you can compare alternatives rather than making a decision from a single image or a short description.</p>
   <p>Good decisions come from complete information, not only the lowest advertised price. Whether you are selecting a flat, renting a vehicle or buying an item, make a short checklist and keep it with you while you compare options. Include budget, location, timing, required features, condition and contact preference. If you need a quotation, describe your requirement clearly and mention the page or listing you are asking about. This reduces confusion and helps providers respond with useful details. The <a href="about.html">About Call4All page</a> explains the platform's local focus, and the <a href="gallery.html">gallery</a> gives another way to discover available work and services.</p>
   <p>For properties, safety and verification matter especially. Do not send a token amount or personal documents solely because of an online message. Visit when possible, verify the person showing the property, review ownership or authority documents where relevant, and keep receipts for any legitimate payment. Renters should clarify maintenance responsibility, meter readings, notice period and what happens to the deposit. Buyers should seek independent legal and technical advice appropriate to the transaction. Call4All provides listing discovery and communication tools; the final commercial decision remains between the visitor and the relevant owner, seller or service provider.</p>
   <p>Use the navigation links on every page to move naturally between categories. A visitor might start with a property search, then check <a href="car-rental-kukas-jaipur.html">Jaipur car rental</a> for a site visit, or explore <a href="construction-labor-kukas.html">construction labour</a> after comparing a plot. This internal navigation is deliberate: it gives you multiple relevant paths instead of forcing a return to a search engine. If a page does not answer your question, open a related listing, compare the latest entries or send a concise enquiry through WhatsApp or the contact form with your budget, preferred area and timeframe.</p>

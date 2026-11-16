@@ -33,16 +33,11 @@
   }
   async function render() {
     const propertyGrid = document.getElementById('homePropertyGrid');
-    const handmadeGrid = document.getElementById('homeHandmadeGrid');
     if (propertyGrid && window.PropertyCatalog) {
       const items = (await window.PropertyCatalog.load())
         .filter(item => item.property_type === 'Lease/Rent' && String(item.image_path || '').trim())
         .sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
       createSlider(propertyGrid, items, window.PropertyCatalog.card, 'New rental property listings with photos coming soon.', 'property');
-    }
-    if (handmadeGrid && window.HandmadeCatalog) {
-      const items = (await window.HandmadeCatalog.load()).slice().reverse();
-      createSlider(handmadeGrid, items, window.HandmadeCatalog.card, 'New handmade items coming soon.', 'handmade');
     }
   }
   document.addEventListener('DOMContentLoaded', render);
