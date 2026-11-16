@@ -39,7 +39,7 @@
         "icon": "🏠",
         "title": "Property in Jaipur",
         "subtitle": "Explore verified property for sale, rent and lease",
-        "background_url": "assets/uploads/property-1786284906619-indraj_palace.png",
+        "background_url": "assets/uploads/property-1786284906619-indraj_palace.webp",
         "link": "properties.html",
         "order": 1
       },
@@ -48,7 +48,7 @@
         "enabled": true,
         "title": "Call4Thali",
         "subtitle": "Fresh vegetarian meals from Rs 49",
-        "background_url": "assets/uploads/tiffin-center-kukas-banner.png",
+        "background_url": "assets/uploads/tiffin-center-kukas-banner.webp",
         "link": "tiffin-center-kukas.html",
         "image_only": true,
         "order": 2
@@ -59,7 +59,7 @@
         "icon": "♻️",
         "title": "Second-Hand Marketplace",
         "subtitle": "Approved used furniture, electronics and everyday items",
-        "background_url": "assets/uploads/second-hand-1787819094199-WhatsApp_Image_2026-08-27_at_10.29.42_AM.jpg",
+        "background_url": "assets/uploads/second-hand-1787819094199-WhatsApp_Image_2026-08-27_at_10.29.42_AM.webp",
         "link": "second-hand-items.html",
         "order": 3
       },
@@ -79,7 +79,7 @@
         "icon": "🏗️",
         "title": "Building Materials",
         "subtitle": "Live rodi, M-Sand and P-Sand prices in Jaipur",
-        "background_url": "assets/uploads/building-material-msand.png",
+        "background_url": "assets/uploads/building-material-msand.webp",
         "link": "building-materials-jaipur.html",
         "order": 5
       },

@@ -47,7 +47,7 @@ window.SITE_CONFIG = {
     branch: 'main'
   },
   services: [
-    { id: 'property',         name: 'Property Sale & Rent',        icon: '🏠', iconName: 'home',      desc: 'Verified property listings for sale, rent and lease in Jaipur.',     page: 'properties.html',              image: 'assets/uploads/property-1786284906619-indraj_palace.png' },
+    { id: 'property',         name: 'Property Sale & Rent',        icon: '🏠', iconName: 'home',      desc: 'Verified property listings for sale, rent and lease in Jaipur.',     page: 'properties.html',              image: 'assets/uploads/property-1786284906619-indraj_palace.webp' },
     { id: 'rental-cars',      name: 'Rental Cars',                 icon: '🚗', iconName: 'car',       desc: 'Comfortable cars for travel, transfers and events.',               page: 'car-rental-kukas.html',       image: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=900&q=80&auto=format&fit=crop' },
     { id: 'rooms-flats',      name: 'Rooms & Flats',               icon: '🏠', iconName: 'home',      desc: 'Explore rooms, flats, PGs and properties.',                          page: 'rooms-flats-kukas.html',       image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=900&q=80&auto=format&fit=crop' },
     { id: 'manpower-supply',  name: 'Manpower Supply',             icon: '👷', iconName: 'hard-hat',  desc: 'Workforce solutions for businesses and events.',                    page: 'manpower-supply-kukas.html',   image: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=900&q=80&auto=format&fit=crop' },
@@ -60,7 +60,7 @@ window.SITE_CONFIG = {
     { id: 'car-decoration',   name: 'Car Decoration',              icon: '🎀', iconName: 'bow',       desc: 'Luxury car decoration for weddings & events.',                       page: 'car-decoration-kukas.html',    image: 'https://images.unsplash.com/photo-1606013519235-f4f8b3ee5ae5?w=900&q=80&auto=format&fit=crop' },
     { id: 'second-hand',      name: 'Second-Hand Items',           icon: '♻️', iconName: 'shopping-bag', desc: 'Verified used furniture, electronics and more at local prices.',    page: 'second-hand-items.html',       image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=900&q=80&auto=format&fit=crop' },
     { id: 'handmade',         name: 'Handmade Items',              icon: '🧶', iconName: 'gift', desc: 'Local artisan gifts, decor, jewellery and crafts with live prices.',       page: 'handmade-items.html',          image: 'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=900&q=80&auto=format&fit=crop' },
-    { id: 'tiffin-center',    name: 'Call4Thali Meals',           icon: '🍱', desc: 'Fresh vegetarian meals and packed thali from Rs 49.',             page: 'tiffin-center-kukas.html', image: 'assets/uploads/tiffin-center-kukas-banner.png' },
+    { id: 'tiffin-center',    name: 'Call4Thali Meals',           icon: '🍱', desc: 'Fresh vegetarian meals and packed thali from Rs 49.',             page: 'tiffin-center-kukas.html', image: 'assets/uploads/tiffin-center-kukas-banner.webp' },
     { id: 'call4plumber',     name: 'Call4Plumber Jaipur',        icon: '🔧', iconName: 'tool', desc: 'Plumbing help for homes, offices and shops across Jaipur.',          page: 'call4plumber-jaipur.html', image: 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=900&q=80&auto=format&fit=crop' },
     { id: 'call4carpenter',   name: 'Call4Carpenter Jaipur',      icon: '🪚', iconName: 'tool', desc: 'Lakdi ka kaam, furniture repair and carpentry across Jaipur.',       page: 'call4carpenter-jaipur.html', image: 'https://images.unsplash.com/photo-1581539250439-c96689b516dd?w=900&q=80&auto=format&fit=crop' },
     { id: 'call4painter',     name: 'Call4Painter Jaipur',        icon: '🎨', iconName: 'edit', desc: 'Home, office, shop painting and putai across Jaipur.',              page: 'call4painter-jaipur.html', image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=900&q=80&auto=format&fit=crop' },
@@ -72,11 +72,11 @@ window.SITE_CONFIG = {
     enabled: true,
     interval_ms: 2000,
     slides: [
-      { id: 'property', enabled: true, icon: '🏠', iconName: 'home', title: 'Property in Jaipur', subtitle: 'Explore verified property for sale, rent and lease', background_url: 'assets/uploads/property-1786284906619-indraj_palace.png', link: 'properties.html', order: 1 },
-      { id: 'thali', enabled: true, title: 'Call4Thali', subtitle: 'Fresh vegetarian meals from Rs 49', background_url: 'assets/uploads/tiffin-center-kukas-banner.png', link: 'tiffin-center-kukas.html', image_only: true, order: 2 },
-      { id: 'second-hand', enabled: true, icon: '♻️', iconName: 'shopping-bag', title: 'Second-Hand Marketplace', subtitle: 'Approved used furniture, electronics and everyday items', background_url: 'assets/uploads/second-hand-1787819094199-WhatsApp_Image_2026-08-27_at_10.29.42_AM.jpg', link: 'second-hand-items.html', order: 3 },
+      { id: 'property', enabled: true, icon: '🏠', iconName: 'home', title: 'Property in Jaipur', subtitle: 'Explore verified property for sale, rent and lease', background_url: 'assets/uploads/property-1786284906619-indraj_palace.webp', link: 'properties.html', order: 1 },
+      { id: 'thali', enabled: true, title: 'Call4Thali', subtitle: 'Fresh vegetarian meals from Rs 49', background_url: 'assets/uploads/tiffin-center-kukas-banner.webp', link: 'tiffin-center-kukas.html', image_only: true, order: 2 },
+      { id: 'second-hand', enabled: true, icon: '♻️', iconName: 'shopping-bag', title: 'Second-Hand Marketplace', subtitle: 'Approved used furniture, electronics and everyday items', background_url: 'assets/uploads/second-hand-1787819094199-WhatsApp_Image_2026-08-27_at_10.29.42_AM.webp', link: 'second-hand-items.html', order: 3 },
       { id: 'weekend-crew', enabled: true, icon: '🥾', iconName: 'pin', title: 'Weekend Treks & Adventures', subtitle: 'Hidden trails, sunrise hikes and group experiences across Rajasthan', background_url: 'assets/uploads/weekend-crew/weekend-crew-05.jpeg', link: 'weekend-treks-jaipur-rajasthan.html', order: 4 },
-      { id: 'building-materials', enabled: true, icon: '🏗️', iconName: 'bricks', title: 'Building Materials', subtitle: 'Live rodi, M-Sand and P-Sand prices in Jaipur', background_url: 'assets/uploads/building-material-msand.png', link: 'building-materials-jaipur.html', order: 5 },
+      { id: 'building-materials', enabled: true, icon: '🏗️', iconName: 'bricks', title: 'Building Materials', subtitle: 'Live rodi, M-Sand and P-Sand prices in Jaipur', background_url: 'assets/uploads/building-material-msand.webp', link: 'building-materials-jaipur.html', order: 5 },
       { id: 's1', enabled: true, icon: '🚗', iconName: 'car', title: 'Rental Cars', subtitle: 'Premium & budget cars for travel and events', background_url: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1900&q=80&auto=format&fit=crop', link: 'car-rental-kukas.html', order: 6 },
       { id: 's2', enabled: true, icon: '🏠', iconName: 'home', title: 'Rooms & Flats', subtitle: 'Quick rentals — rooms, flats, PG, properties', background_url: 'https://images.unsplash.com/photo-1501183638710-841dd1904471?w=1900&q=80&auto=format&fit=crop', link: 'rooms-flats-kukas.html', order: 7 },
       { id: 's3', enabled: true, icon: '🧱', iconName: 'bricks', title: 'Construction Labor', subtitle: 'Mistri, mazdoor, thekedar — all just one call away', background_url: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=1900&q=80&auto=format&fit=crop', link: 'construction-labor-kukas.html', order: 8 },
@@ -1195,7 +1195,7 @@ function renderGlobalThaliAd() {
   ad.setAttribute('aria-label', 'Call4Thali meal advertisement');
   ad.innerHTML = `
     <a class="c4a-thali-ad-image" href="tiffin-center-kukas.html" aria-label="View Call4Thali menu">
-      <img src="assets/uploads/tiffin-center-kukas-banner.png" alt="Call4Thali fresh vegetarian meals from Rs 49" loading="lazy" width="1968" height="544">
+      <img src="assets/uploads/tiffin-center-kukas-banner.webp" alt="Call4Thali fresh vegetarian meals from Rs 49" loading="lazy" width="1968" height="544">
     </a>
     <div class="c4a-thali-ad-copy">
       <span>Call4All recommends</span>
