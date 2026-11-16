@@ -10,6 +10,7 @@ on:
       - 'data/properties.csv'
       - 'scripts/generate-sitemap.mjs'
       - 'scripts/prerender-kukas-rentals.py'
+      - 'scripts/sync-food-topbar.py'
       - '.github/workflows/sitemap.yml'
 
 permissions:
@@ -31,8 +32,11 @@ jobs:
       - name: Generate sitemap.xml
         run: node scripts/generate-sitemap.mjs
 
+      - name: Refresh food ordering links on public pages
+        run: python3 scripts/sync-food-topbar.py
+
       - name: Commit sitemap if changed
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: 'chore: refresh rental listings and sitemap'
-          file_pattern: sitemap.xml rooms-flats-kukas.html room-rent-kukas-jaipur.html flat-rent-kukas-jaipur.html
+          file_pattern: sitemap.xml *.html assets/js/catalog-page-generator.js

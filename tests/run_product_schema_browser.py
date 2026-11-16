@@ -61,6 +61,7 @@ for(const kind of ['handmade','second-hand','property']){
   products.length=0;
   const content=CatalogPageGenerator.html(kind,{id:'fixture',title:'Schema test',price:amount});
   const doc=new DOMParser().parseFromString(content,'text/html');check(doc);
+  assert(doc.querySelectorAll('.c4a-food-topbar').length===1,'Generated page missing food ordering banner');
   const priced=amount===0||amount==='0'||amount==='80.50';
   assert(products.length===(kind!=='property'&&priced?1:0),'Generated schema price handling: '+kind+' / '+amount);
   assert(!!doc.querySelector('meta[property="product:price:amount"]')===(kind!=='property'&&priced),'Incorrect generated price metadata');
