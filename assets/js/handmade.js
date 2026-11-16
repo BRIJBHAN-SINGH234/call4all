@@ -1,9 +1,10 @@
 (function () {
   'use strict';
+  const validPrice = value => value != null && /^(?:0|[1-9]\d*)(?:\.\d+)?$/.test(String(value).trim()) && Number.isFinite(Number(value));
   const PATH = 'data/handmade-items.csv';
   const BASE = 'https://call4all.co.in/';
   const safe = value => String(value || '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
-  const money = value => new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR', maximumFractionDigits:0 }).format(Number(value || 0));
+  const money = value => !validPrice(value) ? 'Price on request' : new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR', maximumFractionDigits:2 }).format(Number(value || 0));
   const image = item => item.image_path || 'assets/icons/icon-512.png';
   const detailUrl = item => 'handmade-item.html?id=' + encodeURIComponent(String(item.id || ''));
   const absolute = path => new URL(path, location.href).href;
@@ -34,9 +35,9 @@
   }
   function updateListingSeo(items) {
     if (!items.length) return;
-    const prices = items.map(item => Number(item.price)).filter(price => price > 0);
+    const prices = items.filter(item => validPrice(item.price)).map(item => Number(item.price));
     const min = Math.min(...prices), max = Math.max(...prices);
-    const range = min === max ? money(min) : `${money(min)}–${money(max)}`;
+    const range = !prices.length ? 'Price on request' : min === max ? money(min) : `${money(min)}–${money(max)}`;
     document.title = `Buy Handmade Products Online with All India Delivery | Call4All`;
     const description = `Shop handmade gifts, decor, jewellery, pottery and Indian crafts online from anywhere in India. Live prices ${range}, artisan details and nationwide delivery ordering.`;
     setMeta('meta[name="description"]', description);
@@ -49,7 +50,6 @@
       '@context':'https://schema.org','@graph':[
         {'@type':'CollectionPage','@id':BASE+'handmade-items.html#page',name:document.title,url:BASE+'handmade-items.html',description,areaServed:{'@type':'Country','name':'India'}},
         {'@type':'ItemList',name:'Handmade Items Across India',numberOfItems:items.length,itemListElement:items.map((item,index)=>({'@type':'ListItem',position:index+1,name:item.title,url:absolute(detailUrl(item))}))},
-        {'@type':'OfferCatalog',name:'Local Handmade Products',numberOfItems:items.length,itemListElement:items.map(item=>({'@type':'Offer',price:item.price,priceCurrency:'INR',availability:'https://schema.org/InStock',url:absolute(detailUrl(item)),itemOffered:{'@type':'Product',name:item.title,image:absolute(image(item))}}))},
         {'@type':'Organization','@id':BASE+'#organization',name:'Call4All',url:BASE,telephone:'+91-7737353588',areaServed:{'@type':'Country','name':'India'}}
       ]
     }, 'handmade-list-schema');
@@ -71,6 +71,8 @@
   }
   async function detailPage() {
     const mount = document.getElementById('handmadeDetail'); if (!mount) return;
+    document.getElementById('catalog-listing-schema')?.remove();
+    document.querySelectorAll('meta[property^="product:price:"]').forEach(tag => tag.remove());
     const items = await load(), id = mount.dataset.catalogId || new URLSearchParams(location.search).get('id'), item = items.find(entry => entry.id === id);
     if (!item) { document.title = 'Handmade Product Not Found | Call4All'; document.querySelector('meta[name="robots"]').content = 'noindex,follow'; mount.innerHTML = '<p class="empty-map">Product not found or currently unavailable. <a href="handmade-items.html">See available handmade items</a>.</p>'; return; }
     const city = item.city || 'Jaipur', area = item.area || city, canonical = absolute(detailUrl(item));
@@ -84,9 +86,11 @@
     let canonicalLink = document.querySelector('link[rel="canonical"]');
     if (!canonicalLink) { canonicalLink = document.createElement('link'); canonicalLink.rel = 'canonical'; document.head.appendChild(canonicalLink); }
     canonicalLink.href = canonical;
+    if (validPrice(item.price)) { setMeta('meta[property="product:price:amount"]', String(item.price).trim(), true); setMeta('meta[property="product:price:currency"]', 'INR', true); }
+
     mount.innerHTML = `<article class="market-detail"><img src="${safe(image(item))}" alt="${safe(item.title)} handmade ${safe(item.category)} by ${safe(item.artisan || 'Indian artisan')} with all India delivery"><div class="market-detail-content"><a href="handmade-items.html">← Back to handmade items</a><span class="market-badge">${safe(item.category)}</span><h1>${safe(item.title)}</h1><div class="market-detail-price">${money(item.price)}</div><dl class="market-specs"><div><dt>Artisan / Maker</dt><dd>${safe(item.artisan || 'Indian artisan')}</dd></div><div><dt>Material</dt><dd>${safe(item.materials || 'Ask seller')}</dd></div><div><dt>Delivery</dt><dd>All India</dd></div><div><dt>Made in</dt><dd>${safe([area,city].filter((v,i,a)=>a.indexOf(v)===i).join(', '))}</dd></div><div><dt>Product ID</dt><dd>${safe(item.id)}</dd></div><div><dt>Category</dt><dd>${safe(item.category)}</dd></div></dl><h2>Product details</h2><p class="product-description">${safe(item.description).replace(/\n/g,'<br>')}</p><p><strong>Nationwide delivery:</strong> India mein kahin se bhi order karne, delivery aur customisation confirm karne ke liye WhatsApp par apna PIN code share karein.</p><a class="btn btn-whatsapp btn-lg" href="${whatsappUrl(item)}" target="_blank" rel="noopener">Order on WhatsApp</a></div></article>`;
     addJsonLd({'@context':'https://schema.org','@graph':[
-      {'@type':'Product','@id':canonical+'#product',name:item.title,image:[absolute(image(item))],description,sku:item.id,category:item.category,material:item.materials,brand:{'@type':'Brand',name:item.artisan || 'Indian Artisan'},offers:{'@type':'Offer',url:canonical,price:String(item.price),priceCurrency:'INR',priceValidUntil:new Date(new Date().setFullYear(new Date().getFullYear()+1)).toISOString().slice(0,10),availability:'https://schema.org/InStock',itemCondition:'https://schema.org/NewCondition',seller:{'@id':BASE+'#localbusiness'},availableAtOrFrom:{'@type':'Place',name:`${area}, ${city}`},shippingDetails:{'@type':'OfferShippingDetails',shippingDestination:{'@type':'DefinedRegion',addressCountry:'IN'}}}},
+      ...(validPrice(item.price) ? [{'@type':'Product','@id':canonical+'#product',name:item.title,image:[absolute(image(item))],description,sku:item.id,category:item.category,material:item.materials,brand:{'@type':'Brand',name:item.artisan || 'Indian Artisan'},offers:{'@type':'Offer',url:canonical,price:String(item.price).trim(),priceCurrency:'INR',availability:'https://schema.org/InStock',itemCondition:'https://schema.org/NewCondition',seller:{'@id':BASE+'#localbusiness'},availableAtOrFrom:{'@type':'Place',name:`${area}, ${city}`},shippingDetails:{'@type':'OfferShippingDetails',shippingDestination:{'@type':'DefinedRegion',addressCountry:'IN'}}}}] : []),
       {'@type':'BreadcrumbList',itemListElement:[{'@type':'ListItem',position:1,name:'Home',item:BASE},{'@type':'ListItem',position:2,name:'Handmade Items',item:BASE+'handmade-items.html'},{'@type':'ListItem',position:3,name:item.title,item:canonical}]},
       {'@type':'LocalBusiness','@id':BASE+'#localbusiness',name:'Call4All',telephone:'+91-7737353588',url:BASE,address:{'@type':'PostalAddress',addressLocality:'Kukas, Jaipur',addressRegion:'Rajasthan',addressCountry:'IN'}}
     ]}, 'handmade-product-schema');

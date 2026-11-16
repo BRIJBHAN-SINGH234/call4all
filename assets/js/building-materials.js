@@ -1,9 +1,10 @@
 (function () {
   'use strict';
+  const validPrice = value => value != null && /^(?:0|[1-9]\d*)(?:\.\d+)?$/.test(String(value).trim()) && Number.isFinite(Number(value));
   const DATA_PATH = 'data/building-materials.csv';
   const PAGE_URL = 'https://call4all.co.in/building-materials-jaipur.html';
   const safe = value => String(value == null ? '' : value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
-  const price = value => new Intl.NumberFormat('en-IN', {style:'currency',currency:'INR',maximumFractionDigits:0}).format(Number(value || 0));
+  const price = value => !validPrice(value) ? 'Price on request' : new Intl.NumberFormat('en-IN', {style:'currency',currency:'INR',maximumFractionDigits:2}).format(Number(value || 0));
   const active = item => String(item.status || '').trim().toLowerCase() === 'active';
   const locationOf = item => [item.area, item.city].filter((value, index, list) => value && list.indexOf(value) === index).join(', ');
   const tone = category => String(category).toLowerCase().includes('sand') ? 'sand' : 'stone';
@@ -22,12 +23,13 @@
   }
 
   function addProductSchema(items) {
+    items = items.filter(item => validPrice(item.price));
     const old = document.getElementById('building-material-products-schema');
     if (old) old.remove();
     if (!items.length) return;
     const script = document.createElement('script');
     script.id = 'building-material-products-schema'; script.type = 'application/ld+json';
-    script.textContent = JSON.stringify({'@context':'https://schema.org','@type':'ItemList',name:'Building Materials Available in Jaipur',numberOfItems:items.length,itemListElement:items.map((item, index) => ({'@type':'ListItem',position:index + 1,item:{'@type':'Product','@id':`${PAGE_URL}#${encodeURIComponent(item.id)}`,name:item.name,image:[absolute(imageOf(item))],description:item.description,category:item.category,sku:item.id,offers:{'@type':'Offer',price:String(item.price),priceCurrency:'INR',priceValidUntil:new Date(new Date().setFullYear(new Date().getFullYear()+1)).toISOString().slice(0,10),availability:'https://schema.org/InStock',itemCondition:'https://schema.org/NewCondition',url:`${PAGE_URL}#${encodeURIComponent(item.id)}`,seller:{'@id':'https://call4all.co.in/#localbusiness'},availableAtOrFrom:{'@type':'Place',name:locationOf(item)}}}}))});
+    script.textContent = JSON.stringify({'@context':'https://schema.org','@type':'ItemList',name:'Building Materials Available in Jaipur',numberOfItems:items.length,itemListElement:items.map((item, index) => ({'@type':'ListItem',position:index + 1,item:{'@type':'Product','@id':`${PAGE_URL}#${encodeURIComponent(item.id)}`,name:item.name,image:[absolute(imageOf(item))],description:item.description,category:item.category,sku:item.id,offers:{'@type':'Offer',price:String(item.price),priceCurrency:'INR',availability:'https://schema.org/InStock',itemCondition:'https://schema.org/NewCondition',url:`${PAGE_URL}#${encodeURIComponent(item.id)}`,seller:{'@id':'https://call4all.co.in/#localbusiness'},availableAtOrFrom:{'@type':'Place',name:locationOf(item)}}}}))});
     document.head.appendChild(script);
   }
 
