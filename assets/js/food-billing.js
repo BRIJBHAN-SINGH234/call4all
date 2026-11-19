@@ -30,6 +30,17 @@
   function resendBill(id){const x=history().find(r=>r.billNo===id);if(!x)return;window.open(`https://wa.me/${x.target}?text=${encodeURIComponent(x.message)}`,'_blank','noopener')}
   function sendWhatsApp(){const phone=digits($('customerPhone').value);if(phone.length!==10&&phone.length!==12)return alert('Customer ka valid 10 digit WhatsApp number enter karein.');if(!cart.length)return alert('Bill mein kam se kam ek item add karein.');if(billLocked)return alert('Sent bill locked hai. New Bill banayein.');const target=phone.length===10?'91'+phone:phone,message=buildBill(),t=totals();window.open(`https://wa.me/${target}?text=${encodeURIComponent(message)}`,'_blank','noopener');saveHistory({billNo:$('billNo').value,sentAt:new Date().toISOString(),table:$('tableNo').value.trim(),customer:$('customerName').value.trim(),phone,target,items:cart.map(x=>({...x})),subtotal:t.subtotal,discount:t.discount,taxRate:t.taxRate,tax:t.tax,total:t.total,staff:currentUser?.name||currentUser?.mobile||'',message});billLocked=true;renderCart()}
   async function restoreSession(){try{const saved=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');if(!saved)return;const users=await withTimeout(loadUsersLocal(),7000),fresh=users.find(x=>x.id===saved.id&&digits(x.mobile).slice(-10)===digits(saved.mobile).slice(-10)&&String(x.status).toLowerCase()==='active');if(fresh)showBilling(fresh);else localStorage.removeItem(SESSION_KEY)}catch(e){$('loginError').textContent='Account verify nahi ho saka. Internet aane par page reload karein; login saved hai.'}}
-  document.addEventListener('DOMContentLoaded',()=>{$('billingLogin').onsubmit=login;$('logoutBtn').onclick=()=>{for(const key of [SESSION_KEY,'c4b_staff_session','c4b_admin_session','c4b_csv_credentials','c4b_csv_access']){localStorage.removeItem(key);sessionStorage.removeItem(key)}location.reload()};$('menuSearch').oninput=renderMenu;$('discount').oninput=renderCart;$('tax').oninput=renderCart;$('tableNo').oninput=renderCart;$('customerName').oninput=renderCart;$('newBillBtn').onclick=()=>{if(!cart.length||billLocked||confirm('Current bill clear karke new bill banayein?'))newBill()};$('printBtn').onclick=()=>{if(!cart.length)return alert('Bill empty hai.');window.print()};$('whatsappBtn').onclick=sendWhatsApp;$('installBtn').onclick=async()=>{if(deferredInstall){deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$('installBtn').hidden=true}};restoreSession()});
+  document.addEventListener('DOMContentLoaded',()=>{$('billingLogin').onsubmit=login;$('logoutBtn').onclick=()=>{for(const key of [SESSION_KEY,'c4b_staff_session','c4b_admin_session','c4b_csv_credentials','c4b_csv_access']){localStorage.removeItem(key);sessionStorage.removeItem(key)}location.reload()};$('menuSearch').oninput=renderMenu;$('discount').oninput=renderCart;$('tax').oninput=renderCart;$('tableNo').oninput=renderCart;$('customerName').oninput=renderCart;$('newBillBtn').onclick=()=>{if(!cart.length||billLocked||confirm('Current bill clear karke new bill banayein?'))newBill()};BillingPrinter.attach({
+      connectButton: $('connectPrinter'),
+      printButton: $('printBtn'),
+      status: $('printerStatus'),
+      getReceipt() {
+        if (!cart.length) {
+          alert('Bill empty hai.');
+          return null;
+        }
+        return buildBill().replace(/^\*|\*$/gm, '');
+      }
+    });$('whatsappBtn').onclick=sendWhatsApp;$('installBtn').onclick=async()=>{if(deferredInstall){deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$('installBtn').hidden=true}};restoreSession()});
   window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;$('installBtn').hidden=false});
 })();

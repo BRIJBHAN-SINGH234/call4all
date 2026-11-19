@@ -8,7 +8,7 @@
  *   - GitHub API calls:  network-only (sensitive, never cache)
  */
 
-const CACHE_VERSION = 'v35-2026-11-16-handmade-disabled';
+const CACHE_VERSION = 'v36-2026-11-19-billing-printer';
 const STATIC_CACHE = 'c4a-static-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'c4a-runtime-' + CACHE_VERSION;
 
@@ -47,7 +47,8 @@ const PRECACHE_URLS = [
   ,'/food-billing.html'
   ,'/food-billing-manifest.json'
   ,'/assets/css/food-billing.css'
-  ,'/assets/js/food-billing.js'
+  ,'/assets/js/food-billing.js?v=20261119-1'
+  ,'/assets/js/billing-printer.js'
   ,'/data/food-menu.csv'
   ,'/data/billing-users.csv'
 ];
