@@ -387,6 +387,12 @@ class Store:
             if old and existing.get('status') == 'generated':
                 clean.append({**old, 'qty': qty})
                 continue
+            if kind == 'food' and variant == 'Custom' and ident.startswith('custom-'):
+                name = text(line.get('name'), 'Custom item name', 120, True)
+                price = integer(line.get('price_cents'), 'Custom item price', 0, 1_000_000)
+                clean.append({'item_id': ident, 'name': name, 'variant': variant,
+                              'qty': qty, 'price_cents': price, 'units': 0})
+                continue
             if kind == 'food':
                 item = db.execute('SELECT * FROM food WHERE id=? AND active=1', (ident,)).fetchone()
                 if not item or variant not in ('Half', 'Full', 'Regular'):
