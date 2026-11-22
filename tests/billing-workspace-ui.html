@@ -22,6 +22,30 @@ historyFrom.value='';historyTo.value='';b.document.getElementById('oldBills').cl
 const adminf=await frame('admin','billing-stock-admin.html'),admin=adminf.contentWindow;const form=admin.document.getElementById('adminLogin');form.elements.mobile.value='admin';form.elements.password.value='test-only-admin-password';form.dispatchEvent(new admin.Event('submit',{cancelable:true}));await wait(()=>!admin.document.getElementById('adminWorkspace').hidden,'Admin login');await wait(()=>admin.document.getElementById('stockLedger').textContent.includes('Bob'),'Ledger shows who reduced stock');assert(admin.document.getElementById('stockList').textContent.includes('87'),'Current stock shown');admin.document.querySelector('[data-restock]').click();const rf=admin.document.getElementById('restockForm');rf.elements.packets.value=1;rf.elements.singles.value=2;rf.elements.note.value='Restock UI '+run;rf.dispatchEvent(new admin.Event('submit',{cancelable:true}));await wait(()=>admin.document.getElementById('stockList').textContent.includes('99'),'Restock adds packet units and singles');assert(admin.document.getElementById('stockLedger').textContent.includes('Billing Admin'),'Restock actor recorded');
 localStorage.setItem('c4b_staff_session',JSON.stringify(a.BillingAPI.session('c4b_staff_session')));const siteFrame=await frame('alice','index.html');await wait(()=>siteFrame.contentWindow.document.getElementById('billingReturnLink'),'Website return button');assert(siteFrame.contentWindow.document.getElementById('billingReturnLink').getAttribute('href')==='billing-workspace.html','Website returns to workspace');siteFrame.remove();localStorage.removeItem('c4b_staff_session');
 a.document.getElementById('newFood').click();
+const activeDiscard=()=>a.document.querySelector('.bw-tab.active').parentElement.querySelector('[data-discard]');
+const draftKey=activeDiscard().dataset.discard;
+a.confirm=()=>false;
+activeDiscard().click();
+assert(activeDiscard()?.dataset.discard===draftKey,'Cancel keeps pending bill');
+a.confirm=()=>true;
+activeDiscard().click();
+assert(!Array.from(a.document.querySelectorAll('[data-discard]')).some(x=>x.dataset.discard===draftKey),'Unsynced bill removed');
+
+a.document.getElementById('newFood').click();
+input(a,'table','DELETE-'+run);
+a.document.getElementById('saveBill').click();
+await wait(()=>a.document.getElementById('saveState').textContent==='Saved','Draft saved before delete');
+const deleteNo=a.document.getElementById('billNo').value;
+activeDiscard().click();
+await wait(()=>!a.document.getElementById('pendingBills').textContent.includes('DELETE-'+run),'Synced pending bill removed');
+const remaining=await b.BillingAPI.request('/bills?status=draft&q='+encodeURIComponent(deleteNo),{token:b.BillingAPI.session('c4b_staff_session').token});
+assert(!remaining.items.length,'Deleted draft removed from shared storage');
+const generatedId=article.querySelector('[data-open]').dataset.open;
+try{
+  await a.BillingAPI.request('/bills/'+generatedId+'/discard',{token:staffSession.token,method:'POST',data:{version:1},key:a.BillingAPI.uid()});
+  throw Error('Generated bill was deleted');
+}catch(e){assert(e.status===409,'Generated bill cannot be deleted')}
+a.document.getElementById('newFood').click();
 const custom=a.document.getElementById('customItemForm');
 custom.elements.itemName.value='Extra chutney & dip';
 custom.elements.itemPrice.value='12.35';
@@ -35,7 +59,7 @@ await wait(()=>a.document.getElementById('cartList').textContent.includes('Extra
 a.document.getElementById('generateBill').click();
 await wait(()=>a.document.getElementById('generateBill').hidden&&!a.document.getElementById('downloadPdf').disabled,'Custom item bill generated');
 assert(a.document.getElementById('cartList').textContent.includes('₹12.35'),'Generated custom unit price preserved');
-document.body.dataset.tests='PASS: custom item save and generation, multi-table food drafts, refresh recovery, active table preserved, item click feedback, food/beverage bills, direct screen-only beverage save and reopen, packet/single deduction, all-user shared history, creator/updater, editable first hour, locked old bill, comments after lock, live stock, actor ledger, admin restock';
+document.body.dataset.tests='PASS: pending bill deletion, custom item save and generation, multi-table food drafts, refresh recovery, active table preserved, item click feedback, food/beverage bills, direct screen-only beverage save and reopen, packet/single deduction, all-user shared history, creator/updater, editable first hour, locked old bill, comments after lock, live stock, actor ledger, admin restock';
 }catch(e){document.body.dataset.tests='FAIL: '+e.stack}
 })();
 </script></body>

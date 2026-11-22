@@ -108,7 +108,7 @@ class Handler(SimpleHTTPRequestHandler):
                 result = self.store.list_bills(query)
             elif path == '/api/bills' and self.command == 'POST':
                 result = self.store.create_bill(actor, body, key)
-            elif re.fullmatch(r'/api/bills/[^/]+(?:/(?:generate|comments))?', path):
+            elif re.fullmatch(r'/api/bills/[^/]+(?:/(?:generate|comments|discard))?', path):
                 parts = path.split('/')
                 ident = parts[3]
                 if len(parts) == 4 and self.command == 'GET':
@@ -117,6 +117,8 @@ class Handler(SimpleHTTPRequestHandler):
                     result = self.store.update_bill(actor, ident, body, key)
                 elif len(parts) == 5 and parts[4] == 'generate' and self.command == 'POST':
                     result = self.store.update_bill(actor, ident, body, key, True)
+                elif len(parts) == 5 and parts[4] == 'discard' and self.command == 'POST':
+                    result = self.store.discard_draft(actor, ident, body, key)
                 elif len(parts) == 5 and parts[4] == 'comments' and self.command == 'POST':
                     result = self.store.comment(actor, ident, body, key)
                 else:

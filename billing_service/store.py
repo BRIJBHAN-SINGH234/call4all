@@ -492,6 +492,20 @@ class Store:
             return self._bill(db, ident)
         return self.mutation(actor, key, ('generate/' if generate else 'update/') + ident, body, op)
 
+    def discard_draft(self, actor, ident, body, key):
+        def op(db):
+            bill = self._bill(db, ident)
+            if bill['status'] != 'draft':
+                raise Error('Sirf pending bill delete kar sakte hain.', 409, 'conflict')
+            if body.get('version') != bill['version']:
+                raise Error('Bill update ho chuka hai. Latest bill load karke dobara delete karein.', 409, 'conflict')
+            db.execute('DELETE FROM comments WHERE bill_id=?', (ident,))
+            db.execute('DELETE FROM audit WHERE bill_id=?', (ident,))
+            db.execute("DELETE FROM requests WHERE json_extract(response, '$.id')=?", (ident,))
+            db.execute('DELETE FROM bills WHERE id=?', (ident,))
+            return {'deleted': True}
+        return self.mutation(actor, key, 'discard/' + ident, body, op)
+
     def comment(self, actor, ident, body, key):
         def op(db):
             self._bill(db, ident)

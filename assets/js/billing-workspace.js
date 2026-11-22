@@ -2,7 +2,7 @@
 'use strict';
 const API=BillingAPI,SESSION='c4b_staff_session',STORE='c4b_workspace_v2:',$=id=>document.getElementById(id),safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),money=c=>'₹'+(Number(c||0)/100).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2}),date=t=>t?new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'}).format(new Date(t*1000)):'—';
 let session=null,workspace={active:null,bills:{}},catalog={food:[],beverage:[]},category='All',historyOffset=null,historyItems=[],serverOffset=0,toastTimer=0,autosaveTimer=0,syncing=false;
-const saving=new Set(),generating=new Set();
+const saving=new Set(),generating=new Set(),discarding=new Set(),discardedIds=new Set();
 const archive=()=>new URLSearchParams(location.search).get('view')==='history';
 const dayFormat=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'});
 const today=()=>dayFormat.format(API.now());
@@ -28,25 +28,25 @@ function showView(){
 function persist(){if(!session)return;try{localStorage.setItem(STORE+session.user.id,JSON.stringify(workspace));$('footerState').textContent='Drafts device par saved · '+new Date().toLocaleTimeString('en-IN')}catch{status('Device storage full/blocked hai. Page band na karein; bills sync karein.')}}
 function status(s){$('status').textContent=s}
 function toast(s){$('toast').textContent=s;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,2000)}
-function locked(b){return !!b&&(expired(b)||b.locked||b.generated_at&&API.now()>=b.generated_at*1000+3600000)}
+function locked(b){return !!b&&(discarding.has(b.key)||expired(b)||b.locked||b.generated_at&&API.now()>=b.generated_at*1000+3600000)}
 function totals(b){return BillingInvoice.totals(b)}
 function data(b){return{kind:b.kind,table:b.kind==='beverage'?'':b.table||'',customer:b.kind==='beverage'?'':b.customer||'',phone:b.kind==='beverage'?'':b.phone||'',discount_cents:b.discount_cents||0,tax_bps:b.tax_bps||0,lines:b.lines.map(x=>({item_id:x.item_id,variant:x.variant,qty:x.qty,...(x.variant==='Custom'?{name:x.name,price_cents:x.price_cents}:{})}))}}
 const fingerprint=b=>JSON.stringify(data(b));
 function canonical(remote,key){return gstDraft({...remote,key,id:remote.id,dirty:false,conflict:null,baseVersion:remote.version})}
 function gstDraft(b){if(b.kind==='food'&&b.status==='draft'&&b.tax_bps!==500){b.tax_bps=500;b.dirty=true;delete b.writeRequest}return b}
 function addDraft(kind){setView(false);const key=API.uid();workspace.bills[key]={key,id:null,bill_no:'Unsynced draft',kind,status:'draft',table:'',customer:'',phone:'',lines:[],discount_cents:0,tax_bps:kind==='food'?500:0,created_at:API.now()/1000,generated_at:null,creator_id:session.user.id,creator_name:session.user.name,updater_name:session.user.name,version:0,baseVersion:0,comments:[],audit:[],dirty:true};workspace.active=key;category='All';$('historyView').hidden=true;$('editor').hidden=false;persist();render();schedule();}
-function mergeRemote(remote){if(expired(remote))return null;let b=Object.values(workspace.bills).find(x=>x.id===remote.id);if(b?.dirty){if(remote.version!==b.baseVersion)b.conflict='Server par bill update ho chuka hai. Aapke local changes safe hain.';return b}const key=b?.key||remote.id;workspace.bills[key]=canonical(remote,key);return workspace.bills[key]}
+function mergeRemote(remote){if(expired(remote)||discardedIds.has(remote.id))return null;let b=Object.values(workspace.bills).find(x=>x.id===remote.id);if(b?.dirty){if(remote.version!==b.baseVersion)b.conflict='Server par bill update ho chuka hai. Aapke local changes safe hain.';return b}const key=b?.key||remote.id;workspace.bills[key]=canonical(remote,key);return workspace.bills[key]}
 function changed(){const b=current();if(!b||locked(b))return;b.dirty=true;b.conflict=null;persist();renderPending();renderCart();if(b.status==='draft')schedule()}
 function schedule(){clearTimeout(autosaveTimer);autosaveTimer=setTimeout(()=>syncDrafts(),API.isCSV?.()?2500:700)}
 async function saveOne(b){if(!b||!b.dirty||b.conflict||saving.has(b.key)||locked(b))return b;saving.add(b.key);const before=fingerprint(b),payload=data(b);try{
-if(!b.id){const created=await API.request('/bills',{token:session.token,method:'POST',data:{kind:b.kind},key:'create-'+b.key});b.id=created.id;b.bill_no=created.bill_no;b.baseVersion=b.version=created.version;persist()}
+if(!b.id){b.createAttempted=true;persist();const created=await API.request('/bills',{token:session.token,method:'POST',data:{kind:b.kind},key:'create-'+b.key});b.id=created.id;b.bill_no=created.bill_no;b.baseVersion=b.version=created.version;persist()}
 const body={...payload,version:b.baseVersion},signature=JSON.stringify(body);if(!b.writeRequest||b.writeRequest.signature!==signature)b.writeRequest={key:API.uid(),signature};persist();
 const remote=await API.request('/bills/'+b.id,{token:session.token,method:'PUT',data:body,key:b.writeRequest.key});const latest=workspace.bills[b.key];if(!latest)return;if(fingerprint(latest)===before)workspace.bills[b.key]=canonical(remote,b.key);else{latest.id=remote.id;latest.bill_no=remote.bill_no;latest.baseVersion=latest.version=remote.version;latest.dirty=true;delete latest.writeRequest}persist();status('Saved · '+remote.bill_no);if(workspace.active===b.key&&$('historyView').hidden)render();else renderPending();return workspace.bills[b.key]
 }catch(e){b.error=e.message;if(e.code==='conflict'||e.status===423){b.conflict=e.message;if(e.status===423)b.locked=true}persist();status(e.message);if(workspace.active===b.key)renderConflict();return null}finally{saving.delete(b.key)}}
 async function syncDrafts(){if(syncing||!session)return;syncing=true;try{for(const b of Object.values(workspace.bills))if(b.status==='draft'&&!expired(b)&&b.dirty&&!b.conflict&&!generating.has(b.key))await saveOne(b)}finally{syncing=false}}
 async function pending(){
   pruneDrafts();
-  const local=Object.values(workspace.bills).filter(b=>b.status==='draft'&&b.id&&!saving.has(b.key)&&!generating.has(b.key));
+  const local=Object.values(workspace.bills).filter(b=>b.status==='draft'&&b.id&&!saving.has(b.key)&&!generating.has(b.key)&&!discarding.has(b.key));
   try{
     await API.request('/bills/expire-drafts',{method:'POST',token:session.token,key:API.uid()}).catch(e=>status(e.message));
     const seen=new Set();
@@ -57,7 +57,7 @@ async function pending(){
       offset=result.next_offset;
     }while(offset!==null);
     for(const b of local){
-      if(seen.has(b.id)||workspace.bills[b.key]!==b||saving.has(b.key)||generating.has(b.key))continue;
+      if(seen.has(b.id)||workspace.bills[b.key]!==b||saving.has(b.key)||generating.has(b.key)||discarding.has(b.key))continue;
       try{
         const remote=await API.request('/bills/'+b.id,{token:session.token});
         if(remote.status!=='generated'||workspace.bills[b.key]!==b)continue;
@@ -69,20 +69,90 @@ async function pending(){
           workspace.active=null;
           render();
         }
-      }catch(e){if(e.status!==404)status(e.message)}
+      }catch(e){
+        if(e.status===404&&workspace.bills[b.key]===b&&!discarding.has(b.key)&&!saving.has(b.key)&&!generating.has(b.key)){
+          removeLocalDraft(b.key,b.id);
+        }else if(e.status!==404)status(e.message);
+      }
     }
     persist();
     renderPending();
   }catch(e){status(e.message)}
 }
 async function loadMenu(){try{catalog=await API.request('/menu',{token:session.token});workspace.catalog=catalog;persist();renderMenu()}catch(e){status(e.message)}}
-function renderPending(){const items=Object.values(workspace.bills).filter(b=>b.status==='draft'&&!expired(b));$('pendingBills').innerHTML=items.length?items.map(b=>`<button type="button" class="bw-tab ${workspace.active===b.key?'active':''}" data-key="${safe(b.key)}"><strong>${safe(b.kind==='beverage'?'Beverage draft':b.table?'Table '+b.table:'New table')} · ${b.kind==='food'?'Food':'Beverage'}</strong><small>${safe(b.creator_name)} · ${money(totals(b).total)}</small><small>${b.conflict?'Conflict · local safe':b.dirty?'Device par saved, sync pending':safe(b.bill_no)}</small></button>`).join(''):'<p>No pending bills. Food ya Beverage bill add karein.</p>';$('pendingBills').querySelectorAll('[data-key]').forEach(btn=>btn.onclick=()=>{persist();workspace.active=btn.dataset.key;category='All';persist();render()})}
-function renderConflict(){const b=current(),mount=$('conflict');mount.hidden=!b?.conflict;if(!b?.conflict)return;mount.innerHTML=`<strong>${safe(b.conflict)}</strong><div><button id="loadLatest" class="fb-btn">Latest server bill load karein</button><button id="copyDraft" class="fb-btn fb-btn-dark">Local changes ko naya draft banayein</button></div>`;$('loadLatest').onclick=async()=>{if(!confirm('Local unsaved changes replace honge. Latest server bill kholein?'))return;try{const remote=await API.request('/bills/'+b.id,{token:session.token});workspace.bills[b.key]=canonical(remote,b.key);persist();render()}catch(e){status(e.message)}};$('copyDraft').onclick=()=>{const copy={...JSON.parse(JSON.stringify(b)),key:API.uid(),id:null,bill_no:'Unsynced draft',status:'draft',created_at:API.now()/1000,version:0,baseVersion:0,generated_at:null,locked:false,dirty:true,conflict:null,comments:[],audit:[],creator_id:session.user.id,creator_name:session.user.name};delete copy.writeRequest;delete copy.error;setView(false);$('historyView').hidden=true;workspace.bills[copy.key]=gstDraft(copy);workspace.active=copy.key;persist();render();schedule()}}
+function draftLabel(b){
+  return b.kind==='beverage'?'Beverage draft':b.table?'Table '+b.table:'New table';
+}
+function removeLocalDraft(key,id){
+  if(id)discardedIds.add(id);
+  delete workspace.bills[key];
+  if(workspace.active===key){
+    workspace.active=Object.values(workspace.bills).find(b=>b.status==='draft'&&!expired(b))?.key||null;
+    if($('historyView').hidden)render();
+  }
+  persist();
+  renderPending();
+}
+async function discardDraft(key){
+  let b=workspace.bills[key];
+  if(b?.status!=='draft'||locked(b)||generating.has(key))return;
+  if(!confirm(draftLabel(b)+' ka pending bill delete karein?'))return;
+  discarding.add(key);
+  renderPending();
+  if(workspace.active===key){renderCart();renderMenu()}
+  try{
+    for(let i=0;saving.has(key)&&i<160;i++)await new Promise(resolve=>setTimeout(resolve,250));
+    if(saving.has(key))throw Error('Draft sync chal raha hai. Thodi der mein delete karein.');
+    b=workspace.bills[key];
+    if(!b||b.status!=='draft')return;
+    if(!b.id&&b.createAttempted){
+      const remote=await API.request('/bills',{token:session.token,method:'POST',data:{kind:b.kind},key:'create-'+key});
+      b.id=remote.id;
+      b.baseVersion=remote.version;
+      persist();
+    }
+    if(b.id){
+      await API.request('/bills/'+b.id+'/discard',{
+        token:session.token,method:'POST',data:{version:b.baseVersion},key:API.uid()
+      }).catch(e=>{if(e.status!==404)throw e});
+    }
+    removeLocalDraft(key,b.id);
+    toast('Pending bill deleted');
+  }catch(e){
+    status(e.message);
+    if(e.status===409){discarding.delete(key);pending()}
+  }finally{
+    discarding.delete(key);
+    renderPending();
+    if(workspace.active===key){renderCart();renderMenu()}
+  }
+}
+function renderPending(){
+  const items=Object.values(workspace.bills).filter(b=>b.status==='draft'&&!expired(b));
+  const mount=$('pendingBills');
+  mount.innerHTML=items.length?items.map(b=>`
+    <div class="bw-pending-card">
+      <button type="button" class="bw-tab ${workspace.active===b.key?'active':''}" data-key="${safe(b.key)}">
+        <strong>${safe(draftLabel(b))} · ${b.kind==='food'?'Food':'Beverage'}</strong>
+        <small>${safe(b.creator_name)} · ${money(totals(b).total)}</small>
+        <small>${b.conflict?'Conflict · local safe':b.dirty?'Device par saved, sync pending':safe(b.bill_no)}</small>
+      </button>
+      <button type="button" class="fb-btn fb-btn-danger" data-discard="${safe(b.key)}" aria-label="Delete pending bill: ${safe(draftLabel(b))}" ${discarding.has(b.key)||generating.has(b.key)?'disabled':''}>Delete</button>
+    </div>`).join(''):'<p>No pending bills. Food ya Beverage bill add karein.</p>';
+  mount.querySelectorAll('[data-key]').forEach(btn=>btn.onclick=()=>{
+    workspace.active=btn.dataset.key;
+    category='All';
+    persist();
+    render();
+  });
+  mount.querySelectorAll('[data-discard]').forEach(btn=>btn.onclick=()=>discardDraft(btn.dataset.discard));
+}
+function renderConflict(){const b=current(),mount=$('conflict');mount.hidden=!b?.conflict;if(!b?.conflict)return;mount.innerHTML=`<strong>${safe(b.conflict)}</strong><div><button id="loadLatest" class="fb-btn">Latest server bill load karein</button><button id="copyDraft" class="fb-btn fb-btn-dark">Local changes ko naya draft banayein</button></div>`;$('loadLatest').onclick=async()=>{if(!confirm('Local unsaved changes replace honge. Latest server bill kholein?'))return;try{const remote=await API.request('/bills/'+b.id,{token:session.token});workspace.bills[b.key]=canonical(remote,b.key);persist();render()}catch(e){status(e.message)}};$('copyDraft').onclick=()=>{const copy={...JSON.parse(JSON.stringify(b)),key:API.uid(),id:null,bill_no:'Unsynced draft',status:'draft',created_at:API.now()/1000,version:0,baseVersion:0,generated_at:null,locked:false,dirty:true,conflict:null,comments:[],audit:[],creator_id:session.user.id,creator_name:session.user.name};delete copy.writeRequest;delete copy.createAttempted;delete copy.error;setView(false);$('historyView').hidden=true;workspace.bills[copy.key]=gstDraft(copy);workspace.active=copy.key;persist();render();schedule()}}
 function render(){$('pendingPanel').hidden=archive();const b=current(),form=$('customItemForm');if(form.dataset.billKey!==b?.key){form.reset();form.dataset.billKey=b?.key||''}renderPending();if(!b){$('editor').hidden=true;return}$('editor').hidden=false;for(const id of ['table','customer','phone']){$(id).value=b.kind==='beverage'?'':b[id]||'';$(id).closest('label').hidden=b.kind==='beverage'}$('pdfShareFallback').hidden=true;$('receiptTitle').textContent=b.kind==='beverage'?'Call4All Beverage Bill':'Call4Food Customer Bill';$('billNo').value=b.bill_no;$('discount').value=b.discount_cents/100;$('tax').value=b.tax_bps/100;$('tax').readOnly=b.kind==='food';$('billType').textContent=b.kind==='food'?'Food bill':'Beverages / snacks bill';renderConflict();renderCart();renderMenu();renderComments()}
 function renderCart(){const b=current();if(!b)return;const ro=locked(b)||generating.has(b.key),t=totals(b);$('billDetails').innerHTML=`<p><strong>${safe(b.bill_no)}</strong>${b.kind==='food'?' · '+safe(b.table?'Table '+b.table:'No table')+'<br>'+safe(b.customer):''}<br>Created by: <strong>${safe(b.creator_name)}</strong><br>Last updated by: ${safe(b.updater_name||b.creator_name)}<br>Created: ${date(b.created_at)}${b.generated_at?'<br>Generated: '+date(b.generated_at):''}</p>`;$('cartList').innerHTML=b.lines.length?b.lines.map((x,i)=>`<div class="fb-cart-row"><div><strong>${safe(x.name)}</strong><small>${safe(x.variant)} · ${money(x.price_cents)} × ${x.qty}</small></div><div class="fb-qty"><button data-index="${i}" data-delta="-1" ${ro?'disabled':''} aria-label="${safe(x.name)} quantity kam karein">−</button><b>${x.qty}</b><button data-index="${i}" data-delta="1" ${ro?'disabled':''} aria-label="${safe(x.name)} quantity badhayein">+</button></div><strong>${money(x.price_cents*x.qty)}</strong></div>`).join(''):'<p class="fb-empty">Items choose karein. Doosra draft kabhi bhi khol sakte hain.</p>';$('cartList').querySelectorAll('[data-index]').forEach(btn=>btn.onclick=()=>{if(locked(b)||generating.has(b.key))return;const x=b.lines[Number(btn.dataset.index)];x.qty+=Number(btn.dataset.delta);b.lines=b.lines.filter(x=>x.qty>0);changed();renderMenu()});$('subtotal').textContent=money(t.subtotal);$('taxAmount').textContent=money(t.tax);$('receiptBusiness').hidden=b.kind!=='food';$('taxLabel').textContent=b.kind==='food'?'GST %':'Tax %';$('taxAmountLabel').textContent=b.kind==='food'?'GST amount':'Tax amount';$('discountAmount').textContent=money(t.discount);$('taxableAmount').textContent=money(t.base);$('total').textContent=money(t.total);$('customItemForm').hidden=b.kind!=='food';$('customItemFields').disabled=ro;for(const id of ['table','customer','phone','discount','tax'])$(id).disabled=ro;$('saveBill').disabled=ro||!b.dirty;$('saveBill').hidden=b.kind==='beverage'&&b.status==='draft';$('saveBill').textContent=b.status==='draft'?'Save draft':'Save bill changes';$('generateBill').textContent=b.kind==='beverage'?'Save beverage bill':'Generate bill';$('printBill').hidden=$('connectPrinter').hidden=$('printerStatus').hidden=b.kind==='beverage';$('whatsappNote').hidden=b.kind==='beverage';$('whatsappBill').hidden=b.kind==='beverage';$('sharePdf').hidden=b.kind==='beverage';$('sharePdf').disabled=b.status!=='generated'||b.dirty;$('downloadPdf').hidden=b.kind==='beverage';$('downloadPdf').disabled=b.status!=='generated'||b.dirty;$('generateBill').hidden=b.status!=='draft';$('generateBill').disabled=!b.lines.length||ro;$('printBill').disabled=b.status!=='generated'||b.dirty;$('whatsappBill').disabled=b.status!=='generated'||b.dirty;$('editNotice').textContent=generating.has(b.key)?'Bill generate ho raha hai; stock aur invoice save ho rahe hain.':ro?'1 ghanta poora: bill edit nahi hoga. Neeche comment add kar sakte hain.':b.generated_at?'Editable until '+date(b.generated_at+3600)+' IST. Changes save karna zaroori hai.':'Pending bill: draft device par turant save hota hai. Stock generate karne par deduct hoga.';$('saveState').textContent=b.dirty?'Device saved · sync pending':'Saved';}
 function renderMenu(){const b=current();if(!b)return;const list=catalog[b.kind]||[],cats=['All',...new Set(list.map(x=>x.category))];if(!cats.includes(category))category='All';$('categories').innerHTML=cats.map(c=>`<button class="fb-cat ${c===category?'active':''}" data-cat="${safe(c)}">${safe(c)}</button>`).join('');$('categories').querySelectorAll('button').forEach(btn=>btn.onclick=()=>{category=btn.dataset.cat;renderMenu()});const query=$('menuSearch').value.trim().toLowerCase(),items=list.filter(x=>(category==='All'||x.category===category)&&(!query||(x.name+' '+x.category).toLowerCase().includes(query)));$('menuGrid').innerHTML=items.length?items.map(x=>{const qty=b.lines.filter(l=>l.item_id===x.id).reduce((s,l)=>s+l.qty,0);return `<article class="fb-item ${qty?'added':''}"><div><h3>${safe(x.name)}</h3><small>${safe(x.category)}${b.kind==='beverage'?' · Stock '+x.stock+' single units':''}</small></div><div class="fb-item-actions">${x.variants.map(v=>`<button data-id="${safe(x.id)}" data-variant="${safe(v.key)}" ${locked(b)||generating.has(b.key)?'disabled':''}>${safe(v.key)} ${money(v.price_cents)}</button>`).join('')}</div>${qty?`<span class="bw-added">✓ Added ${qty}</span>`:''}</article>`}).join(''):'<p class="fb-empty">No items available. Admin se items/stock add karwayein.</p>';$('menuGrid').querySelectorAll('[data-id]').forEach(btn=>btn.onclick=()=>{if(locked(b)||generating.has(b.key))return;const item=list.find(x=>x.id===btn.dataset.id),v=item.variants.find(v=>v.key===btn.dataset.variant),line=b.lines.find(x=>x.item_id===item.id&&x.variant===v.key);if(line)line.qty++;else b.lines.push({item_id:item.id,name:item.name,variant:v.key,price_cents:v.price_cents,units:v.units||0,qty:1});changed();renderMenu();toast('✓ '+item.name+' · '+v.key+' added to '+(b.kind==='food'&&b.table?'Table '+b.table:b.bill_no))})}
 function renderComments(){const b=current();$('comments').innerHTML=(b.comments||[]).map(c=>`<div class="bw-comment">${safe(c.body)}<br><small>${safe(c.actor_name)} · ${date(c.created_at)}</small></div>`).join('')||'<p>No comments.</p>';$('billAudit').innerHTML=(b.audit||[]).map(a=>`<p class="bw-audit">${safe(({draft_created:'Draft banaya',draft_saved:'Draft saved',generated:'Bill generated',bill_edited:'Bill edited'})[a.action]||a.action)} · ${safe(a.actor_name)} · ${date(a.created_at)}</p>`).join('');$('commentForm').querySelector('button').disabled=!b.id;}
-async function generate(){let b=current();if(!b||locked(b)||!b.lines.length||generating.has(b.key))return;const key=b.key;let chat=null;if(b.kind==='food'&&validPhone(b.phone)){try{chat=window.open('about:blank','_blank');if(chat)chat.opener=null}catch{}}generating.add(key);renderCart();renderMenu();try{for(let i=0;saving.has(key)&&i<100;i++)await new Promise(r=>setTimeout(r,100));b=workspace.bills[key];if(!b||expired(b))throw Error('Draft expire ho gaya. Naya bill banayein.');if(saving.has(key))throw Error('Draft sync chal raha hai. Thodi der mein generate karein.');if(b.dirty){b=await saveOne(b);if(!b||b.dirty)throw Error('Pehle draft sync karein.')}const remote=await API.request('/bills/'+b.id+'/generate',{token:session.token,method:'POST',data:{...data(b),version:b.baseVersion},key:API.uid()});workspace.bills[key]=canonical(remote,key);persist();if(workspace.active===key&&$('historyView').hidden){setView(true,remote.id);render()}loadMenu();if(chat&&!chat.closed){chat.location.replace(textURL(remote));chat=null;status('Bill generated. WhatsApp mein bill text ready hai; Send dabayein.')}else status('Bill generated · stock saved. WhatsApp text button se customer ki chat kholein.')}catch(e){if(chat)chat.close();status(e.message)}finally{generating.delete(key);if(workspace.active===key){renderCart();renderMenu()}}}
+async function generate(){let b=current();if(!b||locked(b)||!b.lines.length||generating.has(b.key))return;const key=b.key;let chat=null;if(b.kind==='food'&&validPhone(b.phone)){try{chat=window.open('about:blank','_blank');if(chat)chat.opener=null}catch{}}generating.add(key);renderPending();renderCart();renderMenu();try{for(let i=0;saving.has(key)&&i<100;i++)await new Promise(r=>setTimeout(r,100));b=workspace.bills[key];if(!b||expired(b))throw Error('Draft expire ho gaya. Naya bill banayein.');if(saving.has(key))throw Error('Draft sync chal raha hai. Thodi der mein generate karein.');if(b.dirty){b=await saveOne(b);if(!b||b.dirty)throw Error('Pehle draft sync karein.')}const remote=await API.request('/bills/'+b.id+'/generate',{token:session.token,method:'POST',data:{...data(b),version:b.baseVersion},key:API.uid()});workspace.bills[key]=canonical(remote,key);persist();if(workspace.active===key&&$('historyView').hidden){setView(true,remote.id);render()}loadMenu();if(chat&&!chat.closed){chat.location.replace(textURL(remote));chat=null;status('Bill generated. WhatsApp mein bill text ready hai; Send dabayein.')}else status('Bill generated · stock saved. WhatsApp text button se customer ki chat kholein.')}catch(e){if(chat)chat.close();status(e.message)}finally{generating.delete(key);renderPending();if(workspace.active===key){renderCart();renderMenu()}}}
 function invoice(){const b=current();if(!b||b.kind!=='food')return null;return BillingInvoice.create(b)}
 function downloadPdf(){try{const pdf=invoice();if(!pdf)return;BillingInvoice.download(pdf);status('PDF downloaded · '+pdf.filename)}catch(e){status(e.message)}}
 function validPhone(phone){return /^(?:91)?\d{10}$/.test(String(phone||'').replace(/\D/g,''))}

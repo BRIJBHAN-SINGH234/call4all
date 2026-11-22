@@ -2,3 +2,7 @@
 #receiptBusiness{font-size:12px;color:#425348;border-bottom:1px solid #e7dfcf;padding-bottom:6px}#receiptBusiness p{line-height:1.6}.bw-pdf-fallback{padding:12px;margin-top:12px;border:1px solid #b6d4bf;border-radius:8px;background:#f0f8f2;font-size:13px}.bw-pdf-fallback a{display:inline-block;text-decoration:none}.fb-inline-input[readonly]{background:#f0f3ef;color:#425348}@media print{.fb-cart-list{max-height:none!important;overflow:visible!important}#receipt .fb-summary input{border:0;background:none}#pdfShareFallback,#editNotice{display:none!important}#receipt{border:0}.fb-cart-row{break-inside:avoid}.fb-cart-actions{display:none!important}}
 
 @media print{.bw-whatsapp-note{display:none!important}}
+
+.bw-pending-card{display:flex;flex-direction:column;gap:6px}
+.bw-pending-card .bw-tab{flex:1}
+.bw-pending-card .fb-btn{align-self:flex-start}
