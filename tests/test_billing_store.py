@@ -52,6 +52,25 @@ class BillingTests(unittest.TestCase):
         self.assertEqual(raised.exception.status, status)
         return raised.exception
 
+    def test_expired_drafts_are_removed_and_history_uses_generation_date(self):
+        expired = self.draft()
+        self.now += 11 * 3600 + 59 * 60
+        issued = self.draft(lines=[{'item_id': 'f1', 'variant': 'Full', 'qty': 1}])
+        self.now += 30
+        issued = self.store.update_bill(self.a, issued['id'], self.payload(issued), self.key(), True)
+        self.now += 30
+        active = self.draft()
+        self.assertError(404, lambda: self.store.get_bill(expired['id']))
+        self.assertEqual(self.store.expire_drafts()['deleted'], 1)
+        self.assertEqual(self.store.expire_drafts()['deleted'], 0)
+        pending = self.store.list_bills({'status': 'draft'})
+        self.assertEqual([b['id'] for b in pending['items']], [active['id']])
+        archived = self.store.list_bills({'status': 'generated', 'from': '2026-10-25', 'to': '2026-10-25'})
+        self.assertEqual([b['id'] for b in archived['items']], [issued['id']])
+        with self.store.db(True) as db:
+            db.execute('UPDATE bills SET created_at=created_at-86400 WHERE id=?', (issued['id'],))
+        self.assertEqual(self.store.list_bills({'status': 'generated', 'from': '2026-10-25'})['total'], 1)
+
     def test_multiple_drafts_shared_history_and_creator(self):
         food = self.draft(lines=[{'item_id': 'f1', 'variant': 'Regular', 'qty': 2}])
         stock = self.item()
@@ -64,7 +83,7 @@ class BillingTests(unittest.TestCase):
         self.assertEqual(self.store.stock()['items'][0]['stock'], 100)  # drafts reserve no stock
         self.assertEqual(self.store.list_bills({})['total'], 2)
         self.now += 10 * 86400
-        self.assertEqual(self.store.list_bills({})['total'], 2)  # no two-day deletion
+        self.assertEqual(self.store.list_bills({})['total'], 0)
 
     def test_one_hour_is_generation_time_and_only_comments_after(self):
         draft = self.draft(lines=[{'item_id': 'f1', 'variant': 'Regular', 'qty': 2}])

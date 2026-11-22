@@ -42,6 +42,10 @@ function create(config,API){
  function cutoff(value,end=false){if(!/^\d{4}-\d{2}-\d{2}$/.test(value))fail('Date YYYY-MM-DD format mein chahiye.');const t=Date.parse(value+'T00:00:00+05:30')/1000;if(!Number.isFinite(t))fail('Invalid date.');return t+(end?86400:0)}
  function page(rows,q,defaultLimit=50){const offset=num(Number(q.get('offset')||0),'Offset'),limit=Math.min(100,num(Number(q.get('limit')||defaultLimit),'Limit',1));return{items:rows.slice(offset,offset+limit),total:rows.length,next_offset:offset+limit<rows.length?offset+limit:null}}
  async function saveUser(a,id,body,token){admin(a);for(let retry=0;retry<5;retry++){const f=await file('data/billing-users.csv',token),old=f.rows.find(u=>u.id===id);if(id&&!old)fail('User nahi mila.',404);const mobile=String(body.mobile||'').replace(/\D/g,'').slice(-10),name=txt(body.name,'Name',80,true),status=String(body.status||'active').toLowerCase();if(mobile.length!==10||!['active','blocked'].includes(status))fail('Mobile/status valid bharein.');if(f.rows.some(u=>u.id!==id&&u.mobile===mobile))fail('Mobile already registered hai.',409);let salt=old?.password_salt,passwordHash=old?.password_hash;if(body.password){txt(body.password,'Password',200,true);if(body.password.length<6)fail('Password kam se kam 6 characters ka ho.');salt=hex(crypto.getRandomValues(new Uint8Array(16)));passwordHash=await hash(body.password,salt)}else if(!old)fail('Password required hai.');const user={id:id||API.uid(),mobile,password_salt:salt,password_hash:passwordHash,name,status:status==='active'?'Active':'Blocked',created_at:old?.created_at||new Date(now()*1000).toISOString(),created_by:old?.created_by||a.name};try{await put('data/billing-users.csv',old?f.rows.map(u=>u.id===id?user:u):[...f.rows,user],USERS,f.sha,token);return pub(user)}catch(e){if(e.status!==409||retry===4)throw e}}}
+ const dayFormat=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'});
+ function expiredDraft(b){
+  return b.status==='draft'&&b.created_at<cutoff(dayFormat.format(now()*1000));
+ }
  async function request(route,{token='',method='GET',data={},key='',raw=false}={}){
   if(route==='/health')return{ok:true,service:'call4all-billing',storage:'github-csv',server_now:now()};
   if(route==='/login'||route==='/admin/login')return login(data,route==='/admin/login');
@@ -54,13 +58,22 @@ function create(config,API){
   for(let retry=0;retry<6;retry++){
    const f=await file(path,credential),s=decode(f.rows);let result;
    if(mutation){const previous=s.request.find(r=>r.actor_id===a.id&&r.id===key);if(previous){if(previous.signature!==signature)fail('Request key alag data ke saath reuse nahi kar sakte.',409);return{...previous.response,server_now:now()}}}
-   if(p==='/menu')result={food:foods,beverage:s.inventory.filter(i=>i.active).map(inv)};
+   if(p==='/bills/expire-drafts'&&method==='POST'){
+    const ids=new Set(s.bill.filter(expiredDraft).map(b=>b.id));
+    if(!ids.size)return{deleted:0,server_now:now()};
+    s.bill=s.bill.filter(b=>!ids.has(b.id));
+    s.comment=s.comment.filter(c=>!ids.has(c.bill_id));
+    s.audit=s.audit.filter(a=>!ids.has(a.bill_id));
+    s.request=s.request.filter(r=>!ids.has(r.response?.id));
+    result={deleted:ids.size};
+   }
+   else if(p==='/menu')result={food:foods,beverage:s.inventory.filter(i=>i.active).map(inv)};
    else if(p==='/stock'){const date=q.get('as_of'),t=date?cutoff(date,true):null;result={items:s.inventory.map(i=>({...inv(i),as_of_stock:t?s.movement.filter(m=>m.item_id===i.id&&m.created_at<t).reduce((sum,m)=>sum+m.delta,0):i.stock})),as_of:date,timezone:'Asia/Kolkata'}}
    else if(p==='/stock/ledger')result=page(s.movement.filter(m=>!q.get('item')||m.item_id===q.get('item')).slice().reverse(),q,100);
-   else if(p==='/bills'&&method==='GET'){const search=(q.get('q')||'').toLowerCase(),from=q.get('from')?cutoff(q.get('from')):0,to=q.get('to')?cutoff(q.get('to'),true):Infinity;const rows=s.bill.filter(b=>(!q.get('kind')||b.kind===q.get('kind'))&&(!q.get('status')||b.status===q.get('status'))&&(!q.get('creator')||b.creator_id===q.get('creator'))&&b.created_at>=from&&b.created_at<to&&(!search||[b.bill_no,b.table,b.customer,b.creator_name].some(v=>String(v||'').toLowerCase().includes(search)))).slice().reverse().map(b=>bill(s,b.id));result=page(rows,q)}
-   else if(p==='/bills'&&method==='POST'){if(!['food','beverage'].includes(data.kind))fail('Bill type choose karein.');const id=API.uid(),t=now(),seq=s.bill.length+1,b={id,seq,bill_no:(data.kind==='food'?'C4F':'C4B')+'-'+new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(t*1000)).replace(/\D/g,'')+'-'+String(seq).padStart(6,'0'),kind:data.kind,status:'draft',...clean(s,data,data.kind,foods),created_at:t,updated_at:t,generated_at:null,creator_id:a.id,creator_name:a.name,updater_id:a.id,updater_name:a.name,version:1};s.bill.push(b);audit(s,b,'draft_created',a);result=bill(s,id)}
+   else if(p==='/bills'&&method==='GET'){const search=(q.get('q')||'').toLowerCase(),from=q.get('from')?cutoff(q.get('from')):0,to=q.get('to')?cutoff(q.get('to'),true):Infinity;const dateField=q.get('status')==='generated'?'generated_at':'created_at';const rows=s.bill.filter(b=>!expiredDraft(b)&&(!q.get('kind')||b.kind===q.get('kind'))&&(!q.get('status')||b.status===q.get('status'))&&(!q.get('creator')||b.creator_id===q.get('creator'))&&b[dateField]>=from&&b[dateField]<to&&(!search||[b.bill_no,b.table,b.customer,b.creator_name].some(v=>String(v||'').toLowerCase().includes(search)))).slice().reverse().map(b=>bill(s,b.id));result=page(rows,q)}
+   else if(p==='/bills'&&method==='POST'){if(!['food','beverage'].includes(data.kind))fail('Bill type choose karein.');const id=API.uid(),t=now(),seq=s.bill.reduce((max,b)=>Math.max(max,b.seq||0),0)+1,b={id,seq,bill_no:(data.kind==='food'?'C4F':'C4B')+'-'+new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(t*1000)).replace(/\D/g,'')+'-'+String(seq).padStart(6,'0'),kind:data.kind,status:'draft',...clean(s,data,data.kind,foods),created_at:t,updated_at:t,generated_at:null,creator_id:a.id,creator_name:a.name,updater_id:a.id,updater_name:a.name,version:1};s.bill.push(b);audit(s,b,'draft_created',a);result=bill(s,id)}
    else if(/^\/bills\/[^/]+(?:\/(?:generate|comments))?$/.test(p)){
-    const [, ,id,action]=p.split('/'),b=s.bill.find(b=>b.id===id);if(!b)fail('Bill nahi mila.',404);
+    const [, ,id,action]=p.split('/'),b=s.bill.find(b=>b.id===id);if(!b||expiredDraft(b))fail('Bill nahi mila.',404);
     if(method==='GET'&&!action)result=bill(s,id);
     else if(action==='comments'&&method==='POST'){s.comment.push({id:API.uid(),bill_id:id,body:txt(data.body,'Comment',2000,true),actor_id:a.id,actor_name:a.name,created_at:now()});result=bill(s,id)}
     else if((method==='PUT'&&!action)||(method==='POST'&&action==='generate')){

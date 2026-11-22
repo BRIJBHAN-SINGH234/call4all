@@ -102,6 +102,8 @@ class Handler(SimpleHTTPRequestHandler):
                 result = {'user': actor, 'server_now': self.store.clock()}
             elif path == '/api/menu' and self.command == 'GET':
                 result = self.store.menu()
+            elif path == '/api/bills/expire-drafts' and self.command == 'POST':
+                result = self.store.expire_drafts()
             elif path == '/api/bills' and self.command == 'GET':
                 result = self.store.list_bills(query)
             elif path == '/api/bills' and self.command == 'POST':

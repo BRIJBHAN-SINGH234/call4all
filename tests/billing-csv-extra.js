@@ -10,4 +10,9 @@ async function csvExtraTests(alice,bob,admin){
  const won=results.find(r=>r.status==='fulfilled').value;GithubFixture.advance(3600000);let locked=await c.request('/bills/'+won.id,{token:ct});assert(locked.locked,'Locked exactly one hour later');try{await req(c,ct,'/bills/'+won.id,{version:locked.version,lines:[line]},crypto.randomUUID(),'PUT');throw Error('Expected locked')}catch(e){assert(e.status===423,'Admin also blocked after one hour')}await req(c,ct,'/bills/'+won.id+'/comments',{body:'Still allowed'});
  const u=await req(c,ct,'/admin/users',{name:'Temp',mobile:'9000000003',password:'temp-password',status:'active'});assert(u.id,'User added to CSV');await req(c,ct,'/admin/users/'+u.id,{name:'Temp',mobile:'9000000003',status:'blocked'},crypto.randomUUID(),'PUT');
  const text=await c.request('/export/bills',{token:ct,raw:true});assert(text.includes('creator_name')&&text.includes('Alice'),'Bill CSV export');assert(GithubFixture.records().some(r=>r.type==='comment'&&r.body==='Still allowed'),'Comment persisted in shared CSV');
+ GithubFixture.advance(86400000);
+ const cleanup=await req(a,at,'/bills/expire-drafts',{});
+ assert(cleanup.deleted>0&&!GithubFixture.records().some(r=>r.id===failedDraft.id),'Yesterday’s pending CSV bill physically removed');
+ assert((await a.request('/bills/'+won.id,{token:at})).status==='generated','Generated CSV bill survives cleanup');
+
 }

@@ -326,9 +326,23 @@ class Store:
             rows = db.execute('SELECT * FROM ledger ' + where + ' ORDER BY id DESC LIMIT ? OFFSET ?', args + [min(limit, 200), offset]).fetchall()
         return {'items': [dict(r) for r in rows], 'total': total, 'next_offset': offset + len(rows) if offset + len(rows) < total else None}
 
+    def _draft_cutoff(self):
+        now = dt.datetime.fromtimestamp(self.clock(), IST)
+        return now.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
+
+    def expire_drafts(self):
+        with self.db(True) as db:
+            expired = "SELECT id FROM bills WHERE status='draft' AND created_at<?"
+            cutoff = self._draft_cutoff()
+            for table in ('comments', 'audit'):
+                db.execute(f'DELETE FROM {table} WHERE bill_id IN ({expired})', (cutoff,))
+            db.execute(f"DELETE FROM requests WHERE json_extract(response, '$.id') IN ({expired})", (cutoff,))
+            deleted = db.execute("DELETE FROM bills WHERE status='draft' AND created_at<?", (cutoff,)).rowcount
+        return {'deleted': deleted}
+
     def _bill(self, db, ident):
         row = db.execute('SELECT * FROM bills WHERE id=?', (ident,)).fetchone()
-        if not row:
+        if not row or (row['status'] == 'draft' and row['created_at'] < self._draft_cutoff()):
             raise Error('Bill nahi mila.', 404)
         data = json.loads(row['data'])
         return {**dict(row), **data, 'locked': row['generated_at'] is not None and self.clock() >= row['generated_at'] + 3600, 'edit_until': row['generated_at'] + 3600 if row['generated_at'] else None,
@@ -340,7 +354,8 @@ class Store:
             return self._bill(db, ident)
 
     def list_bills(self, query):
-        clauses, args = [], []
+        clauses, args = ["(status != 'draft' OR created_at >= ?)"], [self._draft_cutoff()]
+        date_column = 'generated_at' if query.get('status') == 'generated' else 'created_at'
         for key, column in [('status', 'status'), ('kind', 'kind'), ('creator', 'creator_id')]:
             if query.get(key):
                 clauses.append(column + '=?')
@@ -355,7 +370,7 @@ class Store:
                     value = dt.datetime.combine(date, dt.time(), IST).timestamp()
                 except ValueError:
                     raise Error('Invalid date filter.')
-                clauses.append('created_at' + op + '?')
+                clauses.append(date_column + op + '?')
                 args.append(value)
         where = ' WHERE ' + ' AND '.join(clauses) if clauses else ''
         try:
