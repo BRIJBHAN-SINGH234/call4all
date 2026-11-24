@@ -337,8 +337,60 @@ installButtons.forEach(button=>button.onclick=async()=>{
   await prompt.prompt();
 });
 window.addEventListener('appinstalled',hideInstall);
-if('serviceWorker' in navigator&&window.top===window){
-  navigator.serviceWorker.register('./sw.js').catch(error=>console.warn('Billing service worker:',error));
+const billingWorker='serviceWorker' in navigator&&window.top===window
+  ? navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).catch(error=>{
+    console.warn('Billing service worker:',error);
+    return null;
+  })
+  : Promise.resolve(null);
+const refreshButtons=document.querySelectorAll('[data-refresh-billing]');
+function refreshStatus(message){
+  if(session)status(message);
+  else $('billingRefreshMessage').textContent=message;
 }
+function waitForActivation(worker){
+  if(!worker)return Promise.resolve();
+  return new Promise((resolve,reject)=>{
+    const timer=setTimeout(()=>finish(new Error('App update ko zyada time lag raha hai. Dobara Refresh App dabayein.')),20000);
+    function finish(error){
+      clearTimeout(timer);
+      worker.removeEventListener('statechange',check);
+      if(error)reject(error);else resolve();
+    }
+    function check(){
+      if(worker.state==='installed')worker.postMessage({type:'SKIP_WAITING'});
+      if(worker.state==='activated')finish();
+      if(worker.state==='redundant')finish(new Error('App update load nahi hua. Dobara Refresh App dabayein.'));
+    }
+    worker.addEventListener('statechange',check);
+    check();
+  });
+}
+async function refreshBilling(){
+  const billInProgress=()=>saving.size||generating.size||cancelling.size||discarding.size;
+  const waitMessage='Bill save hone ke baad Refresh App dabayein.';
+  if(billInProgress()){refreshStatus(waitMessage);return}
+  if(navigator.onLine===false){refreshStatus('Latest update ke liye internet connect karein.');return}
+  refreshButtons.forEach(button=>{button.disabled=true;button.textContent='Checking update…'});
+  refreshStatus('Latest billing app check ho rahi hai…');
+  let reloading=false;
+  try{
+    const registration=await billingWorker;
+    if(registration){
+      await registration.update();
+      const worker=registration.installing||registration.waiting||registration.active;
+      await waitForActivation(worker);
+    }
+    if(billInProgress()){refreshStatus(waitMessage);return}
+    persist();
+    location.reload();
+    reloading=true;
+  }catch(error){
+    refreshStatus(error.message||'App refresh nahi hua. Dobara try karein.');
+  }finally{
+    if(!reloading)refreshButtons.forEach(button=>{button.disabled=false;button.textContent='Refresh App'});
+  }
+}
+refreshButtons.forEach(button=>button.onclick=refreshBilling);
 (async()=>{await API.init();if(API.isCSV?.()){$('csvAccessField').hidden=false;$('csvAccessNote').hidden=false}const s=API.session(SESSION)||API.session('c4b_admin_session');if(!s)return;try{const me=await API.request('/me',{token:s.token});serverOffset=me.server_now*1000-Date.now();await show({...s,user:me.user})}catch(e){if(e.status!==401&&e.status!==403){await show(s);status('Offline mode: pending drafts device se restored. Generate/sync karne ke liye service reconnect karein.')}else{API.clearSession(SESSION);API.clearSession('c4b_admin_session');API.clearSession('c4b_csv_credentials');$('loginError').textContent=e.message}}})();
 })();

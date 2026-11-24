@@ -8,7 +8,7 @@
  *   - GitHub API calls:  network-only (sensitive, never cache)
  */
 
-const CACHE_VERSION = 'v38-2026-11-24-billing-progress';
+const CACHE_VERSION = 'v39-2026-11-24-billing-refresh';
 const STATIC_CACHE = 'c4a-static-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'c4a-runtime-' + CACHE_VERSION;
 
@@ -50,7 +50,7 @@ const PRECACHE_URLS = [
   ,'/assets/js/billing-csv.js?v=20261124-1'
   ,'/assets/js/billing-api.js'
   ,'/assets/js/billing-invoice.js?v=20261124-1'
-  ,'/assets/js/billing-workspace.js?v=20261124-2'
+  ,'/assets/js/billing-workspace.js?v=20261124-3'
   ,'/assets/vendor/jspdf-4.2.1.umd.min.js'
   ,'/assets/vendor/invoice-font.js'
   ,'/data/billing-config.json'
@@ -151,7 +151,8 @@ async function staleWhileRevalidate(req) {
 
 async function networkFirst(req) {
   try {
-    const res = await fetch(req);
+    const billingPage = new URL(req.url).pathname === '/billing-workspace.html';
+    const res = await fetch(req, billingPage ? { cache: 'no-cache' } : undefined);
     if (res.ok) {
       const clone = res.clone();
       caches.open(RUNTIME_CACHE).then(c => c.put(req, clone));
