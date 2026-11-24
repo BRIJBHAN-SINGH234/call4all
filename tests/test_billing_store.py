@@ -71,6 +71,32 @@ class BillingTests(unittest.TestCase):
             db.execute('UPDATE bills SET created_at=created_at-86400 WHERE id=?', (issued['id'],))
         self.assertEqual(self.store.list_bills({'status': 'generated', 'from': '2026-10-25'})['total'], 1)
 
+    def test_direct_generation_cancel_retry_and_collection_across_pages(self):
+        item = self.item()
+        body = {'kind': 'beverage', 'generate': True, 'lines': [
+            {'item_id': item['id'], 'variant': 'Packet', 'qty': 2},
+        ]}
+        create_key = self.key()
+        bill = self.store.create_bill(self.a, body, create_key)
+        self.assertEqual(self.store.create_bill(self.a, body, create_key)['id'], bill['id'])
+        self.assertEqual(self.store.stock()['items'][0]['stock'], 80)
+        self.store.create_bill(self.a, {**body, 'lines': [
+            {'item_id': item['id'], 'variant': 'Single', 'qty': 1},
+        ]}, self.key())
+        query = {'status': 'issued', 'from': '2026-10-25', 'to': '2026-10-25', 'limit': '1'}
+        page = self.store.list_bills(query)
+        self.assertEqual(len(page['items']), 1)
+        self.assertEqual(page['collection_cents'], 4250)
+        self.now += 86400
+        cancelled = self.store.cancel_bill(self.b, bill['id'], {'version': bill['version']}, self.key())
+        self.assertEqual(cancelled['status'], 'cancelled')
+        self.assertTrue(cancelled['locked'])
+        self.store.cancel_bill(self.b, bill['id'], {'version': bill['version']}, self.key())
+        self.assertEqual(self.store.stock()['items'][0]['stock'], 99)
+        self.assertEqual(self.store.list_bills(query)['collection_cents'], 250)
+        self.assertEqual(self.store.list_bills({**query, 'offset': '1'})['items'][0]['status'], 'cancelled')
+        self.assertError(423, lambda: self.store.update_bill(self.a, bill['id'], self.payload(cancelled), self.key(), True))
+
     def test_multiple_drafts_shared_history_and_creator(self):
         food = self.draft(lines=[{'item_id': 'f1', 'variant': 'Regular', 'qty': 2}])
         stock = self.item()

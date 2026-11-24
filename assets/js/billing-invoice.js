@@ -6,7 +6,7 @@ const money=c=>'₹'+(Number(c||0)/100).toLocaleString('en-IN',{minimumFractionD
 function totals(b){const subtotal=b.lines.reduce((s,x)=>s+x.price_cents*x.qty,0),discount=Number(b.discount_cents||0),base=Math.max(0,subtotal-discount),tax=Math.floor((base*Number(b.tax_bps||0)+5000)/10000);return{subtotal,discount,base,tax,total:base+tax}}
 const date=t=>t?new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'}).format(new Date(t*1000))+' IST':'—';
 function create(b){
- if(!b||b.status!=='generated'||b.dirty)throw Error('Pehle generated bill ke changes save karein.');
+ if(!b||!['generated','cancelled'].includes(b.status)||b.dirty)throw Error('Pehle generated bill ke changes save karein.');
  if(!window.jspdf?.jsPDF||!window.BillingInvoiceFont)throw Error('PDF tools load nahi hue. Page refresh karein.');
  const doc=new window.jspdf.jsPDF({unit:'mm',format:'a4',compress:true,putOnlyUsedFonts:true});
  doc.addFileToVFS('Invoice.ttf',window.BillingInvoiceFont);doc.addFont('Invoice.ttf','Invoice','normal');
@@ -26,7 +26,7 @@ function create(b){
   doc.setFont('helvetica','bold');doc.setTextColor(47,53,45);doc.setFontSize(10);doc.text(business.brand,left+5,25);
   doc.setFontSize(23);doc.text(business.subBrand,left+5,35);
   muted('Good Food • Great Mood',left+5,43,8);
-  write('CUSTOMER BILL',right-5,27,12,{align:'right'});
+  write(b.status==='cancelled'?'CANCELLED BILL':'CUSTOMER BILL',right-5,27,12,{align:'right'});
   muted('Branch: '+business.branch,right-5,35,8,{align:'right'});
   muted('call4all.co.in  |  '+business.phone,right-5,42,7,{align:'right'});
   write('GSTIN: '+business.gstin,left,57,9);
@@ -65,10 +65,10 @@ function create(b){
  const summaryTop=y;
  doc.setFillColor(248,248,244);doc.roundedRect(108,summaryTop-5,86,48,2,2,'F');
  for(const [label,amount] of [['Subtotal',t.subtotal],['Discount',t.discount],['Taxable amount',t.base],['GST ('+Number(b.tax_bps||0)/100+'%)',t.tax]]){write(label,112,y,9);write(money(amount),right-3,y,10,{align:'right'});y+=7}
- doc.setFillColor(243,233,208);doc.roundedRect(108,y-3,86,13,1.5,1.5,'F');write('Total payable',112,y+5,10);write(money(t.total),right-3,y+5,12,{align:'right'});y+=22;
+ doc.setFillColor(243,233,208);doc.roundedRect(108,y-3,86,13,1.5,1.5,'F');write(b.status==='cancelled'?'Original total':'Total payable',112,y+5,10);write(money(t.total),right-3,y+5,12,{align:'right'});y+=22;
  write('Thank you for choosing '+business.subBrand+'!',left,y,9);
  const pages=doc.getNumberOfPages();for(let i=1;i<=pages;i++){doc.setPage(i);line(276);muted('Call4All • Call4Food | '+business.phone+' | call4all.co.in',left,282,7);muted(i+' / '+pages,right,282,7,{align:'right'})}
- const filename='Call4Food-'+String(b.bill_no||b.id).replace(/[^a-zA-Z0-9_-]/g,'-')+'.pdf';
+ const filename='Call4Food-'+String(b.bill_no||b.id).replace(/[^a-zA-Z0-9_-]/g,'-')+(b.status==='cancelled'?'-Cancelled':'')+'.pdf';
  return{doc,filename,blob:doc.output('blob'),totals:t};
 }
 function download(invoice){const url=URL.createObjectURL(invoice.blob),a=document.createElement('a');a.href=url;a.download=invoice.filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}

@@ -8,7 +8,7 @@
  *   - GitHub API calls:  network-only (sensitive, never cache)
  */
 
-const CACHE_VERSION = 'v36-2026-11-19-billing-printer';
+const CACHE_VERSION = 'v37-2026-11-24-billing-workspace';
 const STATIC_CACHE = 'c4a-static-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'c4a-runtime-' + CACHE_VERSION;
 
@@ -44,6 +44,16 @@ const PRECACHE_URLS = [
   '/staff.html',
   '/admin-manifest.json',
   '/staff-manifest.json'
+  ,'/billing-workspace.html'
+  ,'/billing-workspace-manifest.json'
+  ,'/assets/css/billing-workspace.css'
+  ,'/assets/js/billing-csv.js?v=20261124-1'
+  ,'/assets/js/billing-api.js'
+  ,'/assets/js/billing-invoice.js?v=20261124-1'
+  ,'/assets/js/billing-workspace.js?v=20261124-1'
+  ,'/assets/vendor/jspdf-4.2.1.umd.min.js'
+  ,'/assets/vendor/invoice-font.js'
+  ,'/data/billing-config.json'
   ,'/food-billing.html'
   ,'/food-billing-manifest.json'
   ,'/assets/css/food-billing.css'
@@ -79,7 +89,7 @@ self.addEventListener('fetch', event => {
   const url = new URL(req.url);
 
   // Only handle GET requests
-  if (req.method !== 'GET') return;
+  if (req.method !== 'GET' || req.headers.has('Authorization') || url.pathname.startsWith('/api/')) return;
 
   // SEO files must always come directly from hosting. In particular, never
   // replace sitemap.xml with the HTML offline fallback on a navigation error.
@@ -152,7 +162,8 @@ async function networkFirst(req) {
     if (cached) return cached;
     // Final fallback for navigation
     if (req.mode === 'navigate') {
-      const fallback = await caches.match('/index.html');
+      const pathname = new URL(req.url).pathname;
+      const fallback = await caches.match(pathname === '/billing-workspace.html' ? pathname : '/index.html');
       if (fallback) return fallback;
     }
     return new Response('Offline. Please connect to the internet.', {

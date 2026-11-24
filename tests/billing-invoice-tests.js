@@ -10,7 +10,7 @@ async function invoiceTests(w){
  w.open=(url)=>{assert(url==='about:blank','Chat window reserved during Generate click');return{opener:w,closed:false,location:{replace:url=>{autoTextURL=url}},close:()=>{chatClosed=true}}};
  const request=api.request;
  try{
-  api.request=(route,options)=>route.endsWith('/generate')?Promise.reject(new Error('Invoice test generation failed')):request(route,options);
+  api.request=(route,options)=>(route.endsWith('/generate')||options?.data?.generate===true)?Promise.reject(new Error('Invoice test generation failed')):request(route,options);
   d.getElementById('generateBill').click();await wait(()=>d.getElementById('status').textContent==='Invoice test generation failed');
   assert(chatClosed&&autoTextURL===null&&!d.getElementById('generateBill').hidden,'Failed generation closes reserved chat without text invoice');
   api.request=request;chatClosed=false;

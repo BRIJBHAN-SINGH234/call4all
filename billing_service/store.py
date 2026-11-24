@@ -345,7 +345,7 @@ class Store:
         if not row or (row['status'] == 'draft' and row['created_at'] < self._draft_cutoff()):
             raise Error('Bill nahi mila.', 404)
         data = json.loads(row['data'])
-        return {**dict(row), **data, 'locked': row['generated_at'] is not None and self.clock() >= row['generated_at'] + 3600, 'edit_until': row['generated_at'] + 3600 if row['generated_at'] else None,
+        return {**dict(row), **data, 'locked': row['status'] == 'cancelled' or (row['generated_at'] is not None and self.clock() >= row['generated_at'] + 3600), 'edit_until': row['generated_at'] + 3600 if row['generated_at'] else None,
                 'comments': [dict(r) for r in db.execute('SELECT * FROM comments WHERE bill_id=? ORDER BY created_at,id', (ident,))],
                 'audit': [dict(r) for r in db.execute('SELECT id,action,actor_id,actor_name,created_at FROM audit WHERE bill_id=? ORDER BY id', (ident,))]}
 
@@ -355,9 +355,12 @@ class Store:
 
     def list_bills(self, query):
         clauses, args = ["(status != 'draft' OR created_at >= ?)"], [self._draft_cutoff()]
-        date_column = 'generated_at' if query.get('status') == 'generated' else 'created_at'
+        status = query.get('status')
+        date_column = 'generated_at' if status in ('generated', 'cancelled', 'issued') else 'created_at'
+        if status == 'issued':
+            clauses.append("status IN ('generated', 'cancelled')")
         for key, column in [('status', 'status'), ('kind', 'kind'), ('creator', 'creator_id')]:
-            if query.get(key):
+            if query.get(key) and (key != 'status' or status != 'issued'):
                 clauses.append(column + '=?')
                 args.append(query[key])
         if query.get('q'):
@@ -378,10 +381,13 @@ class Store:
         except ValueError:
             raise Error('Invalid pagination.')
         with self.db() as db:
-            total = db.execute('SELECT COUNT(*) FROM bills' + where, args).fetchone()[0]
+            db.execute('BEGIN')
+            total, collection = db.execute(
+                "SELECT COUNT(*), COALESCE(SUM(CASE WHEN status='generated' THEN json_extract(data, '$.total_cents') END), 0) FROM bills" + where, args
+            ).fetchone()
             ids = db.execute('SELECT id FROM bills' + where + ' ORDER BY seq DESC LIMIT ? OFFSET ?', args + [limit, offset]).fetchall()
             rows = [self._bill(db, r['id']) for r in ids]
-        return {'items': rows, 'total': total, 'next_offset': offset + len(rows) if offset + len(rows) < total else None}
+        return {'items': rows, 'total': total, 'collection_cents': collection, 'next_offset': offset + len(rows) if offset + len(rows) < total else None}
 
     def _data(self, db, body, kind, existing=None):
         lines = body.get('lines', [])
@@ -440,14 +446,21 @@ class Store:
         kind = body.get('kind')
         if kind not in ('food', 'beverage'):
             raise Error('Food ya beverage bill choose karein.')
+        generate = body.get('generate') is True
         def op(db):
             ident = str(uuid.uuid4())
             data = self._data(db, body, kind)
+            if generate and not data['lines']:
+                raise Error('Generate karne se pehle items add karein.')
             now = self.clock()
             cursor = db.execute('INSERT INTO bills(id,kind,data,created_at,updated_at,creator_id,creator_name,updater_id,updater_name) VALUES(?,?,?,?,?,?,?,?,?)', (ident, kind, json.dumps(data), now, now, actor['id'], actor['name'], actor['id'], actor['name']))
             no = ('C4F' if kind == 'food' else 'C4B') + '-' + dt.datetime.fromtimestamp(now, IST).strftime('%y%m%d') + '-' + str(cursor.lastrowid).zfill(6)
             db.execute('UPDATE bills SET bill_no=? WHERE id=?', (no, ident))
-            self._audit(db, ident, 'draft_created', actor, None, data)
+            if generate:
+                if kind == 'beverage':
+                    self._stock_delta(db, ident, [], data['lines'], actor, 'bill_sale')
+                db.execute("UPDATE bills SET status='generated',generated_at=? WHERE id=?", (now, ident))
+            self._audit(db, ident, 'generated' if generate else 'draft_created', actor, None, data)
             return self._bill(db, ident)
         return self.mutation(actor, key, 'bill/create', body, op)
 
@@ -491,6 +504,23 @@ class Store:
             self._audit(db, ident, 'generated' if generate else 'bill_edited' if bill['status'] == 'generated' else 'draft_saved', actor, bill, data)
             return self._bill(db, ident)
         return self.mutation(actor, key, ('generate/' if generate else 'update/') + ident, body, op)
+
+    def cancel_bill(self, actor, ident, body, key):
+        def op(db):
+            bill = self._bill(db, ident)
+            if bill['status'] == 'cancelled':
+                return bill
+            if bill['status'] != 'generated' or body.get('version') != bill['version']:
+                raise Error('Latest generated bill load karke dobara cancel karein.', 409, 'conflict')
+            if bill['kind'] == 'beverage':
+                self._stock_delta(db, ident, bill['lines'], [], actor, 'bill_cancel')
+            db.execute(
+                "UPDATE bills SET status='cancelled',updated_at=?,updater_id=?,updater_name=?,version=version+1 WHERE id=?",
+                (self.clock(), actor['id'], actor['name'], ident),
+            )
+            self._audit(db, ident, 'cancelled', actor, bill, None)
+            return self._bill(db, ident)
+        return self.mutation(actor, key, 'cancel/' + ident, body, op)
 
     def discard_draft(self, actor, ident, body, key):
         def op(db):

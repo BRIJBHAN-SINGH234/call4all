@@ -29,7 +29,7 @@ function create(config,API){
  function decode(rows){const s={bill:[],inventory:[],movement:[],comment:[],audit:[],request:[]};for(const r of rows){if(!s[r.record_type])fail('Unknown CSV record type; save roka gaya.');try{const value=JSON.parse(r.data_json);if(!value||typeof value!=='object'||typeof value.id!=='string'||value.id!==r.id)throw Error();s[r.record_type].push(value)}catch{fail('Billing CSV record invalid hai. Admin se data check karwayein.')}}return s}
  function encode(s){return Object.entries(s).flatMap(([type,rows])=>rows.map(r=>({record_type:type,id:r.id,bill_id:r.bill_id||'',item_id:r.item_id||'',actor_id:r.actor_id||r.creator_id||'',actor_name:r.actor_name||r.creator_name||'',created_at:r.created_at||'',data_json:JSON.stringify(r)})))}
  const inv=r=>({...r,variants:[{key:'Single',price_cents:r.single_price,units:1},{key:'Packet',price_cents:r.packet_price,units:r.units_per_packet}]});
- function bill(s,id){const b=s.bill.find(b=>b.id===id);if(!b)fail('Bill nahi mila.',404);return{...copy(b),locked:!!b.generated_at&&now()>=b.generated_at+3600,edit_until:b.generated_at?b.generated_at+3600:null,comments:s.comment.filter(c=>c.bill_id===id),audit:s.audit.filter(c=>c.bill_id===id)}}
+ function bill(s,id){const b=s.bill.find(b=>b.id===id);if(!b)fail('Bill nahi mila.',404);return{...copy(b),locked:b.status==='cancelled'||!!b.generated_at&&now()>=b.generated_at+3600,edit_until:b.generated_at?b.generated_at+3600:null,comments:s.comment.filter(c=>c.bill_id===id),audit:s.audit.filter(c=>c.bill_id===id)}}
  async function food(token){const f=await file('data/food-menu.csv',token);return f.rows.filter(r=>r.status.toLowerCase()==='active').map(r=>{const half=Math.round(Number(r.half_price||0)*100),full=Math.round(Number(r.full_price||0)*100);return{id:r.id,name:r.name,category:r.category,variants:[...(half?[{key:'Half',price_cents:half}]:[]),...(full?[{key:half?'Full':'Regular',price_cents:full}]:[])]}})}
  function clean(s,body,kind,foods,existing){if(!Array.isArray(body.lines||[])||(body.lines||[]).length>300)fail('Invalid bill items.');const seen=new Set(),lines=(body.lines||[]).map(l=>{const id=txt(l.item_id,'Item',100,true),variant=txt(l.variant,'Variant',30,true),qty=num(l.qty,'Quantity',1,1000000),key=id+'|'+variant;if(seen.has(key))fail('Duplicate bill item.');seen.add(key);const old=existing?.status==='generated'&&existing.lines.find(l=>l.item_id===id&&l.variant===variant);if(old)return{...old,qty};
   if(kind==='food'&&variant==='Custom'&&id.startsWith('custom-')){
@@ -39,6 +39,15 @@ function create(config,API){
   const item=(kind==='food'?foods:s.inventory.filter(i=>i.active).map(inv)).find(i=>i.id===id),v=item?.variants.find(v=>v.key===variant);if(!v)fail('Item / serving available nahi hai.');return{item_id:id,name:item.name,variant,qty,price_cents:v.price_cents,units:v.units||0}});const subtotal=lines.reduce((sum,l)=>sum+l.qty*l.price_cents,0);num(subtotal,'Bill subtotal',0,1e12);const discount=num(body.discount_cents||0,'Discount',0,subtotal),tax_bps=kind==='food'?(existing?.status==='generated'?num(existing.tax_bps||0,'Tax',0,10000):500):num(body.tax_bps||0,'Tax',0,10000),tax=Math.floor(((subtotal-discount)*tax_bps+5000)/10000);return{table:kind==='beverage'?'':txt(body.table||'','Table',50),customer:kind==='beverage'?'':txt(body.customer||'','Customer',120),phone:kind==='beverage'?'':txt(body.phone||'','Phone',30),lines,subtotal_cents:subtotal,discount_cents:discount,tax_bps,tax_cents:tax,total_cents:subtotal-discount+tax}}
  function audit(s,b,action,a){s.audit.push({id:API.uid(),bill_id:b.id,action,actor_id:a.id,actor_name:a.name,created_at:now()})}
  function move(s,item,delta,kind,a,note='',bill_id=null){if(!delta)return;if(item.stock+delta<0)fail(item.name+': sirf '+item.stock+' singles stock mein hain.',409,'stock');item.stock+=delta;item.version++;s.movement.push({id:API.uid(),item_id:item.id,item_name:item.name,delta,balance:item.stock,kind,bill_id,actor_id:a.id,actor_name:a.name,note,created_at:now(),units_per_packet:item.units_per_packet})}
+ function adjustBillStock(s,beforeBill,before,after,actor,action){
+  const counts=lines=>lines.reduce((units,line)=>units.set(line.item_id,(units.get(line.item_id)||0)+line.units*line.qty),new Map());
+  const old=counts(before),next=counts(after);
+  for(const id of new Set([...old.keys(),...next.keys()])){
+   const item=s.inventory.find(i=>i.id===id);
+   if(!item)fail('Inventory record missing.',409);
+   move(s,item,(old.get(id)||0)-(next.get(id)||0),action,actor,'Bill '+beforeBill.bill_no,beforeBill.id);
+  }
+ }
  function cutoff(value,end=false){if(!/^\d{4}-\d{2}-\d{2}$/.test(value))fail('Date YYYY-MM-DD format mein chahiye.');const t=Date.parse(value+'T00:00:00+05:30')/1000;if(!Number.isFinite(t))fail('Invalid date.');return t+(end?86400:0)}
  function page(rows,q,defaultLimit=50){const offset=num(Number(q.get('offset')||0),'Offset'),limit=Math.min(100,num(Number(q.get('limit')||defaultLimit),'Limit',1));return{items:rows.slice(offset,offset+limit),total:rows.length,next_offset:offset+limit<rows.length?offset+limit:null}}
  async function saveUser(a,id,body,token){admin(a);for(let retry=0;retry<5;retry++){const f=await file('data/billing-users.csv',token),old=f.rows.find(u=>u.id===id);if(id&&!old)fail('User nahi mila.',404);const mobile=String(body.mobile||'').replace(/\D/g,'').slice(-10),name=txt(body.name,'Name',80,true),status=String(body.status||'active').toLowerCase();if(mobile.length!==10||!['active','blocked'].includes(status))fail('Mobile/status valid bharein.');if(f.rows.some(u=>u.id!==id&&u.mobile===mobile))fail('Mobile already registered hai.',409);let salt=old?.password_salt,passwordHash=old?.password_hash;if(body.password){txt(body.password,'Password',200,true);if(body.password.length<6)fail('Password kam se kam 6 characters ka ho.');salt=hex(crypto.getRandomValues(new Uint8Array(16)));passwordHash=await hash(body.password,salt)}else if(!old)fail('Password required hai.');const user={id:id||API.uid(),mobile,password_salt:salt,password_hash:passwordHash,name,status:status==='active'?'Active':'Blocked',created_at:old?.created_at||new Date(now()*1000).toISOString(),created_by:old?.created_by||a.name};try{await put('data/billing-users.csv',old?f.rows.map(u=>u.id===id?user:u):[...f.rows,user],USERS,f.sha,token);return pub(user)}catch(e){if(e.status!==409||retry===4)throw e}}}
@@ -55,14 +64,18 @@ function create(config,API){
  async function request(route,{token='',method='GET',data={},key='',raw=false}={}){
   if(route==='/health')return{ok:true,service:'call4all-billing',storage:'github-csv',server_now:now()};
   if(route==='/login'||route==='/admin/login')return login(data,route==='/admin/login');
-  const a=await actor(token),credential=access(),url=new URL(route,'https://billing.local'),p=url.pathname,q=url.searchParams;
-  if(p==='/me')return{user:a,server_now:now()};
-  if(p==='/admin/users'||p.startsWith('/admin/users/')){admin(a);if(method==='GET')return{items:(await file('data/billing-users.csv',credential)).rows.map(pub)};return saveUser(a,p.split('/')[3],data,credential)}
-  const foods=(p==='/menu'||(method!=='GET'&&(p==='/bills'||/^\/bills\/[^/]+(?:\/generate)?$/.test(p))))?await food(credential):[];
+  const url=new URL(route,'https://billing.local'),p=url.pathname,q=url.searchParams;
+  const credential=access(),authorization=actor(token);
+  if(p==='/me')return{user:await authorization,server_now:now()};
+  if(p==='/admin/users'||p.startsWith('/admin/users/')){const a=await authorization;admin(a);if(method==='GET')return{items:(await file('data/billing-users.csv',credential)).rows.map(pub)};return saveUser(a,p.split('/')[3],data,credential)}
+  const needsFood=p==='/menu'||(method!=='GET'&&data.kind!=='beverage'&&(p==='/bills'||/^\/bills\/[^/]+(?:\/generate)?$/.test(p)));
+  const [a,foods,firstFile]=await Promise.all([
+   authorization,needsFood?food(credential):[],credential?file(path,credential):null
+  ]);
   const mutation=method!=='GET';if(mutation&&!key)fail('Request identity required hai.');
   const signature=JSON.stringify({route,method,data});
   for(let retry=0;retry<6;retry++){
-   const f=await file(path,credential),s=decode(f.rows);let result;
+   const f=retry===0?firstFile:await file(path,credential),s=decode(f.rows);let result;
    if(mutation){const previous=s.request.find(r=>r.actor_id===a.id&&r.id===key);if(previous){if(previous.signature!==signature)fail('Request key alag data ke saath reuse nahi kar sakte.',409);return{...previous.response,server_now:now()}}}
    if(p==='/bills/expire-drafts'&&method==='POST'){
     const ids=new Set(s.bill.filter(expiredDraft).map(b=>b.id));
@@ -73,9 +86,24 @@ function create(config,API){
    else if(p==='/menu')result={food:foods,beverage:s.inventory.filter(i=>i.active).map(inv)};
    else if(p==='/stock'){const date=q.get('as_of'),t=date?cutoff(date,true):null;result={items:s.inventory.map(i=>({...inv(i),as_of_stock:t?s.movement.filter(m=>m.item_id===i.id&&m.created_at<t).reduce((sum,m)=>sum+m.delta,0):i.stock})),as_of:date,timezone:'Asia/Kolkata'}}
    else if(p==='/stock/ledger')result=page(s.movement.filter(m=>!q.get('item')||m.item_id===q.get('item')).slice().reverse(),q,100);
-   else if(p==='/bills'&&method==='GET'){const search=(q.get('q')||'').toLowerCase(),from=q.get('from')?cutoff(q.get('from')):0,to=q.get('to')?cutoff(q.get('to'),true):Infinity;const dateField=q.get('status')==='generated'?'generated_at':'created_at';const rows=s.bill.filter(b=>!expiredDraft(b)&&(!q.get('kind')||b.kind===q.get('kind'))&&(!q.get('status')||b.status===q.get('status'))&&(!q.get('creator')||b.creator_id===q.get('creator'))&&b[dateField]>=from&&b[dateField]<to&&(!search||[b.bill_no,b.table,b.customer,b.creator_name].some(v=>String(v||'').toLowerCase().includes(search)))).slice().reverse().map(b=>bill(s,b.id));result=page(rows,q)}
-   else if(p==='/bills'&&method==='POST'){if(!['food','beverage'].includes(data.kind))fail('Bill type choose karein.');const id=API.uid(),t=now(),seq=Math.max(s.bill.reduce((max,b)=>Math.max(max,b.seq||0),0),s.request.reduce((max,r)=>Math.max(max,r.response?.seq||0),0))+1,b={id,seq,bill_no:(data.kind==='food'?'C4F':'C4B')+'-'+new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(t*1000)).replace(/\D/g,'')+'-'+String(seq).padStart(6,'0'),kind:data.kind,status:'draft',...clean(s,data,data.kind,foods),created_at:t,updated_at:t,generated_at:null,creator_id:a.id,creator_name:a.name,updater_id:a.id,updater_name:a.name,version:1};s.bill.push(b);audit(s,b,'draft_created',a);result=bill(s,id)}
-   else if(/^\/bills\/[^/]+(?:\/(?:generate|comments|discard))?$/.test(p)){
+   else if(p==='/bills'&&method==='GET'){
+    const search=(q.get('q')||'').toLowerCase(),from=q.get('from')?cutoff(q.get('from')):0,to=q.get('to')?cutoff(q.get('to'),true):Infinity;
+    const status=q.get('status'),dateField=['generated','cancelled','issued'].includes(status)?'generated_at':'created_at';
+    const rows=s.bill.filter(b=>!expiredDraft(b)&&(!q.get('kind')||b.kind===q.get('kind'))&&
+     (!status||(status==='issued'?['generated','cancelled'].includes(b.status):b.status===status))&&
+     (!q.get('creator')||b.creator_id===q.get('creator'))&&b[dateField]>=from&&b[dateField]<to&&
+     (!search||[b.bill_no,b.table,b.customer,b.creator_name].some(v=>String(v||'').toLowerCase().includes(search)))).reverse();
+    result=page(rows,q);
+    result.items=result.items.map(b=>bill(s,b.id));
+    result.collection_cents=rows.reduce((sum,b)=>sum+(b.status==='generated'?Number(b.total_cents||0):0),0);
+   }
+   else if(p==='/bills'&&method==='POST'){if(!['food','beverage'].includes(data.kind))fail('Bill type choose karein.');const id=API.uid(),t=now(),seq=Math.max(s.bill.reduce((max,b)=>Math.max(max,b.seq||0),0),s.request.reduce((max,r)=>Math.max(max,r.response?.seq||0),0))+1,b={id,seq,bill_no:(data.kind==='food'?'C4F':'C4B')+'-'+new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(t*1000)).replace(/\D/g,'')+'-'+String(seq).padStart(6,'0'),kind:data.kind,status:'draft',...clean(s,data,data.kind,foods),created_at:t,updated_at:t,generated_at:null,creator_id:a.id,creator_name:a.name,updater_id:a.id,updater_name:a.name,version:1};if(data.generate===true){
+    if(!b.lines.length)fail('Pehle items add karein.');
+    if(b.kind==='beverage')adjustBillStock(s,b,[],b.lines,a,'bill_sale');
+    b.status='generated';b.generated_at=t;
+   }
+   s.bill.push(b);audit(s,b,b.status==='generated'?'generated':'draft_created',a);result=bill(s,id)}
+   else if(/^\/bills\/[^/]+(?:\/(?:generate|comments|discard|cancel))?$/.test(p)){
     const [, ,id,action]=p.split('/'),b=s.bill.find(b=>b.id===id);if(!b||expiredDraft(b))fail('Bill nahi mila.',404);
     if(method==='GET'&&!action)result=bill(s,id);
     else if(action==='discard'&&method==='POST'){
@@ -84,10 +112,20 @@ function create(config,API){
      removeDrafts(s,new Set([id]));
      result={deleted:true,seq:b.seq};
     }
+    else if(action==='cancel'&&method==='POST'){
+     if(b.status!=='cancelled'){
+      if(b.status!=='generated'||data.version!==b.version)fail('Latest generated bill load karke dobara cancel karein.',409,'conflict');
+      if(b.kind==='beverage')adjustBillStock(s,b,b.lines,[],a,'bill_cancel');
+      Object.assign(b,{status:'cancelled',updated_at:now(),updater_id:a.id,updater_name:a.name,version:b.version+1});
+      audit(s,b,'cancelled',a);
+     }
+     result=bill(s,id);
+    }
     else if(action==='comments'&&method==='POST'){s.comment.push({id:API.uid(),bill_id:id,body:txt(data.body,'Comment',2000,true),actor_id:a.id,actor_name:a.name,created_at:now()});result=bill(s,id)}
     else if((method==='PUT'&&!action)||(method==='POST'&&action==='generate')){
      const generate=action==='generate';if(generate&&b.status==='generated')result=bill(s,id);else{
-      if(bill(s,id).locked)fail('1 ghanta poora. Ab sirf comments add kar sakte hain.',423,'locked');if(data.version!==b.version)fail('Bill kisi aur ne update kiya hai. Latest bill load karein.',409,'conflict');if(data.kind&&data.kind!==b.kind)fail('Bill type change nahi kar sakte.');const cleanData=clean(s,data,b.kind,foods,b);if(generate&&!cleanData.lines.length)fail('Pehle items add karein.');if(b.kind==='beverage'&&(generate||b.status==='generated')){const counts=lines=>lines.reduce((r,l)=>(r[l.item_id]=(r[l.item_id]||0)+l.units*l.qty,r),{}),old=counts(b.status==='generated'?b.lines:[]),next=counts(cleanData.lines);for(const itemId of new Set([...Object.keys(old),...Object.keys(next)])){const item=s.inventory.find(i=>i.id===itemId);if(!item)fail('Inventory record missing.',409);move(s,item,(old[itemId]||0)-(next[itemId]||0),b.status==='generated'?'bill_edit':'bill_sale',a,'Bill '+b.bill_no,id)}}Object.assign(b,cleanData,{status:generate?'generated':b.status,generated_at:generate?now():b.generated_at,updated_at:now(),updater_id:a.id,updater_name:a.name,version:b.version+1});audit(s,b,generate?'generated':b.status==='generated'?'bill_edited':'draft_saved',a);result=bill(s,id)}
+      if(b.status==='cancelled')fail('Cancelled bill edit nahi ho sakta.',423,'locked');
+      if(bill(s,id).locked)fail('1 ghanta poora. Ab sirf comments add kar sakte hain.',423,'locked');if(data.version!==b.version)fail('Bill kisi aur ne update kiya hai. Latest bill load karein.',409,'conflict');if(data.kind&&data.kind!==b.kind)fail('Bill type change nahi kar sakte.');const cleanData=clean(s,data,b.kind,foods,b);if(generate&&!cleanData.lines.length)fail('Pehle items add karein.');if(b.kind==='beverage'&&(generate||b.status==='generated'))adjustBillStock(s,b,b.status==='generated'?b.lines:[],cleanData.lines,a,b.status==='generated'?'bill_edit':'bill_sale');Object.assign(b,cleanData,{status:generate?'generated':b.status,generated_at:generate?now():b.generated_at,updated_at:now(),updater_id:a.id,updater_name:a.name,version:b.version+1});audit(s,b,generate?'generated':b.status==='generated'?'bill_edited':'draft_saved',a);result=bill(s,id)}
     }else fail('Method not supported.',405)
    }
    else if(p==='/inventory'||p.startsWith('/inventory/')){admin(a);const id=p.split('/')[2],restock=p.endsWith('/restock'),old=s.inventory.find(i=>i.id===id);if(id&&!old)fail('Item nahi mila.',404);
