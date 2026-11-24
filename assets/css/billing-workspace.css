@@ -6,3 +6,11 @@
 .bw-pending-card{display:flex;flex-direction:column;gap:6px}
 .bw-pending-card .bw-tab{flex:1}
 .bw-pending-card .fb-btn{align-self:flex-start}
+
+.bw-generate-progress{display:flex;align-items:center;gap:9px;font-weight:700}
+.bw-generate-progress span{width:1em;height:1em;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:bw-generate-spin .75s linear infinite}
+@keyframes bw-generate-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.bw-generate-progress span{animation:none}}
+@media print{.bw-generate-progress{display:none!important}}
+
+.bw-food-only-hidden{display:none!important}

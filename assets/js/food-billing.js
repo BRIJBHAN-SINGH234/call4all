@@ -43,6 +43,7 @@
   }
   document.addEventListener('DOMContentLoaded',()=>{$('customItemForm').onsubmit=addCustomItem;$('billingLogin').onsubmit=login;$('logoutBtn').onclick=()=>{for(const key of [SESSION_KEY,'c4b_staff_session','c4b_admin_session','c4b_csv_credentials','c4b_csv_access']){localStorage.removeItem(key);sessionStorage.removeItem(key)}location.reload()};$('menuSearch').oninput=renderMenu;$('discount').oninput=renderCart;$('tax').oninput=renderCart;$('tableNo').oninput=renderCart;$('customerName').oninput=renderCart;$('newBillBtn').onclick=()=>{if(!cart.length||billLocked||confirm('Current bill clear karke new bill banayein?'))newBill()};BillingPrinter.attach({
       connectButton: $('connectPrinter'),
+      serialButton: $('connectSerialPrinter'),
       printButton: $('printBtn'),
       status: $('printerStatus'),
       getReceipt() {

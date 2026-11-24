@@ -6,19 +6,24 @@ async function invoiceTests(w){
  change('table','DEMO-1');change('customer','Demo Customer');change('phone','9000000001');
  d.querySelector('[data-id="f1"][data-variant="Full"]').click();change('discount','0.01');
  assert(d.getElementById('downloadPdf').disabled,'Draft cannot be exported as issued invoice');
- const realOpen=w.open;let autoTextURL=null,chatClosed=false;
- w.open=(url)=>{assert(url==='about:blank','Chat window reserved during Generate click');return{opener:w,closed:false,location:{replace:url=>{autoTextURL=url}},close:()=>{chatClosed=true}}};
- const request=api.request;
+ const realOpen=w.open,request=api.request,initialURL=w.location.href;
+ let opened=0,rejectGenerate;
+ w.open=()=>{opened++;return null};
  try{
-  api.request=(route,options)=>(route.endsWith('/generate')||options?.data?.generate===true)?Promise.reject(new Error('Invoice test generation failed')):request(route,options);
-  d.getElementById('generateBill').click();await wait(()=>d.getElementById('status').textContent==='Invoice test generation failed');
-  assert(chatClosed&&autoTextURL===null&&!d.getElementById('generateBill').hidden,'Failed generation closes reserved chat without text invoice');
-  api.request=request;chatClosed=false;
-  d.getElementById('generateBill').click();await wait(()=>d.getElementById('generateBill').hidden&&autoTextURL!==null);
+  api.request=(route,options)=>(route.endsWith('/generate')||options?.data?.generate===true)
+   ? new Promise((resolve,reject)=>{rejectGenerate=reject}) : request(route,options);
+  d.getElementById('generateBill').click();
+  await wait(()=>rejectGenerate);
+  assert(!d.getElementById('generateProgress').hidden&&d.getElementById('generateBill').disabled,'Generate displays progress and blocks duplicate clicks');
+  assert(w.location.href===initialURL&&opened===0,'Generating stays in the billing window');
+  rejectGenerate(new Error('Invoice test generation failed'));
+  await wait(()=>d.getElementById('status').textContent==='Invoice test generation failed');
+  assert(d.getElementById('generateProgress').hidden&&!d.getElementById('generateBill').disabled,'Failed generation clears progress and allows retry');
+  api.request=request;
+  d.getElementById('generateBill').click();
+  await wait(()=>d.getElementById('generateBill').hidden&&!d.getElementById('downloadPdf').disabled);
+  assert(d.getElementById('generateProgress').hidden&&opened===0&&w.location.pathname==='/billing-workspace.html','Saved receipt stays in billing without a popup');
  }finally{api.request=request;w.open=realOpen}
- assert(!chatClosed&&autoTextURL.startsWith('https://wa.me/919000000001?text='),'Successful generation opens customer text chat');
- const autoMessage=new URL(autoTextURL).searchParams.get('text');
- for(const value of ['Call4All','Call4Food','C4f_RES_001','08GVGPK0382E1ZL','GST (5%): ₹1.00','₹20.99','PDF bill chahiye'])assert(autoMessage.includes(value),'Generated WhatsApp text includes '+value);
  const id=JSON.parse(w.localStorage.getItem('c4b_workspace_v2:'+api.session('c4b_staff_session').user.id)).active;
  const state=JSON.parse(w.localStorage.getItem('c4b_workspace_v2:'+api.session('c4b_staff_session').user.id)),bill=state.bills[id];
  assert(bill.tax_bps===500&&bill.tax_cents===100&&bill.total_cents===2099,'Persisted GST rounds paise after discount');
@@ -28,7 +33,32 @@ async function invoiceTests(w){
  const actualClick=w.HTMLAnchorElement.prototype.click,originalOpen=w.open;
  w.HTMLAnchorElement.prototype.click=function(){if(this.download)downloads++;else actualClick.call(this)};
  w.open=url=>{captured={textURL:url};return null};
- d.getElementById('whatsappBill').click();assert(captured.textURL===autoTextURL,'Text button opens same saved bill and customer directly');
+ d.getElementById('whatsappBill').click();
+ assert(captured.textURL.startsWith('https://wa.me/919000000001?text='),'WhatsApp opens explicitly for saved customer');
+ const message=new URL(captured.textURL).searchParams.get('text');
+ for(const value of ['Call4All','Call4Food','C4f_RES_001','08GVGPK0382E1ZL','GST (5%): ₹1.00','₹20.99','PDF bill chahiye'])assert(message.includes(value),'WhatsApp text includes '+value);
+ const serial=w.navigator.serial,serialButton=d.getElementById('connectSerialPrinter');
+ if(serial&&!serialButton.hidden){
+  const requestPort=serial.requestPort;
+  let connected=false,receipt='';
+  serial.requestPort=async({filters})=>{
+   assert(filters[0].bluetoothServiceClassId===0x1101,'Picker filters to Bluetooth Serial Port Profile');
+   return {
+    open:async()=>{connected=true},
+    close:async()=>{connected=false},
+    writable:new w.WritableStream({write(bytes){receipt=new TextDecoder().decode(bytes)}})
+   };
+  };
+  try{
+   serialButton.click();
+   await wait(()=>serialButton.textContent.includes('Disconnect'));
+   d.getElementById('printBill').click();
+   await wait(()=>d.getElementById('printerStatus').textContent.includes('bhej diya'));
+   assert(connected&&receipt.startsWith('\x1b@')&&receipt.includes('Rs 20.99'),'Bluetooth Classic receives the actual saved receipt');
+   serialButton.click();
+   await wait(()=>!connected&&!serialButton.disabled);
+  }finally{serial.requestPort=requestPort}
+ }
  captured=null;w.open=()=>{throw Error('PDF request must use file sharing, not a text popup')};
  const canShare=Object.getOwnPropertyDescriptor(w.navigator,'canShare'),share=Object.getOwnPropertyDescriptor(w.navigator,'share');
  const set=(key,value)=>Object.defineProperty(w.navigator,key,{value,configurable:true});

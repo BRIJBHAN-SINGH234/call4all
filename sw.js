@@ -8,7 +8,7 @@
  *   - GitHub API calls:  network-only (sensitive, never cache)
  */
 
-const CACHE_VERSION = 'v37-2026-11-24-billing-workspace';
+const CACHE_VERSION = 'v38-2026-11-24-billing-progress';
 const STATIC_CACHE = 'c4a-static-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'c4a-runtime-' + CACHE_VERSION;
 
@@ -46,19 +46,19 @@ const PRECACHE_URLS = [
   '/staff-manifest.json'
   ,'/billing-workspace.html'
   ,'/billing-workspace-manifest.json'
-  ,'/assets/css/billing-workspace.css'
+  ,'/assets/css/billing-workspace.css?v=20261124-2'
   ,'/assets/js/billing-csv.js?v=20261124-1'
   ,'/assets/js/billing-api.js'
   ,'/assets/js/billing-invoice.js?v=20261124-1'
-  ,'/assets/js/billing-workspace.js?v=20261124-1'
+  ,'/assets/js/billing-workspace.js?v=20261124-2'
   ,'/assets/vendor/jspdf-4.2.1.umd.min.js'
   ,'/assets/vendor/invoice-font.js'
   ,'/data/billing-config.json'
   ,'/food-billing.html'
   ,'/food-billing-manifest.json'
   ,'/assets/css/food-billing.css'
-  ,'/assets/js/food-billing.js?v=20261119-1'
-  ,'/assets/js/billing-printer.js'
+  ,'/assets/js/food-billing.js?v=20261124-2'
+  ,'/assets/js/billing-printer.js?v=20261124-2'
   ,'/data/food-menu.csv'
   ,'/data/billing-users.csv'
 ];
